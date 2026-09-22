@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocab Trainer · 闯关训练</title>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--card2:#273549;--accent:#38bdf8;--good:#22c55e;--bad:#ef4444;--txt:#e2e8f0;--dim:#94a3b8;--gold:#fbbf24;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:linear-gradient(160deg,#0f172a 0%,#1e1b4b 100%);color:var(--txt);min-height:100vh;padding:16px;}
+.wrap{max-width:820px;margin:0 auto;}
+header{text-align:center;padding:18px 0 10px;position:relative;}
+.back-home{position:absolute;left:0;top:18px;text-decoration:none;color:var(--dim);font-size:.85rem;padding:6px 12px;border:1px solid #475569;border-radius:8px;background:rgba(30,41,59,.6);transition:all .2s;}
+.back-home:hover{color:var(--accent);border-color:var(--accent);}
+h1{font-size:1.5rem;letter-spacing:1px;}
+.sub{color:var(--dim);font-size:.82rem;margin-top:6px;}
+.bar{height:10px;background:#334155;border-radius:99px;overflow:hidden;margin:14px 0 4px;}
+.bar>i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#818cf8);transition:width .35s ease;border-radius:99px;}
+.barmeta{display:flex;justify-content:space-between;font-size:.75rem;color:var(--dim);margin-bottom:12px;}
+.card{background:var(--card);border:1px solid #334155;border-radius:16px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.35);}
+.leveltag{display:inline-block;font-size:.72rem;color:var(--accent);border:1px solid var(--accent);border-radius:99px;padding:2px 12px;margin-bottom:14px;}
+.sent{font-size:1.08rem;line-height:1.85;margin-bottom:6px;}
+.blank{color:var(--gold);font-weight:700;border-bottom:2px dashed var(--gold);padding:0 6px;}
+.src{font-size:.72rem;color:var(--dim);margin-bottom:10px;}
+.ctxbox{background:rgba(56,189,248,.06);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:16px;font-size:.86rem;line-height:1.7;color:#cbd5e1;}
+.ctxbox b{color:var(--accent);font-size:.75rem;display:block;margin-bottom:4px;}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px;}
+.opts button{background:var(--card2);border:1px solid #3b4a63;color:var(--txt);border-radius:10px;padding:12px;font-size:.95rem;cursor:pointer;transition:all .15s;text-align:left;}
+.opts button:hover:not(:disabled){border-color:var(--accent);transform:translateY(-1px);}
+.opts button:disabled{cursor:default;opacity:.75;}
+.opts button.correct{background:rgba(34,197,94,.18);border-color:var(--good);color:#86efac;}
+.opts button.wrong{background:rgba(239,68,68,.18);border-color:var(--bad);color:#fca5a5;}
+.feedback{margin-top:14px;padding:12px 14px;border-radius:10px;font-size:.88rem;line-height:1.7;display:none;}
+.feedback.ok{display:block;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.4);}
+.feedback.no{display:block;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);}
+.mean{color:#c4b5fd;}
+.trans{color:var(--dim);}
+.tools{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+.tools button{flex:1;min-width:120px;background:#0ea5e9;border:none;color:#082f49;font-weight:700;border-radius:10px;padding:11px;cursor:pointer;font-size:.9rem;}
+.tools button.ghost{background:transparent;border:1px solid #475569;color:var(--dim);font-weight:400;}
+.hidden{display:none!important;}
+.result{text-align:center;padding:40px 10px;}
+.result .big{font-size:2.4rem;margin-bottom:8px;}
+.wronglist{margin-top:18px;text-align:left;font-size:.85rem;color:var(--dim);max-height:260px;overflow:auto;}
+.wronglist div{padding:6px 0;border-bottom:1px dashed #334155;}
+footer{margin-top:18px;text-align:center;color:#64748b;font-size:.72rem;line-height:1.8;}
+@media(max-width:560px){.opts{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<a href="index.html" class="back-home" title="返回首页">← 首页</a>
+<h1>📚 词汇闯关训练</h1>
+<div class="sub" id="setSub">例句来自真实出版物 / 新闻媒体 / 词典语料库</div>
+</header>
+<div class="bar"><i id="barfill"></i></div>
+<div class="barmeta"><span id="pos"></span><span id="score"></span></div>
+<div id="quiz" class="card"><div style="text-align:center;color:var(--dim);padding:40px 0">加载中…</div></div>
+<footer>每题含目标句 + 英文释义提示 · 来源标注于题下 · 中文翻译可隐藏/显示 · 答错题自动进入通关后重练</footer>
+</div>
+<script>
+const params = new URLSearchParams(location.search);
+const setId = params.get('id');
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+// Load set from backend (with auth check)
+(async function init(){
+  if(!setId){
+    document.getElementById('quiz').innerHTML = '<div class="result"><div class="big">⚠️</div><p style="color:var(--dim)">缺少词集 ID</p><p style="margin-top:14px"><a href="index.html" style="color:var(--accent)">← 返回首页</a></p></div>';
+    return;
+  }
+  try {
+    const setsRes = await fetch('/api/sets');
+    if(!setsRes.ok){ location.href = 'login.html'; return; }
+    const sets = await setsRes.json();
+    const set = sets[setId];
+    if(!set){
+      document.getElementById('quiz').innerHTML = '<div class="result"><div class="big">⚠️</div><p style="color:var(--dim)">找不到这个词集，可能已被删除。</p><p style="margin-top:14px"><a href="index.html" style="color:var(--accent)">← 返回首页</a></p></div>';
+      return;
+    }
+    startQuiz(set);
+  } catch(e) {
+    location.href = 'login.html';
+  }
+})();
+
+// Save progress to backend (replaces localStorage saveSets)
+function saveSets(sets){
+  const s = sets[setId];
+  if(!s) return;
+  fetch('/api/sets/'+encodeURIComponent(setId)+'/progress', {
+    method:'PUT', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      mastered: s.mastered || [],
+      wrong: s.wrong || [],
+      pos: s.pos || 0,
+      order: s.order || []
+    })
+  }).catch(()=>{});
+}
+function loadSets(){ return { [setId]: window._currentSet || {} }; }
+
+function startQuiz(set){
+  // Normalize items to reference format: w, m, s, src, t, en
+  const DATA = set.items
+    .filter(it => it.word && !/[\u4e00-\u9fff]/.test(it.word)) // skip entries where word is Chinese
+    .filter(it => it.def && /[\u4e00-\u9fff]/.test(it.def))     // skip entries where def has no CJK (e.g. def="54")
+    .map(it=>({
+      w: it.word,
+      m: it.def || '',
+      s: it.sentence || '',
+      src: it.src || '',
+      t: it.translation || '',
+      en: it.englishDef || ''
+    }));
+  document.getElementById('setSub').textContent = set.name + ' · 共 ' + DATA.length + ' 词';
+
+  const LEVEL = 10;
+  const IRREG = {};
+  let order = shuffle([...Array(DATA.length).keys()]);
+  let pos = 0, correct = 0, wrongPool = [], answered = false, showDef = false;
+  let curOpts = [];
+  let masteredSet = new Set();
+  let wrongSet = new Set();
+
+  // Load saved progress for this set (mastered/wrong words + quiz position)
+  function loadProgress() {
+    masteredSet = new Set(set.mastered || []);
+    wrongSet = new Set(set.wrong || []);
+    if (typeof set.pos === 'number' && set.pos < DATA.length) {
+      pos = set.pos;
+    }
+    if (Array.isArray(set.order) && set.order.length === DATA.length) {
+      order = set.order;
+    }
+  }
+  // Save progress after each answer (mastered/wrong + current position) to backend
+  function saveProgress() {
+    fetch('/api/sets/'+encodeURIComponent(set.id)+'/progress', {
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        mastered: Array.from(masteredSet),
+        wrong: Array.from(wrongSet),
+        pos: pos,
+        order: order
+      })
+    }).catch(()=>{});
+  }
+  loadProgress();
+  // Show resume indicator if continuing from saved position
+  if (pos > 0) {
+    const sub = document.getElementById('setSub');
+    sub.innerHTML = set.name + ' · 共 ' + DATA.length + ' 词' +
+      ' · <span style="color:var(--good)">⏯ 继续上次进度（第 ' + (pos+1) + ' 题，已掌握 ' + masteredSet.size + '）</span>';
+  }
+
+  function formsOf(w){
+    let f=[w, w+'s', w+'es', w+'ed', w+'ing'];
+    if(/e$/.test(w)){ f.push(w.slice(0,-1)+'ing', w.slice(0,-1)+'ed', w.slice(0,-1)+'d'); }
+    if(w.indexOf(' ')>=0){ f=[w]; }
+    if(IRREG[w]) f=f.concat(IRREG[w]);
+    return f;
+  }
+  function blankSentence(item){
+    if(!item.s) return {html:esc(item.m||''), hit:false};
+    // Case 1: sentence is already pre-blanked (contains _______) — style the blank
+    if(/_{3,}/.test(item.s)){
+      const html = esc(item.s).replace(/_{3,}/g,'<span class="blank">＿＿＿</span>');
+      return {html, hit:true};
+    }
+    // Case 2: sentence contains the actual word — replace it (and inflected forms) with blank
+    const fs = formsOf(item.w).sort((a,b)=>b.length-a.length).map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
+    const re = new RegExp('\\b('+fs.join('|')+')\\b','i');
+    const m = item.s.match(re);
+    if(!m) return {html:esc(item.s), hit:false};
+    return {html:esc(item.s).replace(esc(m[1]),'<span class="blank">＿＿＿</span>'), hit:true};
+  }
+  function distractors(item){
+    const pool = DATA.filter((d,i)=>d.w!==item.w);
+    return shuffle(pool).slice(0,3).map(d=>d.w);
+  }
+  function updateMeta(){
+    document.getElementById('barfill').style.width = (pos/DATA.length*100)+'%';
+    document.getElementById('pos').textContent = '第 ' + Math.min(pos+1,DATA.length) + ' / ' + DATA.length + ' 题';
+    document.getElementById('score').textContent = '已掌握 ' + masteredSet.size + ' · 错题 ' + wrongSet.size + ' · 本轮答对 ' + correct;
+  }
+  function render(){
+    if(pos>=order.length){return finish();}
+    answered=false; showDef=false;
+    const item = DATA[order[pos]];
+    const b = blankSentence(item);
+    const opts = shuffle([item.w, ...distractors(item)]);
+    curOpts = opts;
+    const lvl = Math.floor(pos/LEVEL)+1, totalInLvl = Math.min(LEVEL, DATA.length-(lvl-1)*LEVEL), inLvl = pos%LEVEL+1;
+    document.getElementById('quiz').innerHTML =
+      '<span class="leveltag">第 '+lvl+' 关 · '+inLvl+'/'+totalInLvl+'</span>'+
+      '<div class="sent">'+(b.hit?b.html:'选出与下列释义对应的单词：<br><span style="color:var(--gold)">'+esc(item.m)+'</span>')+'</div>'+
+      (item.t?'<div class="trans" style="margin-top:8px;font-size:.92rem;line-height:1.7;color:#94a3b8">🌐 '+esc(item.t)+'</div>':'')+
+      (item.src?'<div class="src">📰 目标句出处：'+esc(item.src)+'</div>':'')+
+      '<div class="opts">'+opts.map(o=>'<button data-w="'+esc(o)+'">'+esc(o)+'</button>').join('')+'</div>'+
+      '<div class="feedback" id="fb"></div>'+
+      '<div class="tools">'+
+        '<button class="ghost" id="tglDef">📖 显示答案释义</button>'+
+        '<button id="next" class="hidden">下一题 ➜</button>'+
+      '</div>'+
+      '<div id="defBox" class="hidden" style="margin-top:14px;font-size:.9rem;line-height:1.8;color:#cbd5e1">📖 答案释义：'+esc(item.m)+'</div>';
+    document.querySelectorAll('.opts button').forEach(btn=>btn.onclick=()=>pick(btn,item));
+    document.getElementById('tglDef').onclick = toggleDef;
+    document.getElementById('next').onclick = ()=>{pos++; saveProgress(); updateMeta(); render();};
+    updateMeta();
+  }
+  function toggleDef(){
+    showDef=!showDef;
+    document.getElementById('defBox').classList.toggle('hidden',!showDef);
+    document.getElementById('tglDef').textContent = showDef?'🙈 隐藏答案释义':'📖 显示答案释义';
+  }
+  function pick(btn, item){
+    if(answered) return;
+    answered=true;
+    const ok = btn.dataset.w===item.w;
+    const idx = order[pos];
+    document.querySelectorAll('.opts button').forEach(b=>{b.disabled=true; if(b.dataset.w===item.w) b.classList.add('correct');});
+    const fb=document.getElementById('fb');
+    if(!ok){btn.classList.add('wrong'); wrongPool.push(idx); wrongSet.add(idx); masteredSet.delete(idx);}
+    else { correct++; masteredSet.add(idx); wrongSet.delete(idx); }
+    saveProgress(); // save per-question progress
+    fb.className='feedback '+(ok?'ok':'no');
+    fb.innerHTML = (ok?'✅ 正确！　':'❌ 你选的是 <b>'+esc(btn.dataset.w)+'</b>　')
+      + '<div style="margin-top:6px;color:#cbd5e1">📖 '+esc(item.w)+'　'+esc(item.m)+'</div>'
+      + '<div style="margin-top:12px;font-size:.83rem"><b style="color:var(--accent)">🔍 选项解析（全部选项释义）</b>'
+      + curOpts.map(o=>{const d=DATA.find(x=>x.w===o);
+          const mark = (o===item.w)?' <span style="color:var(--good)">✔ 正确</span>':(o===btn.dataset.w?' <span style="color:var(--bad)">✗ 你选的</span>':'');
+          return '<div style="padding:6px 0;border-bottom:1px dashed #334155">▸ <b>'+esc(o)+'</b>'+mark
+            +'<div style="margin-top:3px"><span style="color:var(--dim)">中文：</span><span class="mean">'+esc(d.m||'-')+'</span></div>'
+            +'<div style="margin-top:2px"><span style="color:var(--dim)">英文：</span><span class="trans">'+esc(d.en||'-')+'</span></div></div>';}).join('')
+      + '</div>';
+    if(!showDef){showDef=true;toggleDef();}
+    document.getElementById('next').classList.remove('hidden');
+    updateMeta();
+  }
+  function finish(){
+    saveProgress();
+    document.getElementById('barfill').style.width='100%';
+    const mastered = masteredSet.size;
+    const wrong = wrongSet.size;
+    const perfect = wrong === 0 && mastered === DATA.length;
+    let html = '<div class="result"><div class="big">'+(perfect?'🏆':'🎉')+'</div>'+
+      '<h2>'+(perfect?'全部掌握！':'本轮完成！')+'</h2>'+
+      '<p style="margin-top:10px;color:var(--dim)">共 '+DATA.length+' 词 · 已掌握 '+mastered+' · 错题 '+wrong+'</p>';
+    if(wrong>0){
+      html += '<div class="wronglist"><b>📌 错题回顾</b>';
+      Array.from(wrongSet).forEach(i=>{const d=DATA[i];
+        html+='<div>▸ <b style="color:#fca5a5">'+esc(d.w)+'</b>　<span class="mean">'+esc(d.m)+'</span>'+(d.s?'<br><span class="trans">'+esc(d.s)+'</span>':'')+'</div>';});
+      html+='</div><div class="tools" style="margin-top:20px"><button id="retry">🔁 重练错题</button></div>';
+    }
+    html+='<div class="tools" style="margin-top:20px;justify-content:center"><a href="index.html" class="ghost" style="background:transparent;border:1px solid #475569;color:var(--dim);text-decoration:none;padding:11px 18px;border-radius:10px">← 返回首页</a></div></div>';
+    document.getElementById('quiz').innerHTML=html;
+    const r=document.getElementById('retry');
+    if(r) r.onclick=()=>{order=shuffle(Array.from(wrongSet));pos=0;wrongPool=[];correct=0;updateMeta();render();};
+  }
+  // Keyboard shortcuts: Enter → next question (after answering), 1-4 → pick option
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' && answered){
+      const nxt = document.getElementById('next');
+      if(nxt && !nxt.classList.contains('hidden')){ e.preventDefault(); nxt.click(); }
+    } else if(['1','2','3','4'].includes(e.key) && !answered){
+      const btns = document.querySelectorAll('.opts button');
+      const idx = parseInt(e.key)-1;
+      if(btns[idx]){ e.preventDefault(); btns[idx].click(); }
+    }
+  });
+  updateMeta(); render();
+}
+</script>
+</body>
+</html>

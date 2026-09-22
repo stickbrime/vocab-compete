@@ -1,0 +1,802 @@
+[
+  {
+    "word": "allegiance",
+    "def": "n. 效忠，忠诚；忠贞",
+    "sentence": "Before Sept. 11 became an argument about war, security, patriotism or political _______, it was an encounter with human vulnerability and then human resilience.",
+    "translation": "在9月11日之前，这是一场关于战争、安全、爱国主义或政治忠诚的争论，这是一场与人类脆弱性的遭遇，然后是人类复原力的遭遇。",
+    "src": "From Salon ● Sep. 8, 2026",
+    "englishDef": "[Noun] Loyalty or commitment to a cause, group, nation or of a subordinate to a superior."
+  },
+  {
+    "word": "mincing",
+    "def": "adj. 装腔作势的；矫饰的",
+    "sentence": "\"Over to you Keir,\" says a senior minister, not _______ his words.",
+    "translation": "“交给你了，基尔，”一位高级大臣说，没有贬低他的话。",
+    "src": "From BBC ● May 9, 2026",
+    "englishDef": "[Adjective] Affectedly dainty."
+  },
+  {
+    "word": "problematic",
+    "def": "adj. 问题的；有疑问的；不确定的",
+    "sentence": "“NYC 93” is about the celebratory chaos of band life in the early ’90s, “The Long Goodbye” addresses the horrors of dementia, and the title track is about closure, whether positive or _______ .",
+    "translation": "“NYC 93”讲述了90年代初乐队生活的庆祝混乱， “漫长的告别”讲述了痴呆症的恐怖，标题曲是关于关闭，无论是积极的还是有问题的。",
+    "src": "From Los Angeles Times ● Sep. 17, 2026",
+    "englishDef": "[Adjective] Posing a problem; having or suffering from problem(s):\nDifficult to overcome, solve, or decide.\n\nNot settled, uncertain, of uncertain outcome; debatable, questionable, open to doubt."
+  },
+  {
+    "word": "ravel",
+    "def": "vt. 解开（线圈等）；弄清 vi. 使更复杂 n. 纠结，纠缠",
+    "sentence": "“Hence, _______; a tool that does the fiddly nesting together of details and summary tags for you.”",
+    "translation": "“因此， RAVL是一个工具，可以将细节和摘要标签巧妙地嵌套在一起。”",
+    "src": "From The Verge ● Aug. 3, 2022",
+    "englishDef": "[Verb] \nTo entwine or tangle (something) confusedly; to entangle."
+  },
+  {
+    "word": "tender",
+    "def": "adj. 温柔的；（食物）柔软的；疼痛的 vt. 提议 n. 投标",
+    "sentence": "Tatiana, the Afro-Caribbean restaurant at New York’s Lincoln Center, is one of the toughest reservations in the city, thanks in part to dishes like _______ Wagyu short rib and head-on shrimp drenched in Creole butter.",
+    "translation": "纽约林肯中心（ Lincoln Center ）的Tatiana餐厅是该市最难预订的餐厅之一，这在一定程度上要归功于嫩和牛短排和克里奥尔黄油正面虾等菜肴。",
+    "src": "From The Wall Street Journal ● Sep. 20, 2026",
+    "englishDef": "[Adjective] Sensitive or painful to the touch."
+  },
+  {
+    "word": "title",
+    "def": "n. 冠军；标题；头衔；权利 vt. 加标题于；赋予头衔",
+    "sentence": "Eccles said he hoped to defend his _______ next year and that he planned to continue gurning \"until the day I can't do it anymore\".",
+    "translation": "埃克尔斯说，他希望明年能够捍卫自己的头衔，并计划继续“直到我再也做不到的那一天”。",
+    "src": "From BBC ● Sep. 21, 2026",
+    "englishDef": "[Noun] The name of a film, musical piece, painting, or other work of art."
+  },
+  {
+    "word": "derogatory",
+    "def": "adj. 贬低的，不敬的，持批评态度的",
+    "sentence": "What’s even more frustrating is that, when it was first announced, the Met said the exhibition would address the _______ conduct that fundamentally altered Galliano’s career and reception.",
+    "translation": "更令人沮丧的是，当它首次宣布时，大都会表示展览将解决从根本上改变加利亚诺职业生涯和接待的贬损行为。",
+    "src": "From Salon ● Sep. 5, 2026",
+    "englishDef": "[Adjective] Disparaging."
+  },
+  {
+    "word": "recrimination",
+    "def": "n. 反责，反控；（互相）指责",
+    "sentence": "This matter calls for sober deliberation with a minimum of partisanship and _______ .",
+    "translation": "这件事需要冷静的审议，尽量减少党派偏见和指责。",
+    "src": "From The Wall Street Journal ● Mar. 31, 2026",
+    "englishDef": "[Noun] The act of recriminating."
+  },
+  {
+    "word": "distinction",
+    "def": "n. 区别；差别；特性；荣誉、勋章",
+    "sentence": "The record of the 2005 San Diego Padres, the worst squad ever to qualify for the MLB playoffs in an uninterrupted season—a dubious _______ that could fall this year.",
+    "translation": "2005年圣地亚哥教士队的纪录，是有史以来最差的球队，在不间断的赛季中获得美国职业棒球大联盟季后赛的资格-今年可能会出现令人怀疑的区别。",
+    "src": "From The Wall Street Journal ● Sep. 19, 2026",
+    "englishDef": "[Noun] That which distinguishes; a single occurrence of a determining factor or feature, the fact of being divided; separation, discrimination."
+  },
+  {
+    "word": "woe",
+    "def": "n. 困难，灾难；痛苦，悲伤 int. 唉",
+    "sentence": "Even Jon Bernthal’s Punisher, an occasional ally to Spider-Man, embraces the _______ .",
+    "translation": "即使Jon Bernthal的惩罚者，偶尔也是蜘蛛侠的盟友，也会拥抱悲惨局面。",
+    "src": "From The Wall Street Journal ● Jul. 30, 2026",
+    "englishDef": "[Noun] Great sadness or distress; a misfortune causing such sadness."
+  },
+  {
+    "word": "perpetrate",
+    "def": "vt. 犯（罪）；做（恶）",
+    "sentence": "Amodei’s main concern, he wrote in the letter, was the risk of authoritarian governments catching up with the U.S. in AI “to achieve permanent military superiority or _______ incredibly deep repression of their own people.”",
+    "translation": "他在信中写道， Amodei的主要担忧是专制政府在人工智能领域赶上美国的风险， “以实现永久的军事优势或对本国人民进行令人难以置信的深度镇压。”",
+    "src": "From The Wall Street Journal ● Jul. 29, 2026",
+    "englishDef": "[Verb]  To be guilty of, or responsible for a crime etc; to commit."
+  },
+  {
+    "word": "warranty",
+    "def": "n. 保证；担保；授权；理由",
+    "sentence": "JLR had indicated at the time that it would make the savings through cuts in areas such as materials, _______ and fixed costs.",
+    "translation": "捷豹路虎当时表示，它将通过削减材料、保修和固定成本等领域来节省开支。",
+    "src": "From BBC ● Sep. 5, 2026",
+    "englishDef": "[Noun] A guarantee that a certain outcome or obligation will be fulfilled; security."
+  },
+  {
+    "word": "pretext",
+    "def": "n. 借口；托辞 vt. 以…为借口",
+    "sentence": "She believed they were duped by the daughter of ex-president Jacob Zuma under the _______ of attending a personal development course in Russia.",
+    "translation": "她认为他们被前总统雅各布·祖马的女儿以参加俄罗斯的个人发展课程为借口欺骗了。",
+    "src": "From Barron's ● Aug. 19, 2026",
+    "englishDef": "[Noun] A false, contrived, or assumed purpose or reason; a pretense."
+  },
+  {
+    "word": "ramble",
+    "def": "v. （在乡间）漫步，闲逛；漫谈 n. 漫步；长篇大论",
+    "sentence": "In plain language, that means he’s probably going to _______ late into the night about a bunch of baseless conspiracy theories.",
+    "translation": "用简单的语言来说，这意味着他可能会在深夜漫步，谈论一堆毫无根据的阴谋论。",
+    "src": "From Slate ● Jul. 16, 2026",
+    "englishDef": "[Noun] A leisurely stroll; a recreational walk in the countryside."
+  },
+  {
+    "word": "reiterate",
+    "def": "vt. 重申；反复地做",
+    "sentence": "Their mission, as Kirk would _______ at the top of each episode, was “to explore strange new worlds,” “seek out new life and new civilizations” and “boldly go where no man has gone before.”",
+    "translation": "正如柯克在每集的顶部所重申的那样，他们的任务是“探索陌生的新世界” ， “寻找新的生命和新的文明” ， “大胆地走向以前没有人去过的地方”。",
+    "src": "From Los Angeles Times ● Sep. 8, 2026",
+    "englishDef": "[Verb] To say or do (something) for a second time, such as for emphasis."
+  },
+  {
+    "word": "abstemious",
+    "def": "adj. 节约的，节省的；有节制的",
+    "sentence": "By 2014, she says, “the _______, incorruptible leader had become a louche, boorish one.”",
+    "translation": "她说，到2014年， “这位节制、廉洁的领导者已经变成了一个笨拙、粗鲁的领导者。”",
+    "src": "From The Wall Street Journal ● Apr. 30, 2026",
+    "englishDef": "[Adjective] Refraining from freely consuming food or strong drink; sparing in diet; abstinent, temperate. .mw-parser-output .defdate{font-size:smaller}"
+  },
+  {
+    "word": "founder",
+    "def": "n. 创立者，创办者 v. 失败；（船）沉没；蹒跚",
+    "sentence": "“All the girls want to bring their boyfriends and husbands,” said Laura Wilson, _______ of Natural Pilates, a studio in Los Angeles and New York.",
+    "translation": "洛杉矶和纽约的自然普拉提工作室创始人劳拉·威尔逊（ Laura Wilson ）说： “所有的女孩都想带上她们的男朋友和丈夫。”",
+    "src": "From The Wall Street Journal ● Sep. 21, 2026",
+    "englishDef": "[Noun] One who founds or establishes (a company, project, organisation, state, etc.)."
+  },
+  {
+    "word": "detraction",
+    "def": "n. 诽谤；减损",
+    "sentence": "For the Logan community the charter has long been an unwanted _______ from their efforts.",
+    "translation": "对于洛根社区来说，该宪章长期以来一直是他们努力的不必要的减损。",
+    "src": "From Los Angeles Times ● Oct. 16, 2025",
+    "englishDef": "[Noun] The act of detracting something, or something detracted; taking away; diminution."
+  },
+  {
+    "word": "zephyr",
+    "def": "n. 和风；西风；轻薄织物",
+    "sentence": "Indulge yourself with handcrafted, artisanal, small-batch chocolates, including yuzu pâte de fruit, sesame crunch, honey ganache and cinnamon _______ ganache flavors.",
+    "translation": "尽情享用手工制作、手工制作的小批量巧克力，包括柚子、芝麻、蜂蜜和肉桂口味。",
+    "src": "From Seattle Times ● Nov. 16, 2023",
+    "englishDef": "[Noun] A light wind from the west."
+  },
+  {
+    "word": "rebuff",
+    "def": "n. 断然拒绝；回绝 vt. 断然拒绝",
+    "sentence": "On July 28, 2020, George Stephanopoulos interviewed Dr. Fauci on ABC’s “Good Morning America,” and the host offered an easy opening for Dr. Fauci to _______ criticism by President Trump.",
+    "translation": "2020年7月28日， George Stephanopoulos在美国广播公司的“早安美国”节目中采访了Fauci博士，主持人为Fauci博士提供了一个轻松的开场白，以拒绝特朗普总统的批评。",
+    "src": "From The Wall Street Journal ● Jul. 29, 2026",
+    "englishDef": "[Noun] A sudden resistance or refusal."
+  },
+  {
+    "word": "chastise",
+    "def": "vt. 惩罚；严惩；责骂",
+    "sentence": "Pete and Viv _______ Corey about his wayward ways—for example, his failure to show up at their mother’s funeral.",
+    "translation": "皮特和薇薇责备科里任性的举动--例如，他没有出现在他们母亲的葬礼上。",
+    "src": "From The Wall Street Journal ● Aug. 14, 2026",
+    "englishDef": "[Verb] To punish, especially by corporal punishment."
+  },
+  {
+    "word": "marked",
+    "def": "adj. 显著的；有记号的 v. 表示；作记号",
+    "sentence": "That _______ both the end of Skubal’s start and the beginning of the Dodgers’ offensive onslaught.",
+    "translation": "这标志着斯库巴的开局和道奇进攻的开始。",
+    "src": "From Los Angeles Times ● Sep. 20, 2026",
+    "englishDef": "[Adjective] Having a visible or identifying mark."
+  },
+  {
+    "word": "frigid",
+    "def": "adj. 寒冷的，严寒的；冷淡的",
+    "sentence": "But on that day, the Wolverines’ punter could almost be forgiven for fumbling a long snap that came spiraling toward him in _______ autumn conditions.",
+    "translation": "但在那一天，狼獾的下注者几乎可以原谅，因为他在寒冷的秋季条件下摸索了一个长长的啪啪声。",
+    "src": "From The Wall Street Journal ● Sep. 20, 2026",
+    "englishDef": "[Adjective] Very cold; lacking warmth; icy."
+  },
+  {
+    "word": "impassive",
+    "def": "adj. 冷漠的；无感觉的",
+    "sentence": "Her face remained _______ even as tears formed and began to travel down her cheek.",
+    "translation": "她的脸仍然无动于衷，即使眼泪形成，开始流下她的脸颊。",
+    "src": "From Los Angeles Times ● May 24, 2026",
+    "englishDef": "[Adjective] Having, or revealing, no emotion."
+  },
+  {
+    "word": "schism",
+    "def": "n. 分裂；分裂教会罪",
+    "sentence": "You could ache for the cozy city of the past in “The Royal Tenenbaums” or grabble with the _______ of everything suddenly feeling different in “Mulholland Drive.”",
+    "translation": "您可以在「皇家特嫩鲍姆（ The Royal Tenenbaums ）」中为过去的舒适城市感到痛苦，也可以在「穆赫兰大道（ Mulholland Drive ）」中抓住一切突然感觉不同的分裂。",
+    "src": "From Los Angeles Times ● Sep. 11, 2026",
+    "englishDef": "[Noun] A split or separation within a group or organization, typically caused by discord."
+  },
+  {
+    "word": "liquidate",
+    "def": "vt. 清算；偿付；消除 vi. 清算；清理债务",
+    "sentence": "The government initially took control of SSUK, previously part of Liberty Steel, last year after it was forced to _______ by the High Court.",
+    "translation": "去年，在高等法院被迫清算后，政府最初控制了SSUK ，后者以前是Liberty Steel的一部分。",
+    "src": "From BBC ● Sep. 14, 2026",
+    "englishDef": "[Verb] Synonym of liquefy (“to make (something) into a liquid”); to liquidize. To make (a sound) less harsh. To use up (money or other assets) wastefully; to dissipate, to squander, to waste. To kill (someone), usually violently, and especially for some ideological or political aim; to assassinate, to murder; also, to abolish or eliminate (something); to do away with, to put an end to."
+  },
+  {
+    "word": "prosaic",
+    "def": "adj. 平凡的，乏味的；散文体的",
+    "sentence": "But there are other, more _______, unintended consequences to consider too.",
+    "translation": "但还有其他更平淡无奇的意外后果需要考虑。",
+    "src": "From BBC ● Jun. 20, 2026",
+    "englishDef": "[Adjective] Pertaining to or having the characteristics of prose."
+  },
+  {
+    "word": "swarm",
+    "def": "n. 一大群；蜂群；人群 v. 成群来回移动；蜂拥而至",
+    "sentence": "Two weeks after a _______ of AI agents broke out of containment at OpenAI to hack the company Hugging Face, the ChatGPT maker learned about another AI-powered intrusion—and this time it was the target.",
+    "translation": "两周后，一群人工智能特工从OpenAI的遏制中爆发，入侵了Hugging Face公司， ChatGPT制造商了解到另一个人工智能驱动的入侵-这次是目标。",
+    "src": "From The Wall Street Journal ● Sep. 18, 2026",
+    "englishDef": "[Noun] A large number of insects or other bugs (e.g. centipedes), especially when in motion or (for bees) migrating to a new colony."
+  },
+  {
+    "word": "abominable",
+    "def": "adj. 讨厌的；令人憎恶的；糟透的",
+    "sentence": "She said her party was pushing for a \"diplomatic resolution of this _______ war\".",
+    "translation": "她说，她的政党正在推动“通过外交途径解决这场令人憎恶的战争”。",
+    "src": "From Barron's ● Sep. 4, 2026",
+    "englishDef": "[Adjective] Worthy of, or causing, abhorrence, as a thing of evil omen; odious in the utmost degree; very hateful; detestable; loathsome; execrable. .mw-parser-output .defdate{font-size:smaller}"
+  },
+  {
+    "word": "irrational",
+    "def": "adj. 不合理的；无理性的；荒谬的 n. 无理数",
+    "sentence": "Keeping a collection of arbitrary objects may be _______ .",
+    "translation": "保留任意对象的集合可能是不合理的。",
+    "src": "From The Wall Street Journal ● Sep. 11, 2026",
+    "englishDef": "[Adjective] Not rational; unfounded, nonsensical or wrong-headed."
+  },
+  {
+    "word": "preeminent",
+    "def": "adj. 卓越的；超群的",
+    "sentence": "Claire McNear, America’s _______ Jeopardy! reporter, did a deep dive into the beloved event—which disappeared after Trebek’s death—and got some news about its future.",
+    "translation": "美国杰出的《危险边缘！》记者克莱尔·麦克尼尔（ Claire McNear ）深入研究了这个在特雷贝克去世后消失的可爱事件，并获得了一些关于其未来的消息。",
+    "src": "From Slate ● Sep. 14, 2026",
+    "englishDef": "[Adjective] Exceeding others in quality or rank; of outstanding excellence, extremely notable or important. .mw-parser-output .defdate{font-size:smaller}"
+  },
+  {
+    "word": "geniality",
+    "def": "n. 亲切；温暖；舒适",
+    "sentence": "Elsewhere she defined the term as “this mixture of _______ and sentiment stuck together with a sticky slime of calf’s-foot jelly.”",
+    "translation": "在其他地方，她将这个术语定义为“这种和蔼可亲和情感的混合物与一团粘稠的小腿果冻粘在一起。”",
+    "src": "From Salon ● Apr. 19, 2026",
+    "englishDef": "[Noun] The quality of being genial; friendly cheerfulness; warmth of disposition and manners."
+  },
+  {
+    "word": "pan",
+    "def": "n. 平底锅；秤盘 v. 淘金；严厉批评",
+    "sentence": "Watch the mushrooms more than the clock; a mix containing oyster mushrooms behaves differently than a _______ full of white buttons.",
+    "translation": "观看蘑菇多于观看时钟；含有牡蛎蘑菇的混合物的行为与装满白色纽扣的平底锅不同。",
+    "src": "From Salon ● Sep. 14, 2026",
+    "englishDef": "[Noun] A wide, flat receptacle used around the house, especially for cooking."
+  },
+  {
+    "word": "natty",
+    "def": "adj. 整洁的；敏捷的；考虑周到的",
+    "sentence": "One simple rule: “Read the room,” says Tim Gunn, the _______ fashion author and academic best known for his tenure on “Project Runway,” the reality show.",
+    "translation": "一个简单的规则： “阅读房间，”蒂姆·冈恩（ Tim Gunn ）说，他是一位时髦的时尚作家和学者，以其在真人秀节目“Project Runway”中的任期而闻名。",
+    "src": "From The Wall Street Journal ● Aug. 6, 2026",
+    "englishDef": "[Adjective] Smart and fashionable."
+  },
+  {
+    "word": "dispirited",
+    "def": "adj. 沮丧的；没有精神的；意气消沉的",
+    "sentence": "Its cast includes the bickering members of a Sri Lankan hotel cleaner’s family, insecure American freshmen, dead-end third-tier college professors and their highflying Ivy League counterparts and _______ university functionaries.",
+    "translation": "它的演员阵容包括斯里兰卡酒店清洁工家庭的争吵成员，不安全的美国新生，死胡同三线大学教授和他们高飞的常春藤联盟同行和沮丧的大学工作人员。",
+    "src": "From The Wall Street Journal ● Sep. 2, 2026",
+    "englishDef": "[Verb] To lower the morale of; to make despondent; to dishearten."
+  },
+  {
+    "word": "maverick",
+    "def": "n. 持不同意见的人 adj. 未打烙印的；特立独行的",
+    "sentence": "United's freer approach has been praised by the _______ Fernandes, who saw a boost in his output following Carrick's appointment last season and was subsequently crowned Premier League Player of the Season.",
+    "translation": "曼联更自由的方式得到了特立独行的费尔南德斯的赞扬，他在上赛季卡里克被任命后看到了他的产出得到了提升，随后被加冕为本赛季的英超联赛球员。",
+    "src": "From BBC ● Sep. 13, 2026",
+    "englishDef": "[Adjective] Unbranded."
+  },
+  {
+    "word": "anecdote",
+    "def": "n. 轶事；奇闻；秘史",
+    "sentence": "Carney shared the _______ on Tuesday at the gathering of the global financial elite in Toronto where he was pitching Canada as an ideal place to invest.",
+    "translation": "卡尼周二在多伦多举行的全球金融精英聚会上分享了这则轶事，当时他正在宣传加拿大是一个理想的投资地点。",
+    "src": "From Barron's ● Sep. 15, 2026",
+    "englishDef": "[Noun] A short account of a real incident or person, often humorous or interesting."
+  },
+  {
+    "word": "impart",
+    "def": "vt. 告知，传授；透露，泄露；赋予",
+    "sentence": "Army leaders in Europe over recent years have taken advantage of having Ukrainian forces on hand to participate and _______ their hard-won skills to U.S. and allied troops in practice, on simulated battlefields.",
+    "translation": "近年来，欧洲的军队领导人利用乌克兰军队在模拟战场上参与并在实践中向美国和盟军传授他们来之不易的技能。",
+    "src": "From The Wall Street Journal ● Aug. 12, 2026",
+    "englishDef": "[Verb] To give or bestow (e.g. a quality or property)."
+  },
+  {
+    "word": "astral",
+    "def": "adj. 星的；星际的；精神世界的",
+    "sentence": "She claims that she and Charlie often spoke not just of politics but of more intimate matters, including shared, shall we say, spiritual capabilities—third eye, _______ projecting, that kind of thing.",
+    "translation": "她声称，她和查理经常不仅谈论政治，还谈论更亲密的事情，包括共同的，我们可以说，精神能力--第三只眼睛，星体投射，诸如此类的事情。",
+    "src": "From Slate ● Feb. 27, 2026",
+    "englishDef": "[Adjective] Relating to or resembling the stars; starry."
+  },
+  {
+    "word": "hindrance",
+    "def": "n. 障碍；妨碍；妨害；阻碍物",
+    "sentence": "I’m not certain being out of office will be all that great a _______ .",
+    "translation": "我不确定离开办公室会不会是一个很大的障碍。",
+    "src": "From Los Angeles Times ● Sep. 13, 2026",
+    "englishDef": "[Noun] Something which hinders: something that holds back or causes problems with something else."
+  },
+  {
+    "word": "nuance",
+    "def": "n. 细微差别",
+    "sentence": "Women, and especially mothers, are not cheering Clancy on, but are largely calling for some _______ and care.",
+    "translation": "女性，尤其是母亲，并没有为克兰西欢呼，而是在很大程度上呼吁一些细微差别和关怀。",
+    "src": "From Slate ● Sep. 5, 2026",
+    "englishDef": "[Noun] A minor distinction."
+  },
+  {
+    "word": "repudiate",
+    "def": "vt. 拒绝；否定；批判；与…断绝关系",
+    "sentence": "This signal turns to static if defendants are allowed to _______ allegations to which they just agreed “without admitting or denying” these very same allegations.",
+    "translation": "如果被告被允许否认他们刚刚同意的指控，而“不承认或否认”这些相同的指控，那么这个信号就会变成静止的。",
+    "src": "From MarketWatch ● Jun. 17, 2026",
+    "englishDef": "[Verb] To reject the truth or validity of; to deny."
+  },
+  {
+    "word": "theoretical",
+    "def": "adj. 理论的；理论上的；假设的；推理的",
+    "sentence": "Researchers have debated for decades whether the Qumran sect actually followed its unusual 364-day calendar or whether the system existed mainly as a religious and _______ ideal.",
+    "translation": "几十年来，研究人员一直在争论Qumran教派是否真的遵循其不寻常的364天日历，或者该系统是否主要作为宗教和理论理想存在。",
+    "src": "From Science Daily ● Sep. 20, 2026",
+    "englishDef": "[Adjective] Of or relating to theory; abstract; not empirical."
+  },
+  {
+    "word": "arraign",
+    "def": "vt. 传讯，控告；责难，指责",
+    "sentence": "O’Connor said federal law and rules of criminal procedure “require this Court to publicly _______ Boeing and permit the crime victims’ representatives to be heard at or in advance of the proceeding.”",
+    "translation": "奥康纳表示，联邦法律和刑事诉讼规则“要求本法院公开审讯波音公司，并允许在诉讼程序期间或之前听取犯罪受害者代表的意见。”",
+    "src": "From Washington Post ● Jan. 19, 2023",
+    "englishDef": "[Verb] To officially charge someone in a court of law."
+  },
+  {
+    "word": "insurgent",
+    "def": "adj. 叛乱的；起义的 n. 叛乱者；起义者",
+    "sentence": "Ethiopia has been manufacturing drones at two factories since last year and is now thought to have a fleet of thousands, analysts say, giving the government an edge against its multiple _______ enemies.",
+    "translation": "分析人士说，自去年以来，埃塞俄比亚一直在两家工厂生产无人机，现在被认为拥有数千架无人机，这使政府能够抵御多名叛乱分子的敌人。",
+    "src": "From Barron's ● Sep. 8, 2026",
+    "englishDef": "[Adjective] Rebellious, opposing authority."
+  },
+  {
+    "word": "gruff",
+    "def": "adj. 粗暴的；粗哑的；脾气坏的",
+    "sentence": "As Morrison jammed in the kitchen, Hansard said his request for one of his songs was met with a _______ response from Morrison.",
+    "translation": "当莫里森在厨房里卡住时，汉萨德说他要求他的一首歌得到了莫里森的粗暴回应。",
+    "src": "From BBC ● Jul. 30, 2026",
+    "englishDef": "[Adjective] having a rough, surly, and harsh demeanor and nature."
+  },
+  {
+    "word": "host",
+    "def": "n. 主机；主人；主持人；许多 vt. 主持",
+    "sentence": "Bharat and Jyoti met at a magic show in 1977 and became a double act, with their career leading them to meet King Charles and Princess Anne as well as a _______ of celebrities.",
+    "translation": "Bharat和Jyoti在1977年的一场魔术表演中相遇，并成为双重角色，他们的职业生涯引导他们与查尔斯国王和安妮公主以及众多名人见面。",
+    "src": "From BBC ● Sep. 20, 2026",
+    "englishDef": "[Noun] One which receives or entertains a guest, socially, commercially, or officially."
+  },
+  {
+    "word": "spontaneity",
+    "def": "n. 自发性；自然发生",
+    "sentence": "For Cami, a content creator and podcast host from Northampton, September spells the end of summer _______ and a time to restore order.",
+    "translation": "对于来自北安普敦的内容创作者兼播客主持人Cami来说， 9月意味着夏季自发性的结束和恢复秩序的时间。",
+    "src": "From BBC ● Sep. 13, 2026",
+    "englishDef": "[Noun] The quality of being spontaneous."
+  },
+  {
+    "word": "derivative",
+    "def": "n. 派生物；衍生物 adj. 模仿的；衍生的",
+    "sentence": "Still, he blends it all into his own vision so it doesn’t feel _______ .",
+    "translation": "尽管如此，他还是将这一切融入了自己的愿景中，因此感觉不到衍生品。",
+    "src": "From Los Angeles Times ● Sep. 18, 2026",
+    "englishDef": "[Adjective] Obtained by derivation; not radical, original, or fundamental."
+  },
+  {
+    "word": "subsidiary",
+    "def": "adj. 辅助的，次要的；附属的 n. 子公司",
+    "sentence": "The global brand has been a _______ of Nike since 2003.",
+    "translation": "该全球品牌自2003年以来一直是耐克的子公司。",
+    "src": "From BBC ● Sep. 19, 2026",
+    "englishDef": "[Adjective] Auxiliary or supplemental."
+  },
+  {
+    "word": "propound",
+    "def": "vt. 提出；提议；将…提供考虑",
+    "sentence": "\"And no matter what you may think, Mr. Kennedy. And I revere your name. You're not here to _______ your case for censorship,\" Connolly said.",
+    "translation": "“不管你怎么想，肯尼迪先生。我尊敬你的名字。你不是来这里为审查制度辩护的，”康诺利说。",
+    "src": "From Salon ● Jul. 20, 2023",
+    "englishDef": "[Verb] To put forward; to offer for discussion or debate."
+  },
+  {
+    "word": "convention",
+    "def": "n. 大会；惯例；约定；协定；习俗",
+    "sentence": "Inside, over the course of my three days at the _______, I met no bears within the predominantly male crowd.",
+    "translation": "在里面，在我参加大会的三天时间里，我在主要是男性的人群中没有遇到熊。",
+    "src": "From Slate ● Sep. 20, 2026",
+    "englishDef": "[Noun] A meeting or gathering."
+  },
+  {
+    "word": "personable",
+    "def": "adj. 品貌兼优的；英俊潇洒的；和蔼可亲的",
+    "sentence": "One memorable scene shows the wiry, _______ Hammer introducing a classroom of grade-schoolers to experimental film.",
+    "translation": "一个令人难忘的场景是，风度翩翩、风度翩翩的Hammer向小学生教室介绍实验电影。",
+    "src": "From Los Angeles Times ● Sep. 11, 2026",
+    "englishDef": "[Adjective] Of a person: having a pleasing appearance; attractive; handsome."
+  },
+  {
+    "word": "collate",
+    "def": "vt. 核对，校对；校勘",
+    "sentence": "She created and initially self-funded a \"Preventable Deaths Tracker\" - a system that aims to _______ the reports to stop similar deaths.",
+    "translation": "她创建了一个“可预防的死亡追踪器” ，并最初自筹资金-该系统旨在整理报告以阻止类似的死亡。",
+    "src": "From BBC ● Aug. 24, 2026",
+    "englishDef": "[Verb] To examine diverse documents and so on, to discover similarities and differences."
+  },
+  {
+    "word": "disparate",
+    "def": "adj. 不同的；不相干的；全异的",
+    "sentence": "Can you make sense of lots of _______ pieces of information?",
+    "translation": "你能理解许多不同的信息吗？",
+    "src": "From The Wall Street Journal ● Sep. 12, 2026",
+    "englishDef": "[Adjective] Composed of inherently different or distinct elements; incongruous."
+  },
+  {
+    "word": "matriculate",
+    "def": "vt. 准许…入学；录取…入大学 vi. 准许入学",
+    "sentence": "Seemingly, all the children of the Valley are being shuttled by their parents toward Stanford, where they will _______ by hook or by crook.",
+    "translation": "看来，山谷的所有孩子都被父母送往斯坦福大学，在那里他们将通过钩子或骗子入学。",
+    "src": "From Los Angeles Times ● Apr. 12, 2026",
+    "englishDef": "[Verb] To enroll as a member of a body, especially of a college or university."
+  },
+  {
+    "word": "ostentatious",
+    "def": "adj. 招摇的；卖弄的；夸耀的；铺张的",
+    "sentence": "The variety of goods is striking, ranging from the _______ - Lalique salt and pepper grinders priced at £2,618 - to the mundane, like Loctite super glue costing £3.50.",
+    "translation": "商品种类繁多，从炫耀性的Lalique盐辣椒研磨机（售价£ 2,618 ）到普通的乐泰超级胶水（售价£ 3.50 ） ，应有尽有。",
+    "src": "From BBC ● Jun. 1, 2026",
+    "englishDef": "[Adjective] Intended to attract notice; tawdry or showy display."
+  },
+  {
+    "word": "bluff",
+    "def": "n. 吓唬；绝壁；断崖 v. 吓唬 adj. 直率的；陡峭的",
+    "sentence": "Some interpreted the move as the market calling the Federal Reserve’s _______ .",
+    "translation": "一些人将这一举动解释为市场称之为美联储的虚张声势。",
+    "src": "From MarketWatch ● Aug. 3, 2026",
+    "englishDef": "[Noun] An act of bluffing; a false expression of the strength of one’s position in order to intimidate or deceive; braggadocio."
+  },
+  {
+    "word": "appropriate",
+    "def": "adj. 适当的；恰当的 vt. 占用，拨出",
+    "sentence": "That means that, for almost all of you, the _______ reaction to this week’s Fed’s rate hike decision is to sit on your hands.",
+    "translation": "这意味着，对于几乎所有人来说，对本周美联储加息决定的适当反应是坐视不管。",
+    "src": "From MarketWatch ● Sep. 18, 2026",
+    "englishDef": "[Verb] To take to oneself; to claim or use, especially as by an exclusive right."
+  },
+  {
+    "word": "outmoded",
+    "def": "adj. 过时的，不流行的",
+    "sentence": "Co-Chief Executive Ted Sarandos has previously called such releases “an _______ idea for most people” and said Netflix makes movies for people to watch on Netflix.",
+    "translation": "联合首席执行官泰德·萨兰多斯（ Ted Sarandos ）此前曾称此类发行“对大多数人来说是一个过时的想法” ，并表示Netflix制作电影供人们在Netflix上观看。",
+    "src": "From The Wall Street Journal ● May 1, 2026",
+    "englishDef": "[Adjective] Unfashionable."
+  },
+  {
+    "word": "gait",
+    "def": "n. 步法，步态 vt. 训练步法",
+    "sentence": "None of it amounts to a diagnosis, and analysts caution against reading too much into a stiff _______ .",
+    "translation": "这些都不等于诊断，分析师警告不要过度解读僵硬的步态。",
+    "src": "From The Wall Street Journal ● Sep. 18, 2026",
+    "englishDef": "[Noun] A manner of walking or stepping; a bearing or carriage while moving on legs."
+  },
+  {
+    "word": "comparable",
+    "def": "adj. 类似的，可比较的；同等的",
+    "sentence": "Despite generations of increasingly sophisticated experiments, the gravitational constant remains less precisely known than _______ constants associated with nature's other three fundamental forces: electromagnetism and the strong and weak nuclear forces.",
+    "translation": "尽管几代人进行了越来越复杂的实验，但与自然界的其他三种基本力（电磁力和强弱核力）相关的可比常数相比，引力常数仍然不那么精确。",
+    "src": "From Science Daily ● Sep. 20, 2026",
+    "englishDef": "[Adjective] Able to be compared (to)."
+  },
+  {
+    "word": "subsidy",
+    "def": "n. 补贴；津贴；补助金",
+    "sentence": "This regulatory _______ has prompted some California refineries to switch to producing renewable diesel.",
+    "translation": "这项监管补贴促使加利福尼亚州的一些炼油厂转向生产可再生柴油。",
+    "src": "From The Wall Street Journal ● Sep. 17, 2026",
+    "englishDef": "[Noun] Financial support or assistance, such as a grant."
+  },
+  {
+    "word": "dogmatic",
+    "def": "adj. 教条的；武断的",
+    "sentence": "And as dramatists, they’re uniquely positioned to appreciate the conflicted loyalties and communal tensions of American life in dramatic rather than _______ terms.",
+    "translation": "作为剧作家，他们具有独特的优势，能够以戏剧性的而不是教条式的方式欣赏美国生活中相互冲突的忠诚和社区紧张局势。",
+    "src": "From Los Angeles Times ● Jun. 29, 2026",
+    "englishDef": "[Adjective] Adhering only to principles which are true a priori, rather than truths based on evidence or deduction."
+  },
+  {
+    "word": "underscore",
+    "def": "vt. 强调；划线于…下 n. 下划线",
+    "sentence": "\"Today's multi-location and international arrests _______ the FBI's continued commitment to bringing all participants in this plot to justice,\" FBI special agent Brett Skiles said on X.",
+    "translation": "“今天的多个地点和国际逮捕突显了联邦调查局继续致力于将这一阴谋的所有参与者绳之以法，”联邦调查局特工Brett Skiles在X上说。",
+    "src": "From BBC ● Sep. 21, 2026",
+    "englishDef": "[Noun] A line drawn or printed beneath text; the character _."
+  },
+  {
+    "word": "humane",
+    "def": "adj. 仁慈的，人道的；高尚的",
+    "sentence": "\"The use of such restrictive spaces is highly unconventional and does not align with standards for _______ treatment.\"",
+    "translation": "“这种限制性空间的使用非常非常规，不符合人道待遇标准。”",
+    "src": "From Barron's ● Sep. 14, 2026",
+    "englishDef": "[Adjective] Having or showing concern for the pain or suffering of another; compassionate."
+  },
+  {
+    "word": "warrant",
+    "def": "n. 根据；证明；正当理由；委任状 vt. 保证；担保",
+    "sentence": "When the Beverly Hills detective spotted Lavie at the restaurant without her ankle monitor, the _______ says, he reached out to officials who confirmed Lavie’s monitor was showing her location at the nearby Peninsula Hotel.",
+    "translation": "搜查令说，当比佛利山庄的侦探在没有脚踝监视器的情况下发现Lavie在餐厅时，他联系了官员，确认Lavie的监视器显示了她在附近半岛酒店的位置。",
+    "src": "From Los Angeles Times ● Sep. 17, 2026",
+    "englishDef": "[Noun] Authorization or certification; a sanction, as given by a superior."
+  },
+  {
+    "word": "disclose",
+    "def": "vt. 公开；揭露",
+    "sentence": "\"We demand the government immediately _______ her whereabouts and ensure her safe return,\" Khanum's son Shahrez Khan wrote on X.",
+    "translation": "“我们要求政府立即披露她的下落，并确保她安全返回，” Khanum的儿子Shahrez Khan在X上写道。",
+    "src": "From BBC ● Sep. 20, 2026",
+    "englishDef": "[Verb] To open up; unfasten."
+  },
+  {
+    "word": "incontinent",
+    "def": "adj. 失禁的；不能自制的，无节制的",
+    "sentence": "The cast’s choices are like weather-balloon data that presage the disaster of the movie’s climax, when everyone behaves like an emotionally _______ millennial.",
+    "translation": "演员的选择就像气象气球数据，预示着电影高潮的灾难，当时每个人的行为都像一个情绪失控的千禧一代。",
+    "src": "From The Wall Street Journal ● May 28, 2026",
+    "englishDef": "[Adjective] Unable to contain or retain."
+  },
+  {
+    "word": "degenerate",
+    "def": "v. 使退化；恶化；堕落 adj. 退化的；堕落的",
+    "sentence": "I’m kind of glad that I’m not so much of a _______ anymore.",
+    "translation": "我很高兴我不再是一个堕落的人了。",
+    "src": "From Los Angeles Times ● Feb. 25, 2026",
+    "englishDef": "[Adjective] Having deteriorated, degraded or fallen from normal, coherent, balanced and desirable to undesirable and typically abnormal."
+  },
+  {
+    "word": "vulnerable",
+    "def": "adj. 易受攻击的；易受伤害的；有弱点的",
+    "sentence": "Study co-author Dr. Andre Samson said the researchers discovered that intestinal cells could remain _______ even when patients felt well, and their disease appeared stable.",
+    "translation": "该研究的共同作者Andre Samson博士说，研究人员发现，即使患者感觉良好，肠道细胞也会保持脆弱，并且他们的疾病似乎稳定。",
+    "src": "From Science Daily ● Sep. 20, 2026",
+    "englishDef": "[Adjective] More or most likely to be exposed to the chance of being attacked or harmed, either physically or emotionally."
+  },
+  {
+    "word": "antiquated",
+    "def": "adj. 过时的；陈旧的；年老的",
+    "sentence": "The government has introduced a bill to end _______ laws preventing Roman Catholic or Jewish prime ministers from being involved in the process of making Church of England appointments.",
+    "translation": "政府提出了一项法案，以结束阻止罗马天主教或犹太教总理参与英格兰教会任命过程的过时法律。",
+    "src": "From BBC ● Sep. 15, 2026",
+    "englishDef": "[Adjective] old-fashioned, out of date"
+  },
+  {
+    "word": "hypercritical",
+    "def": "adj. 吹毛求疵的，苛评的",
+    "sentence": "The only blot on Farhan's copybook - and it may feel _______ to highlight it - was an apparent lack of match awareness when he reached three figures off 59 balls.",
+    "translation": "Farhan的副本上唯一的污点-强调它可能会感到过于挑剔-当他从59个球中拿到3位数时，显然缺乏比赛意识。",
+    "src": "From BBC ● Feb. 28, 2026",
+    "englishDef": "[Adjective] Meticulously or excessively critical."
+  },
+  {
+    "word": "asteroid",
+    "def": "n. 小行星；海盘车 adj. 星状的",
+    "sentence": "In particular, the moon's irregular appearance resembles what scientists call a rubble pile _______, an object made from many pieces of rock held together relatively loosely by gravity.",
+    "translation": "特别是，月球的不规则外观类似于科学家所谓的碎石堆小行星，这是一个由许多岩石碎片组成的物体，在重力作用下相对松散地聚集在一起。",
+    "src": "From Science Daily ● Sep. 19, 2026",
+    "englishDef": "[Noun] A naturally occurring solid object, which is smaller than a planet and a dwarf planet, larger than a meteoroid and not a comet, that orbits a star and often has an irregular shape."
+  },
+  {
+    "word": "reaper",
+    "def": "n. 收割者；收割机；收获者",
+    "sentence": "He wasn’t a man to sit idly in death’s anteroom, awaiting the grim _______ .",
+    "translation": "他不是一个坐在死亡前厅里等待死神的人。",
+    "src": "From The Wall Street Journal ● May 13, 2026",
+    "englishDef": "[Noun] One who reaps; a person employed to harvest crops from the fields by reaping."
+  },
+  {
+    "word": "check",
+    "def": "vt. 检查，核对；制止 n. 支票；检验",
+    "sentence": "The Fed was still hopeful enough about inflation and worried enough about the labor market that it gradually lowered rates in 2025, keeping yields in _______ .",
+    "translation": "美联储仍然对通货膨胀充满希望，对劳动力市场充满担忧，以至于在2025年逐步降低利率，控制了收益率。",
+    "src": "From The Wall Street Journal ● Sep. 21, 2026",
+    "englishDef": "[Noun] An inspection or examination."
+  },
+  {
+    "word": "arousal",
+    "def": "n. 性兴奋；兴奋；唤起，觉醒；激励",
+    "sentence": "Norepinephrine is often elevated in anxiety disorders, and the UC Davis researchers suggest that this heightened _______ may increase the brain's demand for choline.",
+    "translation": "去甲肾上腺素通常在焦虑症中升高，加州大学戴维斯分校的研究人员认为，这种升高的唤醒可能会增加大脑对胆碱的需求。",
+    "src": "From Science Daily ● May 16, 2026",
+    "englishDef": "[Noun] The act of arousing or the state of being aroused."
+  },
+  {
+    "word": "impalpable",
+    "def": "adj. 感触不到的；难理解的；无形的",
+    "sentence": "Is it matter, a physical thing, or is it more like energy, something _______ ?",
+    "translation": "它是物质，还是物质，还是更像能量，某种无法触及的东西？",
+    "src": "From The Wall Street Journal ● Jul. 10, 2026",
+    "englishDef": "[Adjective] Incapable of being touched or felt; incorporeal, intangible."
+  },
+  {
+    "word": "gentility",
+    "def": "n. 有教养，文雅；上流阶层",
+    "sentence": "I had thought that Fairhope, which some call “Mayberry by the Bay,” was a place where real Southern _______ had survived.",
+    "translation": "我原以为Fairhope （有人称之为“Mayberry by the Bay” ）是一个真正的南方绅士幸存下来的地方。",
+    "src": "From Slate ● May 4, 2026",
+    "englishDef": "[Noun] The state of being elegant, genteel, having good breeding, or being socially superior."
+  },
+  {
+    "word": "skeptic",
+    "def": "n. 怀疑论者，不可知论者；无神论者",
+    "sentence": "A vaccine _______, Kennedy has shared mixed messaging on MMR vaccine, at times endorsing it and other times sharing unproven claims about its safety.",
+    "translation": "作为疫苗怀疑论者，肯尼迪分享了关于MMR疫苗的混合信息，有时认可它，有时分享未经证实的关于其安全性的说法。",
+    "src": "From BBC ● Aug. 25, 2026",
+    "englishDef": "[Noun] Someone who doubts beliefs, claims, plans, etc. that are accepted by others as true or appropriate, especially one who habitually does so."
+  },
+  {
+    "word": "retrieve",
+    "def": "vt. 检索；恢复；重新得到 n. 检索；恢复",
+    "sentence": "Alongside the pearled axons, they found evidence of ultrafast endocytosis, a process through which nerve endings quickly _______ membrane after releasing chemical messages.",
+    "translation": "除了珍珠轴突外，他们还发现了超快内吞作用的证据，这是一种神经末梢在释放化学信息后迅速恢复膜的过程。",
+    "src": "From Science Daily ● Sep. 17, 2026",
+    "englishDef": "[Verb] To regain or get back something."
+  },
+  {
+    "word": "recast",
+    "def": "vt. 重铸；彻底改动 n. 重铸；重做",
+    "sentence": "As the nation abandoned Reconstruction, a generation of politicians and historians _______ Johnson as a martyr to congressional tyranny.",
+    "translation": "随着国家放弃重建，一代政治家和历史学家将约翰逊重新塑造成国会暴政的烈士。",
+    "src": "From Slate ● Sep. 16, 2026",
+    "englishDef": "[Verb] To cast or throw again."
+  },
+  {
+    "word": "roil",
+    "def": "vt. 搅浑；惹怒 vi. 动荡；喧闹",
+    "sentence": "“There are underlying tensions that do need to be addressed, and if left unaddressed, will continue to _______ the world trading system,” said Robert Staiger, the WTO’s chief economist.",
+    "translation": "世贸组织首席经济学家罗伯特·施泰格（ Robert Staiger ）表示： “确实存在需要解决的潜在紧张局势，如果不加以解决，将继续扰乱世界贸易体系。”",
+    "src": "From The Wall Street Journal ● Sep. 15, 2026",
+    "englishDef": "[Verb] To render turbid by stirring up the dregs or sediment of."
+  },
+  {
+    "word": "inalienable",
+    "def": "adj. 不可分割的；不可剥夺的；不能让与的",
+    "sentence": "That news was posted on X by Ebrahim Azizi, head of the assembly's national security commission, who told us in April that controlling the waterway was Iran's \"_______ right\".",
+    "translation": "议会国家安全委员会主席易卜拉欣·阿齐兹（ Ebrahim Azizi ）在X上发布了这一消息，他在4月告诉我们，控制水道是伊朗“不可剥夺的权利”。",
+    "src": "From BBC ● Jul. 14, 2026",
+    "englishDef": "[Adjective] Not subject to being alienated, that is, surrendered, taken away, or transferred to another."
+  },
+  {
+    "word": "legacy",
+    "def": "n. 遗产；遗赠财物；遗留问题；后遗症",
+    "sentence": "They have sought to engage those instincts, pitching Cuba’s future to Trump not only as a political cause and part of his _______, but also as a vast reconstruction project.",
+    "translation": "他们试图利用这些本能，不仅将古巴的未来作为特朗普的政治事业和遗产的一部分，而且将其作为一个庞大的重建项目。",
+    "src": "From The Wall Street Journal ● Sep. 21, 2026",
+    "englishDef": "[Noun] Money or property bequeathed to someone in a will."
+  },
+  {
+    "word": "decrepit",
+    "def": "adj. 衰老的；破旧的",
+    "sentence": "I have heard from haggard, _______ millennials that it used to be different, that it used to be grungy and alternative.",
+    "translation": "我从憔悴、破旧的千禧一代那里听说，它曾经是不同的，曾经是肮脏的和可替代的。",
+    "src": "From Slate ● Sep. 6, 2026",
+    "englishDef": "[Adjective] Weakened or worn out from age or wear."
+  },
+  {
+    "word": "cipher",
+    "def": "n. 密码；暗号；零 v. 使用密码；计算",
+    "sentence": "But when Walker and Auen plunge our _______, Béatrice, into the world of sparse electrostatic video, the result is both harrowing and unbelievably beautiful.",
+    "translation": "但是，当Walker和Auen将我们的密码Béatrice投入到稀疏的静电视频世界中时，结果既令人痛苦又令人难以置信的美丽。",
+    "src": "From Salon ● Sep. 7, 2026",
+    "englishDef": "[Noun] A numeric character."
+  },
+  {
+    "word": "incongruous",
+    "def": "adj. 不协调的；不一致的；不和谐的",
+    "sentence": "But I don’t think they’re _______ at all.",
+    "translation": "但我不认为它们不协调。",
+    "src": "From Slate ● Sep. 16, 2026",
+    "englishDef": "[Adjective] Not similar or congruent; not matching or fitting in."
+  },
+  {
+    "word": "nicety",
+    "def": "n. 精密；美好；细节；拘泥细节",
+    "sentence": "Discipline will: software that earns trust, organizations that measure what automation actually delivers, and governance treated as a necessity rather than a _______ .",
+    "translation": "纪律意志：赢得信任的软件，衡量自动化实际交付的组织，以及被视为必需品而不是细节的治理。",
+    "src": "From The Wall Street Journal ● Aug. 4, 2026",
+    "englishDef": "[Noun] A small detail or distinction."
+  },
+  {
+    "word": "withstand",
+    "def": "vt. 抵挡；禁得起；反抗 vi. 反抗",
+    "sentence": "Raymond James analyst Joe Altobello said Harley might be better equipped than BRP to _______ an extended showdown, given that Canada represents a relatively small portion of Harley’s overall business.",
+    "translation": "雷蒙德·詹姆斯（ Raymond James ）分析师乔·阿尔托贝洛（ Joe Altobello ）表示，鉴于加拿大占哈雷整体业务的比例相对较小，哈雷可能比BRP更好地承受长时间的摊牌。",
+    "src": "From The Wall Street Journal ● Sep. 21, 2026",
+    "englishDef": "[Verb] To resist or endure (something) successfully."
+  },
+  {
+    "word": "bait",
+    "def": "n. 饵；诱饵；诱惑物 v. 上饵；故意激怒",
+    "sentence": "The experiments used small groups of termites under controlled conditions, and the researchers described the findings as support for developing bistrifluron further as a localized treatment or possible _______ ingredient.",
+    "translation": "这些实验在受控条件下使用了一小群白蚁，研究人员将这些发现描述为进一步开发bistrifluron作为局部治疗或可能的诱饵成分的支持。",
+    "src": "From Science Daily ● Sep. 19, 2026",
+    "englishDef": "[Noun] Any substance, especially food, used in catching fish, or other animals, by alluring them to a hook, snare, trap, or net."
+  },
+  {
+    "word": "facilitate",
+    "def": "vt. 促进；帮助；使容易",
+    "sentence": "It acknowledged that being separated from a baby following birth could be distressing and said its teams worked to _______ contact \"at the earliest safe opportunity\".",
+    "translation": "它承认，出生后与婴儿分离可能令人痛苦，并表示其团队致力于“尽早安全机会”促进联系。",
+    "src": "From BBC ● Sep. 7, 2026",
+    "englishDef": "[Verb] To make easy or easier."
+  },
+  {
+    "word": "expunge",
+    "def": "vt. 擦去；删掉",
+    "sentence": "He's among those seeking to _______ his record in the U.S.",
+    "translation": "他是那些试图抹去他在美国的记录的人之一",
+    "src": "From BBC ● Apr. 14, 2026",
+    "englishDef": "[Verb] To erase or strike out."
+  },
+  {
+    "word": "roster",
+    "def": "n. 花名册；执勤人员表；逐项登记表",
+    "sentence": "The Seahawks lost Walker to the Chiefs but have retained a remarkable 17 of 22 starters and 44 of their 53-man _______ from last season's title win.",
+    "translation": "海鹰队将沃克输给了酋长队，但从上赛季的冠军头衔中保留了22名首发球员中的17名和53名球员中的44名。",
+    "src": "From BBC ● Sep. 21, 2026",
+    "englishDef": "[Noun] A list of individuals or groups, usually for an organization of some kind such as military officers and enlisted personnel enrolled in a particular unit; a muster roll; a sports team, with the names of players who are eligible to be placed in the lineup for a particular game; or a list of students officially enrolled in a school or class."
+  },
+  {
+    "word": "feral",
+    "def": "adj. 野生的；凶猛的；阴郁的",
+    "sentence": "She’s passionate about _______ cats because there are too many in Los Angeles and hopes one day every neighborhood could have a cohort of volunteer cat rescuers.",
+    "translation": "她对野猫充满热情，因为洛杉矶有太多的野猫，她希望有一天每个社区都能有一群志愿的猫救援人员。",
+    "src": "From Los Angeles Times ● Sep. 8, 2026",
+    "englishDef": "[Adjective] Wild; untamed."
+  },
+  {
+    "word": "communal",
+    "def": "adj. 公共的；公社的",
+    "sentence": "I found a $100 bill in the _______ washer at my Airbnb.",
+    "translation": "我在爱彼迎的公共洗衣机里发现了一张100 $的钞票。",
+    "src": "From MarketWatch ● Sep. 21, 2026",
+    "englishDef": "[Adjective] Pertaining to a community or a commune."
+  },
+  {
+    "word": "coin",
+    "def": "n. 硬币，钱币 v. 铸造；杜撰，创造",
+    "sentence": "These two types of judicial power are not two sides of one _______ .",
+    "translation": "这两种类型的司法权力不是一枚硬币的两面。",
+    "src": "From Slate ● Sep. 16, 2026",
+    "englishDef": "[Noun]  A piece of currency, usually metallic and in the shape of a disc, but sometimes polygonal, or with a hole in the middle."
+  },
+  {
+    "word": "salacious",
+    "def": "adj. 好色的；猥亵的；淫荡的",
+    "sentence": "Notably, the show didn’t hook viewers with sex or other _______ material but, rather, plausible portrayals of greed and motivating vindictiveness.",
+    "translation": "值得注意的是，该节目并没有用性或其他淫秽材料吸引观众，而是对贪婪和激励报复行为的合理描绘。",
+    "src": "From Salon ● Jul. 19, 2026",
+    "englishDef": "[Adjective] Promoting sexual desire or lust."
+  },
+  {
+    "word": "quiescent",
+    "def": "adj. 静止的；不活动的；沉寂的",
+    "sentence": "Alexis said, \"It is clearly important to focus on proliferative cancer cells, but we also need to understand this population of _______ dormant cancer cells. And that's been less studied.\"",
+    "translation": "Alexis说： “关注增殖性癌细胞显然很重要，但我们也需要了解这群静止休眠的癌细胞。而且研究得很少。”",
+    "src": "From Science Daily ● Sep. 6, 2026",
+    "englishDef": "[Adjective]  Inactive, quiet, at rest."
+  },
+  {
+    "word": "taint",
+    "def": "v. 污染；玷污；使腐坏 n. 腐坏；污染；污点",
+    "sentence": "The good news is that the gala survived its Bezos _______ .",
+    "translation": "好消息是，这场盛会幸免于贝索斯的污染。",
+    "src": "From Los Angeles Times ● May 5, 2026",
+    "englishDef": "[Noun] A contamination, decay or putrefaction, especially in food."
+  }
+]

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>错题集 · 词汇闯关训练</title>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--accent:#38bdf8;--good:#22c55e;--bad:#ef4444;--txt:#e2e8f0;--dim:#94a3b8;--gold:#fbbf24;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:linear-gradient(160deg,#0f172a 0%,#1e1b4b 100%);color:var(--txt);min-height:100vh;padding:16px;}
+.wrap{max-width:860px;margin:0 auto;}
+header{text-align:center;padding:18px 0 10px;position:relative;}
+.back-home{position:absolute;left:0;top:18px;text-decoration:none;color:var(--dim);font-size:.85rem;padding:6px 12px;border:1px solid #475569;border-radius:8px;background:rgba(30,41,59,.6);transition:all .2s;}
+.back-home:hover{color:var(--accent);border-color:var(--accent);}
+h1{font-size:1.5rem;letter-spacing:1px;}
+.sub{color:var(--dim);font-size:.82rem;margin-top:6px;}
+.userbar{display:flex;justify-content:space-between;align-items:center;padding:0 4px 14px;color:var(--dim);font-size:.82rem;}
+.card{background:var(--card);border:1px solid #334155;border-radius:16px;padding:22px;margin-top:14px;box-shadow:0 10px 30px rgba(0,0,0,.35);}
+.w-item{padding:14px 0;border-bottom:1px dashed #334155;}
+.w-item:last-child{border-bottom:none;}
+.w-word{font-size:1.15rem;font-weight:700;color:var(--gold);}
+.w-set{font-size:.72rem;color:var(--dim);margin-left:8px;}
+.w-def{margin-top:4px;color:#c4b5fd;font-size:.92rem;}
+.w-sent{margin-top:6px;font-size:.88rem;line-height:1.7;color:var(--txt);}
+.w-trans{margin-top:3px;font-size:.84rem;color:var(--dim);}
+.w-src{font-size:.72rem;color:var(--dim);margin-top:4px;}
+.empty{text-align:center;padding:60px 20px;color:var(--dim);}
+.empty .big{font-size:3rem;margin-bottom:12px;}
+.btn{display:inline-block;padding:10px 18px;border:1px solid #475569;border-radius:10px;background:#2a2f3a;color:var(--txt);cursor:pointer;font-size:.88rem;text-decoration:none;transition:all .2s;}
+.btn:hover{border-color:var(--accent);color:var(--accent);}
+.btn-primary{background:var(--accent);color:#082f49;border-color:var(--accent);font-weight:700;}
+.btn-primary:hover{opacity:.9;color:#082f49;}
+.tools{display:flex;gap:10px;justify-content:center;margin-top:18px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a href="index.html" class="back-home">← 首页</a>
+    <h1>📕 错题集</h1>
+    <div class="sub">汇总所有词集中答错的单词</div>
+  </header>
+  <div class="userbar">
+    <span id="userInfo">加载中…</span>
+    <button class="btn" id="logoutBtn" style="padding:5px 12px;font-size:.78rem">退出登录</button>
+  </div>
+  <div id="content" class="card"><div style="text-align:center;color:var(--dim);padding:40px 0">加载中…</div></div>
+</div>
+<script>
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+document.getElementById('logoutBtn').onclick = async () => {
+  try { await fetch('/api/logout', {method:'POST'}); } catch(e){}
+  location.href = 'login.html';
+};
+
+(async function init(){
+  try {
+    const uRes = await fetch('/api/user');
+    if(!uRes.ok){ location.href = 'login.html'; return; }
+    const user = await uRes.json();
+    document.getElementById('userInfo').textContent = '👤 ' + user.email;
+
+    const res = await fetch('/api/wrong-words');
+    if(!res.ok){ location.href = 'login.html'; return; }
+    const words = await res.json();
+    const box = document.getElementById('content');
+
+    if(!words.length){
+      box.innerHTML = '<div class="empty"><div class="big">🎉</div><div>还没有错题，继续加油！</div><div class="tools"><a href="index.html" class="btn btn-primary">返回首页</a></div></div>';
+      return;
+    }
+
+    let html = '<div style="margin-bottom:14px;color:var(--dim);font-size:.85rem">共 <b style="color:var(--bad)">' + words.length + '</b> 个错题</div>';
+    words.forEach(w => {
+      html += '<div class="w-item">' +
+        '<span class="w-word">' + esc(w.word) + '</span>' +
+        '<span class="w-set">📂 ' + esc(w.setName) + '</span>' +
+        '<div class="w-def">' + esc(w.def) + '</div>' +
+        (w.sentence ? '<div class="w-sent">' + esc(w.sentence) + '</div>' : '') +
+        (w.translation ? '<div class="w-trans">' + esc(w.translation) + '</div>' : '') +
+        (w.src ? '<div class="w-src">📰 ' + esc(w.src) + '</div>' : '') +
+        '</div>';
+    });
+    html += '<div class="tools"><a href="index.html" class="btn">← 返回首页</a></div>';
+    box.innerHTML = html;
+  } catch(e) {
+    location.href = 'login.html';
+  }
+})();
+</script>
+</body>
+</html>

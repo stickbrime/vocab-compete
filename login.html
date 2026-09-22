@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>登录 · 词汇闯关训练</title>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--accent:#38bdf8;--txt:#e2e8f0;--dim:#94a3b8;--bad:#ef4444;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:linear-gradient(160deg,#0f172a 0%,#1e1b4b 100%);color:var(--txt);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;}
+.wrap{width:100%;max-width:400px;}
+.card{background:var(--card);border:1px solid #334155;border-radius:16px;padding:32px 28px;box-shadow:0 10px 40px rgba(0,0,0,.4);}
+h1{font-size:1.4rem;text-align:center;margin-bottom:6px;}
+.sub{text-align:center;color:var(--dim);font-size:.82rem;margin-bottom:24px;}
+.tabs{display:flex;background:#0f172a;border-radius:10px;padding:4px;margin-bottom:20px;}
+.tabs button{flex:1;padding:10px;border:none;background:transparent;color:var(--dim);border-radius:7px;cursor:pointer;font-size:.9rem;transition:all .2s;}
+.tabs button.active{background:var(--accent);color:#082f49;font-weight:700;}
+label{display:block;font-size:.82rem;color:var(--dim);margin-bottom:6px;}
+input{width:100%;padding:12px 14px;border:1px solid #334155;border-radius:10px;background:#0f172a;color:var(--txt);font-size:.95rem;margin-bottom:14px;outline:none;}
+input:focus{border-color:var(--accent);}
+button.submit{width:100%;padding:13px;border:none;border-radius:10px;background:var(--accent);color:#082f49;font-weight:700;font-size:1rem;cursor:pointer;margin-top:6px;}
+button.submit:hover{opacity:.9;}
+.err{color:var(--bad);font-size:.82rem;margin-top:10px;min-height:18px;text-align:center;}
+.hint{text-align:center;color:var(--dim);font-size:.76rem;margin-top:16px;line-height:1.6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>📚 词汇闯关训练</h1>
+    <div class="sub">登录以保存你的学习进度</div>
+    <div class="tabs">
+      <button id="tabLogin" class="active">登录</button>
+      <button id="tabReg">注册</button>
+    </div>
+    <form id="authForm">
+      <label>邮箱</label>
+      <input type="email" id="email" placeholder="you@example.com" required autocomplete="email">
+      <label>密码</label>
+      <input type="password" id="password" placeholder="至少 6 位" required autocomplete="current-password">
+      <button type="submit" class="submit" id="submitBtn">登录</button>
+      <div class="err" id="err"></div>
+    </form>
+    <div class="hint">账号数据保存在本地服务器，仅用于学习进度同步</div>
+  </div>
+</div>
+<script>
+let mode = 'login';
+const tabLogin = document.getElementById('tabLogin');
+const tabReg = document.getElementById('tabReg');
+const form = document.getElementById('authForm');
+const submitBtn = document.getElementById('submitBtn');
+const errEl = document.getElementById('err');
+
+tabLogin.onclick = () => setMode('login');
+tabReg.onclick = () => setMode('register');
+
+function setMode(m){
+  mode = m;
+  tabLogin.classList.toggle('active', m==='login');
+  tabReg.classList.toggle('active', m==='register');
+  submitBtn.textContent = m==='login' ? '登录' : '注册';
+  errEl.textContent = '';
+}
+
+form.onsubmit = async (e) => {
+  e.preventDefault();
+  errEl.textContent = '';
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  submitBtn.disabled = true;
+  submitBtn.textContent = '请稍候…';
+  try {
+    const res = await fetch('/api/'+mode, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email, password})
+    });
+    const data = await res.json();
+    if(!res.ok){ errEl.textContent = data.error || '操作失败'; return; }
+    location.href = 'index.html';
+  } catch(e) {
+    errEl.textContent = '网络错误，请检查服务器是否运行';
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = mode==='login' ? '登录' : '注册';
+  }
+};
+</script>
+</body>
+</html>

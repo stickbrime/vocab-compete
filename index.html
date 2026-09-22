@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocab Trainer — 单词集首页</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #1a1d24;
+    --panel-2: #22262f;
+    --text: #e7e9ee;
+    --muted: #9aa0aa;
+    --accent: #6ea8ff;
+    --accent-2: #8b5cf6;
+    --ok: #4ade80;
+    --warn: #fbbf24;
+    --danger: #f87171;
+    --border: #2a2f3a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+  .container { max-width: 980px; margin: 0 auto; padding: 32px 20px 80px; }
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap; margin-bottom: 28px;
+  }
+  h1 {
+    margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .subtitle { color: var(--muted); font-size: 14px; margin-top: 4px; }
+  .btn {
+    background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+    padding: 10px 16px; border-radius: 10px; cursor: pointer; font-size: 14px;
+    font-weight: 500; transition: all .15s; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn:hover { background: #2a2f3a; border-color: #3a414f; }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    border: none; color: #fff;
+  }
+  .btn-primary:hover { opacity: .92; }
+  .btn-danger { color: var(--danger); }
+  .btn-danger:hover { background: rgba(248,113,113,.1); border-color: rgba(248,113,113,.3); }
+  .toolbar { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .empty {
+    text-align: center; padding: 64px 20px; color: var(--muted);
+    border: 1px dashed var(--border); border-radius: 14px;
+  }
+  .empty .big { font-size: 48px; margin-bottom: 12px; }
+
+  .set-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+  .set-card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+    padding: 18px; cursor: pointer; transition: all .15s; position: relative;
+  }
+  .set-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .set-name { font-size: 16px; font-weight: 600; margin-bottom: 6px; word-break: break-word; padding-right: 28px; }
+  .set-meta { color: var(--muted); font-size: 13px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .set-meta span { display: inline-flex; align-items: center; gap: 4px; }
+  .set-progress {
+    margin-top: 10px; height: 6px; background: var(--panel-2); border-radius: 3px; overflow: hidden;
+  }
+  .set-progress > div {
+    height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    transition: width .3s;
+  }
+  .set-delete {
+    position: absolute; top: 12px; right: 12px; width: 26px; height: 26px;
+    border: none; background: transparent; color: var(--muted); cursor: pointer;
+    border-radius: 6px; font-size: 16px; line-height: 1;
+  }
+  .set-delete:hover { background: rgba(248,113,113,.15); color: var(--danger); }
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px;
+    background: rgba(110,168,255,.12); color: var(--accent); font-weight: 500;
+  }
+
+  /* Modal */
+  .modal-mask {
+    position: fixed; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center; padding: 20px; z-index: 100;
+  }
+  .modal-mask.show { display: flex; }
+  .modal {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+    width: 100%; max-width: 640px; padding: 24px; max-height: 88vh; overflow: auto;
+  }
+  .modal h2 { margin: 0 0 6px; font-size: 20px; }
+  .modal .hint { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .field input[type=text] {
+    width: 100%; background: var(--panel-2); border: 1px solid var(--border);
+    color: var(--text); padding: 10px 12px; border-radius: 8px; font-size: 14px;
+  }
+  .field input[type=text]:focus { outline: none; border-color: var(--accent); }
+  .dropzone {
+    border: 2px dashed var(--border); border-radius: 12px; padding: 28px;
+    text-align: center; color: var(--muted); cursor: pointer; transition: all .15s;
+    background: var(--panel-2);
+  }
+  .dropzone:hover, .dropzone.drag { border-color: var(--accent); color: var(--text); }
+  .dropzone .icon { font-size: 32px; margin-bottom: 8px; }
+  .dropzone .filename { color: var(--accent); font-weight: 500; }
+  .format-help {
+    background: var(--panel-2); border-radius: 8px; padding: 12px 14px;
+    font-size: 12px; color: var(--muted); margin-top: 12px; line-height: 1.7;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  .format-help code { color: var(--accent); }
+  .preview {
+    margin-top: 12px; font-size: 13px; color: var(--muted);
+  }
+  .preview b { color: var(--ok); }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--panel); border: 1px solid var(--border); color: var(--text);
+    padding: 10px 18px; border-radius: 10px; font-size: 14px; opacity: 0;
+    transition: opacity .25s, transform .25s; z-index: 200; pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+  .toast.ok { border-color: var(--ok); }
+  .toast.err { border-color: var(--danger); }
+
+  @media (max-width: 560px) {
+    h1 { font-size: 22px; }
+    .container { padding: 20px 14px 60px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div>
+      <h1>Vocab Trainer</h1>
+      <div class="subtitle">上传文档创建词集，闯关式训练 SAT / GRE / 任意词汇</div>
+    </div>
+    <div class="toolbar">
+      <button class="btn" id="wrongBtn" title="查看所有错题">📕 错题集</button>
+      <button class="btn" id="vocab100Btn" title="加载本次抓取的 100 个词汇（含真实外刊例句 + 中文翻译）">+ 新词 100 词</button>
+      <button class="btn" id="satBtn" title="加载从文档解析的 200 个 SAT 词汇（含真实外刊例句）">+ SAT 200 词</button>
+      <button class="btn" id="sampleBtn" title="加载示例词集">+ 示例词集</button>
+      <button class="btn btn-primary" id="uploadBtn">上传/粘贴创建词集</button>
+    </div>
+  </header>
+  <div class="userbar" style="display:flex;justify-content:space-between;align-items:center;padding:0 4px 14px;color:var(--muted);font-size:.82rem">
+    <span>👤 <span id="userInfo">加载中…</span></span>
+    <button class="btn" id="logoutBtn" style="padding:5px 12px;font-size:.78rem">退出登录</button>
+  </div>
+
+  <div id="setsContainer"></div>
+</div>
+
+<!-- Upload modal -->
+<div class="modal-mask" id="uploadModal">
+  <div class="modal">
+    <h2>② 从文本创建词集</h2>
+    <div class="hint">支持 .txt / .csv / .md，每行一个词条。可拖拽文件到下方区域，或点击选择。也可直接粘贴步骤 1 提取的文本。</div>
+
+    <div class="field">
+      <label>词集名称</label>
+      <input type="text" id="setName" placeholder="例如：SAT 重点词汇 Task1">
+    </div>
+
+    <div class="dropzone" id="dropzone">
+      <div class="icon">📄</div>
+      <div>点击选择文件，或拖拽到此</div>
+      <div class="filename" id="filename"></div>
+    </div>
+    <input type="file" id="fileInput" accept=".txt,.csv,.md,.tsv,.pdf,.docx" style="display:none">
+
+    <div class="format-help">
+      <b>支持格式</b>：.txt / .csv / .md / .tsv（直接读取）· .pdf / .docx（自动提取文本）<br>
+      <b>词条格式</b>（每行一条，制表符或 <code>|</code> 分隔，列顺序任意）：<br>
+      <code>word&nbsp;&nbsp;词性 + 释义</code> → 释义模式<br>
+      <code>word&nbsp;&nbsp;释义&nbsp;&nbsp;英文例句&nbsp;&nbsp;中文翻译</code> → 例句挖空模式（推荐）<br>
+      也可粘贴到下方文本框（会覆盖文件解析）。
+    </div>
+
+    <div class="field" style="margin-top:14px">
+      <label>或直接粘贴文本</label>
+      <textarea id="pasteArea" rows="5" style="width:100%;background:var(--panel-2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-size:13px;font-family:ui-monospace,Menlo,monospace;resize:vertical" placeholder="abase&#9;vt. 表现卑微&#10;ponderous&#9;adj. 笨重的；沉闷的"></textarea>
+    </div>
+
+    <div class="preview" id="preview"></div>
+
+    <div class="modal-actions">
+      <button class="btn" id="cancelBtn">取消</button>
+      <button class="btn btn-primary" id="confirmBtn">创建词集</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="extract_lib.js"></script>
+<script src="sat_vocab_200.js"></script>
+<script src="vocab_100.js"></script>
+<script>
+const STORAGE_KEY = 'vocab_sets_v1';
+const PENDING_KEY = 'vocab_pending_extract';
+let pendingText = '';
+let pendingFilename = '';
+let SETS = {}; // in-memory cache, synced to backend
+
+function loadSets() { return SETS; }
+function saveSets(s) {
+  const oldIds = new Set(Object.keys(SETS));
+  const newIds = new Set(Object.keys(s));
+  SETS = { ...s };
+  // Sync deletions
+  oldIds.forEach(id => { if (!newIds.has(id)) apiDeleteSet(id); });
+  // Sync new/changed sets
+  Object.values(s).forEach(set => apiSaveSet(set));
+}
+async function apiSaveSet(set) {
+  try {
+    await fetch('/api/sets', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ id: set.id, name: set.name, items: set.items })
+    });
+  } catch(e) { console.warn('saveSet failed', e); }
+}
+async function apiDeleteSet(id) {
+  try { await fetch('/api/sets/'+encodeURIComponent(id), {method:'DELETE'}); }
+  catch(e) { console.warn('deleteSet failed', e); }
+}
+function uid() { return 's_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function parseVocab(text) {
+  // Reject obvious binary content up front
+  if (!text) return [];
+  if (text.charCodeAt(0) === 0xFFFD) return [];
+  if (/[\x00-\x08\x0E-\x1F\x80-\x9F]{3,}/.test(text.slice(0, 2048))) return [];
+  if (text.startsWith('%PDF')) return [];
+  if (text.startsWith('PK\x03\x04')) return [];
+
+  const hasReplacementChar = /\uFFFD/;
+  const internalLine = /^(obj|endobj|stream|endstream|xref|trailer|startxref|\d+\s+\d+\s+obj)\b/;
+  const pdfDictFrag = /<<\s*\/|\/FlateDecode|\/Length\s+\d+|\/Filter\s+\/|\/Type\s*\/|\/Subtype\s*\//;
+
+  const isEnglishWord = p => /^[A-Za-z][A-Za-z\-']{1,59}$/.test(p);
+  const isPosToken = p => /^(n|v|vt|vi|adj|adv|prep|pron|conj|int|art|num)\.?$/i.test(p);
+  const hasCJK = p => /[\u4e00-\u9fff]/.test(p);
+
+  // Normalize PDF extraction artifacts: split merged numbers, detached word numbers, etc.
+  function normalizeText(t) {
+    // Insert space between a digit and an uppercase letter (e.g. "16abstemious" → "16 abstemious")
+    t = t.replace(/(\d)([A-Z][a-z])/g, '$1 $2');
+    // Split merged numbers that are 3-4 digits into two valid 1-2 digit numbers (1-100 range)
+    // e.g. "2335" → "23 35", "111" → "1 11"
+    t = t.replace(/\b(\d{3,4})\b/g, (m) => {
+      const n = m;
+      if (n.length === 3) {
+        const a = parseInt(n[0]), b = parseInt(n.slice(1));
+        const c = parseInt(n.slice(0,2)), d = parseInt(n[2]);
+        if (a >= 1 && a <= 100 && b >= 1 && b <= 100) return `${a} ${b}`;
+        if (c >= 1 && c <= 100 && d >= 1 && d <= 100) return `${c} ${d}`;
+      } else if (n.length === 4) {
+        const a = parseInt(n.slice(0,2)), b = parseInt(n.slice(2));
+        if (a >= 1 && a <= 100 && b >= 1 && b <= 100) return `${a} ${b}`;
+      }
+      return m;
+    });
+    // Merge detached numbers: if a line is just a number (1-100) and the
+    // previous line contains an English word, prepend the number to that line.
+    const rawLines = t.split(/\r?\n/);
+    const merged = [];
+    for (let i = 0; i < rawLines.length; i++) {
+      const line = rawLines[i].trim();
+      const numMatch = line.match(/^(\d{1,3})$/);
+      if (numMatch && merged.length > 0) {
+        const prev = merged[merged.length - 1];
+        // Only merge if previous line has an English word and no number+word already
+        if (/[A-Za-z][A-Za-z\-']{2,}/.test(prev) && !/^\s*\d{1,3}\s+[A-Za-z]/.test(prev)) {
+          merged[merged.length - 1] = numMatch[1] + ' ' + prev;
+          continue;
+        }
+      }
+      merged.push(rawLines[i]);
+    }
+    return merged.join('\n');
+  }
+
+  // Match: number + word + optional [phonetic] — number may have 0+ spaces before word
+  const numberedWordRe = /(\d{1,3})\s*([A-Za-z][A-Za-z\-']{1,59})\s*(?:\[[^\]]*\])?/g;
+  // POS markers used to split concatenated definitions
+  const posSplitRe = /(?=(?:n|v|vt|vi|adj|adv|prep|pron|conj|int|art|num)\.)/i;
+
+  function extractNumberedWords(line) {
+    const words = [];
+    numberedWordRe.lastIndex = 0;
+    let m;
+    while ((m = numberedWordRe.exec(line)) !== null) {
+      const w = m[2];
+      if (!isPosToken(w)) words.push(w);
+    }
+    return words;
+  }
+
+  function cleanDef(s) {
+    return s
+      .replace(/^\d+[\s.\-]*/, '')
+      .replace(/\s+\d+$/, '')
+      .replace(/-\d+-/g, '')
+      .replace(/\[[^\]]*\]/g, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+  }
+
+  const lines = normalizeText(text).split(/\r?\n/);
+  const items = [];
+
+  let i = 0;
+  while (i < lines.length) {
+    let line = lines[i].trim();
+    i++;
+    if (!line) continue;
+    if (/^(User|Kimi|说明|提示词|格式|格式说明)/.test(line)) continue;
+    if (line.startsWith('//') || line.startsWith('#')) continue;
+    if (internalLine.test(line)) continue;
+    if (pdfDictFrag.test(line)) continue;
+    if (hasReplacementChar.test(line) && line.replace(/\uFFFD/g, '').length < 5) continue;
+
+    // ===== Mode 1: numbered word line (PDF vocab list, possibly 2-column) =====
+    const words = extractNumberedWords(line);
+    if (words.length > 0) {
+      // Collect definition text from following lines.
+      // A numbered word may appear mid-line (def continuation + next word);
+      // in that case take only the prefix before it, then stop.
+      let defText = '';
+      let j = i;
+      // Matches: number + word + optional phonetic — to find the next word boundary
+      const nextWordRe = /(\d{1,3})\s*[A-Za-z][A-Za-z\-']{1,59}\s*(?:\[[^\]]*\])?/;
+      while (j < lines.length) {
+        const nl = lines[j].trim();
+        if (!nl) { j++; continue; }
+        if (internalLine.test(nl) || pdfDictFrag.test(nl)) { j++; continue; }
+        const wm = nl.match(nextWordRe);
+        if (wm) {
+          // Numbered word found on this line
+          const prefix = nl.slice(0, wm.index).trim();
+          const suffix = nl.slice(wm.index + wm[0].length).trim();
+          if (prefix) defText += ' ' + prefix;
+          // If suffix has CJK (def continuing after the next word on same line), include it
+          if (suffix && hasCJK(suffix)) defText += ' ' + suffix;
+          break; // do NOT advance j — this line will be processed as next word-line
+        }
+        defText += ' ' + nl;
+        j++;
+      }
+
+      defText = cleanDef(defText);
+      if (defText && hasCJK(defText)) {
+        const segments = defText.split(posSplitRe).map(s => s.trim()).filter(s => s);
+        if (segments.length > 0) {
+          if (segments.length <= words.length) {
+            // 1:1 pairing; words without a segment get the full defText as fallback
+            for (let k = 0; k < words.length; k++) {
+              const d = segments[k] || defText;
+              if (hasCJK(d)) {
+                items.push({ word: words[k], def: d, sentence: '', translation: '', src: '' });
+              }
+            }
+          } else {
+            // More segments than words — extras belong to the FIRST word
+            const extras = segments.length - words.length;
+            const firstDef = segments.slice(0, 1 + extras).join(' ');
+            if (hasCJK(firstDef)) {
+              items.push({ word: words[0], def: firstDef, sentence: '', translation: '', src: '' });
+            }
+            for (let k = 1; k < words.length; k++) {
+              const d = segments[extras + k];
+              if (d && hasCJK(d)) {
+                items.push({ word: words[k], def: d, sentence: '', translation: '', src: '' });
+              }
+            }
+          }
+        } else {
+          // No POS segments found — give every word the full defText
+          for (const w of words) {
+            items.push({ word: w, def: defText, sentence: '', translation: '', src: '' });
+          }
+        }
+      } else {
+        // No CJK def found at all — still push words (trainer will filter if needed)
+        for (const w of words) {
+          items.push({ word: w, def: w, sentence: '', translation: '', src: '' });
+        }
+      }
+      i = j; // skip consumed definition lines (j points at the next word-line or end)
+      continue;
+    }
+
+    // ===== Mode 3: unnumbered English word (number detached on another line) =====
+    // Match a standalone English word (not POS, not in a CJK line) and pair with following def
+    const wordOnlyRe = /^([A-Za-z][A-Za-z\-']{2,})(?:\s*\[[^\]]*\])?\s*$/;
+    const wm = line.match(wordOnlyRe);
+    if (wm && !isPosToken(wm[1])) {
+      const word = wm[1];
+      // Collect CJK definition from following lines until next word line
+      let defText = '';
+      let j = i;
+      const nextWordLineRe = /(?:^\d{1,3}\s*[A-Za-z])|(?:^[A-Za-z][A-Za-z\-']{2,}\s*\[?)/;
+      while (j < lines.length) {
+        const nl = lines[j].trim();
+        if (!nl) { j++; continue; }
+        if (internalLine.test(nl) || pdfDictFrag.test(nl)) { j++; continue; }
+        // Stop at next word line (numbered or standalone English word)
+        if (nextWordLineRe.test(nl) && !hasCJK(nl)) break;
+        // If line starts with a number+word, stop and don't consume
+        const nw = nl.match(nextWordRe);
+        if (nw && !hasCJK(nl)) break;
+        defText += ' ' + nl;
+        j++;
+      }
+      defText = cleanDef(defText);
+      if (defText && hasCJK(defText)) {
+        items.push({ word, def: defText, sentence: '', translation: '', src: '' });
+      }
+      i = j;
+      continue;
+    }
+
+    // ===== Mode 2: TSV / delimited format (one word per line) =====
+    let parts;
+    if (line.includes('\t')) parts = line.split('\t');
+    else if (line.includes('|')) parts = line.split('|');
+    else if (/\s{2,}/.test(line)) parts = line.split(/\s{2,}/);
+    else {
+      const m = line.match(/^(\S+)\s+(.+)$/);
+      parts = m ? [m[1], m[2]] : null;
+    }
+    if (!parts) continue;
+    parts = parts.map(p => p.trim()).filter(p => p);
+    if (parts.length < 2) continue;
+
+    // Find English word and CJK definition
+    let wordIdx = parts.findIndex(p => {
+      const c = p.replace(/\[[^\]]*\]/g, '').replace(/\d+$/, '').trim();
+      return isEnglishWord(c) && !isPosToken(c);
+    });
+    if (wordIdx < 0) continue;
+    let word = parts[wordIdx].replace(/\[[^\]]*\]/g, '').replace(/\d+$/, '').trim();
+    if (!isEnglishWord(word) || isPosToken(word) || hasCJK(word)) continue;
+
+    const defIdx = parts.findIndex((p, j) => j !== wordIdx && hasCJK(p));
+    if (defIdx < 0) continue;
+    let def = cleanDef(parts[defIdx]);
+    if (!def || !hasCJK(def)) continue;
+
+    // Optional sentence / translation
+    const rest = parts.filter((p, j) => j !== wordIdx && j !== defIdx);
+    let sentence = '', translation = '';
+    for (const p of rest) {
+      if (isPosToken(p) || p.length <= 4) continue;
+      if (hasCJK(p) && !translation) translation = p;
+      else if (!sentence && /[A-Za-z]/.test(p) && p.length > 10) sentence = p;
+    }
+    items.push({ word, def, sentence, translation, src: '' });
+  }
+  return items;
+}
+
+function renderSets() {
+  const sets = loadSets();
+  const container = document.getElementById('setsContainer');
+  const keys = Object.keys(sets).sort((a,b) => (sets[b].createdAt||0) - (sets[a].createdAt||0));
+  if (keys.length === 0) {
+    container.innerHTML = `
+      <div class="empty">
+        <div class="big">📚</div>
+        <div style="font-size:16px;color:var(--text);margin-bottom:6px">还没有词集</div>
+        <div>点击右上角 <b>+ 上传文档创建词集</b>，或加载 <b>示例词集</b> 试试看</div>
+      </div>`;
+    return;
+  }
+  const cards = keys.map(k => {
+    const s = sets[k];
+    const total = s.items.length;
+    const mastered = s.mastered || [];
+    const wrong = s.wrong || [];
+    const hasProgress = mastered.length > 0 || wrong.length > 0 || (typeof s.pos === 'number' && s.pos > 0);
+    const pct = total ? Math.round(mastered.length / total * 100) : 0;
+    const last = s.lastPlayed ? new Date(s.lastPlayed).toLocaleDateString('zh-CN') : '—';
+    return `
+      <div class="set-card" data-id="${k}">
+        <button class="set-delete" data-del="${k}" title="删除">×</button>
+        <div class="set-name">${escapeHtml(s.name)}</div>
+        <div class="set-meta">
+          <span>📖 ${total} 词</span>
+          <span>✅ ${pct}%</span>
+          <span>🕐 ${last}</span>
+        </div>
+        <div class="set-progress"><div style="width:${pct}%"></div></div>
+        <div class="card-actions" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-primary" data-resume="${k}" style="flex:1;min-width:110px;padding:9px 12px;font-size:.85rem">${hasProgress ? '⏯ 继续进度' : '▶ 开始训练'}</button>
+          <button class="btn" data-rename="${k}" title="重命名词集" style="padding:9px 10px;font-size:.82rem;background:#2a2f3a">✎ 重命名</button>
+          <button class="btn" data-reset="${k}" title="清除进度，从头开始" style="padding:9px 10px;font-size:.82rem;background:#2a2f3a;color:#f87171;border-color:#3a414f">↻ 重练</button>
+        </div>
+      </div>`;
+  }).join('');
+  container.innerHTML = `<div class="set-grid">${cards}</div>`;
+}
+
+function toast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+// --- Upload modal flow ---
+const modal = document.getElementById('uploadModal');
+const fileInput = document.getElementById('fileInput');
+const dropzone = document.getElementById('dropzone');
+const filenameEl = document.getElementById('filename');
+const pasteArea = document.getElementById('pasteArea');
+const previewEl = document.getElementById('preview');
+const setNameInput = document.getElementById('setName');
+
+function openModal() {
+  modal.classList.add('show');
+  pendingText = ''; pendingFilename = '';
+  filenameEl.textContent = ''; pasteArea.value = ''; previewEl.innerHTML = '';
+  setNameInput.value = '';
+  setTimeout(() => setNameInput.focus(), 50);
+}
+function closeModal() { modal.classList.remove('show'); }
+
+function showPreview(text) {
+  const items = parseVocab(text);
+  if (items.length === 0) {
+    previewEl.innerHTML = '<span style="color:var(--danger)">⚠ 未解析到有效词条，请检查格式</span>';
+    return;
+  }
+  const withSent = items.filter(i => i.sentence && i.sentence.trim()).length;
+  const sample = items.slice(0, 2).map(i => {
+    let html = `<code><b>${escapeHtml(i.word)}</b> — ${escapeHtml(i.def.slice(0,30))}${i.def.length>30?'…':''}</code>`;
+    if (i.sentence && i.sentence.trim()) {
+      html += `<div style="color:var(--muted);font-size:12px;margin:2px 0 0 14px">📝 ${escapeHtml(i.sentence.slice(0,60))}${i.sentence.length>60?'…':''}</div>`;
+    }
+    if (i.translation && i.translation.trim()) {
+      html += `<div style="color:var(--muted);font-size:12px;margin:0 0 6px 14px">🇨🇳 ${escapeHtml(i.translation.slice(0,40))}${i.translation.length>40?'…':''}</div>`;
+    }
+    return html;
+  }).join('<br>');
+  const sentNote = withSent > 0
+    ? `<span style="color:var(--ok)">· ${withSent} 条含例句</span>`
+    : `<span style="color:var(--warn)">· 无例句（将使用释义模式）</span>`;
+  previewEl.innerHTML = `✓ 解析到 <b>${items.length}</b> 条词条 ${sentNote}<br>${sample}${items.length>2?'<br>…':''}`;
+}
+
+function readFile(file) {
+  pendingFilename = file.name;
+  filenameEl.textContent = '📎 ' + file.name + ' · 解析中…';
+  previewEl.innerHTML = '<span style="color:var(--accent)">⏳ 正在解析文件…</span>';
+  readFileSmart(file).then(text => {
+    filenameEl.textContent = '📎 ' + file.name;
+    pendingText = text;
+    pasteArea.value = '';
+    if (!setNameInput.value) setNameInput.value = file.name.replace(/\.[^.]+$/, '');
+    showPreview(text);
+  }).catch(err => {
+    filenameEl.textContent = '📎 ' + file.name;
+    previewEl.innerHTML = `<span style="color:var(--danger)">⚠ ${escapeHtml(err.message || String(err))}</span>`;
+  });
+}
+
+async function readFileSmart(file) {
+  // Use the shared extract_lib.js module (loaded via <script src="extract_lib.js">)
+  return await extractTextFromFile(file);
+}
+
+document.getElementById('uploadBtn').onclick = openModal;
+document.getElementById('cancelBtn').onclick = closeModal;
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+dropzone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => { if (e.target.files[0]) readFile(e.target.files[0]); });
+['dragenter','dragover'].forEach(ev =>
+  dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.add('drag'); }));
+['dragleave','drop'].forEach(ev =>
+  dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.remove('drag'); }));
+dropzone.addEventListener('drop', e => {
+  if (e.dataTransfer.files[0]) readFile(e.dataTransfer.files[0]);
+});
+
+pasteArea.addEventListener('input', () => {
+  if (pasteArea.value.trim()) showPreview(pasteArea.value);
+  else if (pendingText) showPreview(pendingText);
+  else previewEl.innerHTML = '';
+});
+
+document.getElementById('confirmBtn').onclick = () => {
+  const text = pasteArea.value.trim() || pendingText;
+  if (!text) { toast('请提供文件或粘贴文本', 'err'); return; }
+  const items = parseVocab(text);
+  if (items.length === 0) { toast('未解析到有效词条', 'err'); return; }
+  const name = setNameInput.value.trim() || `词集 ${new Date().toLocaleString('zh-CN')}`;
+  const id = uid();
+  const sets = loadSets();
+  sets[id] = { id, name, items, createdAt: Date.now(), mastered: [], lastPlayed: 0 };
+  saveSets(sets);
+  closeModal();
+  renderSets();
+  toast(`✓ 已创建「${name}」，共 ${items.length} 词`, 'ok');
+};
+
+// --- Set card actions ---
+document.getElementById('setsContainer').addEventListener('click', e => {
+  const delBtn = e.target.closest('[data-del]');
+  if (delBtn) {
+    e.stopPropagation();
+    const id = delBtn.dataset.del;
+    const sets = loadSets();
+    const name = sets[id]?.name || '';
+    if (confirm(`确定删除词集「${name}」？此操作不可撤销。`)) {
+      delete sets[id];
+      saveSets(sets);
+      renderSets();
+      toast('已删除', 'ok');
+    }
+    return;
+  }
+  // Resume button → start trainer (auto-loads saved progress)
+  const resumeBtn = e.target.closest('[data-resume]');
+  if (resumeBtn) {
+    e.stopPropagation();
+    const id = resumeBtn.dataset.resume;
+    location.href = `trainer.html?id=${encodeURIComponent(id)}`;
+    return;
+  }
+  // Rename button → rename this set
+  const renameBtn = e.target.closest('[data-rename]');
+  if (renameBtn) {
+    e.stopPropagation();
+    const id = renameBtn.dataset.rename;
+    const sets = loadSets();
+    if (!sets[id]) return;
+    const newName = prompt('重命名词集：', sets[id].name);
+    if (!newName || !newName.trim() || newName.trim() === sets[id].name) return;
+    sets[id].name = newName.trim();
+    fetch('/api/sets/'+encodeURIComponent(id), {
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ name: newName.trim() })
+    }).catch(()=>{});
+    saveSets(sets);
+    renderSets();
+    toast('已重命名', 'ok');
+    return;
+  }
+  // Reset button → clear saved progress for this set
+  const resetBtn = e.target.closest('[data-reset]');
+  if (resetBtn) {
+    e.stopPropagation();
+    const id = resetBtn.dataset.reset;
+    const sets = loadSets();
+    if (!sets[id]) return;
+    const hasProgress = (sets[id].mastered && sets[id].mastered.length) ||
+                        (sets[id].wrong && sets[id].wrong.length) ||
+                        typeof sets[id].pos === 'number';
+    if (hasProgress && !confirm('清除这个词集的学习进度（已掌握/错题/当前位置）？')) return;
+    sets[id].mastered = [];
+    sets[id].wrong = [];
+    sets[id].pos = 0;
+    sets[id].order = [];
+    fetch('/api/sets/'+encodeURIComponent(id)+'/progress', {
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ mastered: [], wrong: [], pos: 0, order: [] })
+    }).catch(()=>{});
+    saveSets(sets);
+    renderSets();
+    toast(hasProgress ? '进度已清除，可从头开始' : '已是全新状态', 'ok');
+    return;
+  }
+  // Clicking the card itself → start training
+  const card = e.target.closest('[data-id]');
+  if (card) {
+    const id = card.dataset.id;
+    location.href = `trainer.html?id=${encodeURIComponent(id)}`;
+  }
+});
+
+// --- New 100-word set (fetched from thesaurus.com) ---
+document.getElementById('vocab100Btn').onclick = () => {
+  if (typeof VOCAB_100 === 'undefined' || !VOCAB_100.length) {
+    toast('未加载到 VOCAB_100 数据，请确认 vocab_100.js 在同目录', 'err');
+    return;
+  }
+  const existing = loadSets();
+  const hit = Object.values(existing).find(s => s._vocab100 === true);
+  if (hit) {
+    // Refresh items (add englishDef if missing, sync with latest data)
+    const byWord = {};
+    VOCAB_100.forEach(it => { byWord[it.word] = it; });
+    hit.items = hit.items.map(it => {
+      const src = byWord[it.word];
+      if (!src) return it;
+      return {
+        word: src.word, def: src.def, src: src.src || '',
+        sentence: src.sentence || '', translation: src.translation || '',
+        englishDef: src.englishDef || ''
+      };
+    });
+    existing[hit.id] = hit;
+    saveSets(existing);
+    toast('新词 100 词集已更新（含英文释义），进入训练', 'ok');
+    location.href = `trainer.html?id=${encodeURIComponent(hit.id)}`;
+    return;
+  }
+  const id = uid();
+  existing[id] = {
+    id, name: '新词 100 · 真实外刊例句 + 翻译',
+    items: VOCAB_100.map(it => ({
+      word: it.word, def: it.def, src: it.src || '',
+      sentence: it.sentence || '', translation: it.translation || '',
+      englishDef: it.englishDef || ''
+    })),
+    createdAt: Date.now(), mastered: [], lastPlayed: 0,
+    _vocab100: true
+  };
+  saveSets(existing);
+  renderSets();
+  toast(`✓ 已加载 100 个词汇（含真实例句 + 翻译）`, 'ok');
+};
+
+// --- SAT 200 set (decoded from 生词网页化.docx) ---
+document.getElementById('satBtn').onclick = () => {
+  if (typeof SAT_VOCAB_200 === 'undefined' || !SAT_VOCAB_200.length) {
+    toast('未加载到 SAT_VOCAB_200 数据，请确认 sat_vocab_200.js 在同目录', 'err');
+    return;
+  }
+  // Avoid duplicates: if a SAT 200 set already exists, just toast
+  const existing = loadSets();
+  const existingSAT = Object.values(existing).find(s => s._sat200 === true);
+  if (existingSAT) {
+    toast('SAT 200 词集已存在，直接进入训练', 'ok');
+    location.href = `trainer.html?id=${encodeURIComponent(existingSAT.id)}`;
+    return;
+  }
+  const id = uid();
+  existing[id] = {
+    id, name: 'SAT 200 词 · 真实外刊例句',
+    items: SAT_VOCAB_200.map(it => ({
+      word: it.word, def: it.def, src: it.src || '',
+      sentence: it.sentence || '', translation: it.translation || ''
+    })),
+    createdAt: Date.now(), mastered: [], lastPlayed: 0,
+    _sat200: true
+  };
+  saveSets(existing);
+  renderSets();
+  toast(`✓ 已加载 200 个 SAT 词汇（含真实例句）`, 'ok');
+};
+
+// --- Sample set ---
+document.getElementById('sampleBtn').onclick = () => {
+  const sample = [
+    { word: 'abase', def: 'vt. 表现卑微；使降低（身份）', sentence: 'He would rather die than _______ himself before his enemies.', translation: '他宁死也不愿在敌人面前卑躬屈膝。', src: '示例' },
+    { word: 'ponderous', def: 'adj. 笨重的；沉闷的', sentence: 'The essay was a _______ read, full of jargon and endless clauses.', translation: '这篇文章读起来沉闷乏味，充斥着术语和无尽的长句。', src: '示例' },
+    { word: 'assert', def: 'vt. 维护；断言；主张', sentence: 'She _______ed her authority by reorganizing the entire department.', translation: '她通过重组整个部门来维护自己的权威。', src: '示例' },
+    { word: 'superficial', def: 'adj. 表面的；肤浅的', sentence: 'His _______ charm hid a complete lack of depth.', translation: '他表面的魅力掩盖了内在的完全肤浅。', src: '示例' },
+    { word: 'provoke', def: 'vt. 驱使；激怒；惹起', sentence: 'The policy _______ed widespread protests across the country.', translation: '该政策在全国范围内引发了广泛抗议。', src: '示例' },
+    { word: 'compile', def: 'vt. 编译；编制；汇编', sentence: 'Researchers _______d data from over 200 studies.', translation: '研究人员汇编了来自200多项研究的数据。', src: '示例' },
+    { word: 'bureaucracy', def: 'n. 官僚主义；官僚机构', sentence: 'The project stalled in the _______ of three different agencies.', translation: '项目卡在三个不同机构的官僚体制中。', src: '示例' },
+    { word: 'aversion', def: 'n. 厌恶；讨厌的人', sentence: 'He had an _______ to small talk and forced smiles.', translation: '他对寒暄和勉强的微笑有一种厌恶。', src: '示例' },
+    { word: 'beneficial', def: 'adj. 有益的，有利的', sentence: 'Regular exercise is _______ to both body and mind.', translation: '规律运动对身心都有益。', src: '示例' },
+    { word: 'connotation', def: 'n. 内涵；含蓄；隐含意义', sentence: 'The word "home" carries warm _______s for most people.', translation: '对大多数人来说，"家"这个词带有温暖的内涵。', src: '示例' },
+    { word: 'egressive', def: 'adj. 向外的；流出的', sentence: 'The pipe measured the _______ flow of water per minute.', translation: '管道测量了每分钟向外流出的水量。', src: '示例' },
+    { word: 'mercurial', def: 'adj. 活泼善变的；雄辩机智的', sentence: 'Her _______ moods made collaboration impossible.', translation: '她善变的情绪让合作变得不可能。', src: '示例' },
+  ];
+  const id = uid();
+  const sets = loadSets();
+  sets[id] = {
+    id, name: '示例词集 · SAT 入门 12 词',
+    items: sample, createdAt: Date.now(), mastered: [], lastPlayed: 0
+  };
+  saveSets(sets);
+  renderSets();
+  toast('✓ 已加载示例词集', 'ok');
+};
+
+// --- Logout ---
+document.getElementById('logoutBtn').onclick = async () => {
+  try { await fetch('/api/logout', {method:'POST'}); } catch(e){}
+  location.href = 'login.html';
+};
+
+// --- 错题集 (wrong words collection) ---
+document.getElementById('wrongBtn').onclick = () => {
+  location.href = 'wrong.html';
+};
+
+// Auth check + load sets from backend
+(async function init(){
+  try {
+    const res = await fetch('/api/user');
+    if (!res.ok) { location.href = 'login.html'; return; }
+    const user = await res.json();
+    document.getElementById('userInfo').textContent = user.email;
+    const setsRes = await fetch('/api/sets');
+    if (setsRes.ok) SETS = await setsRes.json();
+    renderSets();
+  } catch(e) {
+    location.href = 'login.html';
+  }
+})();
+
+// Auto-receive extracted text from extract.html (step 1)
+(function autoReceiveFromExtract() {
+  const params = new URLSearchParams(location.search);
+  if (params.get('from') !== 'extract') return;
+  const text = localStorage.getItem(PENDING_KEY);
+  if (!text) return;
+  // Populate the paste area and open the upload modal automatically
+  openModal();
+  pasteArea.value = text;
+  pendingText = text;
+  const itemCount = parseVocab(text).length;
+  showPreview(text);
+  toast(`✓ 已收到步骤 1 提取的文本（${text.length} 字符，${itemCount} 条候选词条）`);
+  // Don't consume it yet — let user edit in the modal before confirming.
+})();
+</script>
+</body>
+</html>
