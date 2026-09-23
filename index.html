@@ -161,7 +161,10 @@
   </header>
   <div class="userbar" style="display:flex;justify-content:space-between;align-items:center;padding:0 4px 14px;color:var(--muted);font-size:.82rem">
     <span>👤 <span id="userInfo">加载中…</span></span>
-    <button class="btn" id="logoutBtn" style="padding:5px 12px;font-size:.78rem">退出登录</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn" id="migrateBtn" style="padding:5px 12px;font-size:.78rem">📥 导入本地数据</button>
+      <button class="btn" id="logoutBtn" style="padding:5px 12px;font-size:.78rem">退出登录</button>
+    </div>
   </div>
 
   <div id="setsContainer"></div>
@@ -221,6 +224,7 @@ const PENDING_KEY = 'vocab_pending_extract';
 let pendingText = '';
 let pendingFilename = '';
 let SETS = {}; // in-memory cache, synced to backend
+const _pendingSaves = new Set();
 
 function loadSets() { return SETS; }
 function saveSets(s) {
@@ -228,9 +232,16 @@ function saveSets(s) {
   const newIds = new Set(Object.keys(s));
   SETS = { ...s };
   // Sync deletions
-  oldIds.forEach(id => { if (!newIds.has(id)) apiDeleteSet(id); });
+  oldIds.forEach(id => { if (!newIds.has(id)) _track(apiDeleteSet(id)); });
   // Sync new/changed sets
-  Object.values(s).forEach(set => apiSaveSet(set));
+  Object.values(s).forEach(set => _track(apiSaveSet(set)));
+}
+function _track(promise) {
+  _pendingSaves.add(promise);
+  promise.finally(() => _pendingSaves.delete(promise));
+}
+async function flushSaves() {
+  await Promise.allSettled(Array.from(_pendingSaves));
 }
 async function apiSaveSet(set) {
   try {
@@ -651,7 +662,9 @@ document.getElementById('setsContainer').addEventListener('click', e => {
   if (resumeBtn) {
     e.stopPropagation();
     const id = resumeBtn.dataset.resume;
-    location.href = `trainer.html?id=${encodeURIComponent(id)}`;
+    flushSaves().then(() => {
+      location.href = `trainer.html?id=${encodeURIComponent(id)}`;
+    });
     return;
   }
   // Rename button → rename this set
@@ -806,16 +819,58 @@ document.getElementById('sampleBtn').onclick = () => {
 
 // --- Logout ---
 document.getElementById('logoutBtn').onclick = async () => {
+  await flushSaves();
   try { await fetch('/api/logout', {method:'POST'}); } catch(e){}
   location.href = 'login.html';
 };
 
 // --- 错题集 (wrong words collection) ---
-document.getElementById('wrongBtn').onclick = () => {
+document.getElementById('wrongBtn').onclick = async () => {
+  await flushSaves();
   location.href = 'wrong.html';
 };
 
-// Auth check + load sets from backend
+// --- Migrate old localStorage data into current account ---
+async function migrateLocalStorage() {
+  const oldRaw = localStorage.getItem('vocab_sets_v1');
+  if (!oldRaw) { toast('本地没有可导入的数据', 'err'); return; }
+  try {
+    const oldSets = JSON.parse(oldRaw);
+    const oldIds = Object.keys(oldSets).filter(id => oldSets[id] && oldSets[id].items && oldSets[id].items.length);
+    if (!oldIds.length) { toast('本地没有可导入的词集', 'err'); return; }
+    let migrated = 0, merged = 0;
+    for (const id of oldIds) {
+      const os = oldSets[id];
+      if (SETS[id]) {
+        merged++;
+        await fetch('/api/sets/'+encodeURIComponent(id)+'/progress', {
+          method:'PUT', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ mastered: os.mastered||[], wrong: os.wrong||[], pos: os.pos||0, order: os.order||[] })
+        }).catch(()=>{});
+        Object.assign(SETS[id], { mastered: os.mastered||[], wrong: os.wrong||[], pos: os.pos||0 });
+      } else {
+        migrated++;
+        await fetch('/api/sets', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ id, name: os.name, items: os.items })
+        }).catch(()=>{});
+        await fetch('/api/sets/'+encodeURIComponent(id)+'/progress', {
+          method:'PUT', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ mastered: os.mastered||[], wrong: os.wrong||[], pos: os.pos||0, order: os.order||[] })
+        }).catch(()=>{});
+        SETS[id] = { ...os };
+      }
+    }
+    localStorage.removeItem('vocab_sets_v1');
+    renderSets();
+    toast(`已导入 ${migrated} 个词集 + ${merged} 个进度`, 'ok');
+  } catch(e) {
+    toast('导入失败：' + e.message, 'err');
+  }
+}
+document.getElementById('migrateBtn').onclick = migrateLocalStorage;
+
+// Auth check + load sets from backend + auto-migrate on first login
 (async function init(){
   try {
     const res = await fetch('/api/user');
@@ -824,6 +879,8 @@ document.getElementById('wrongBtn').onclick = () => {
     document.getElementById('userInfo').textContent = user.email;
     const setsRes = await fetch('/api/sets');
     if (setsRes.ok) SETS = await setsRes.json();
+    // Auto-migrate once if localStorage data exists
+    if (localStorage.getItem('vocab_sets_v1')) await migrateLocalStorage();
     renderSets();
   } catch(e) {
     location.href = 'login.html';
