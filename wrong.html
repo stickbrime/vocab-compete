@@ -9,9 +9,15 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:linear-gradient(160deg,#0f172a 0%,#1e1b4b 100%);color:var(--txt);min-height:100vh;padding:16px;}
 .wrap{max-width:860px;margin:0 auto;}
-header{text-align:center;padding:18px 0 10px;position:relative;}
-.back-home{position:absolute;left:0;top:18px;text-decoration:none;color:var(--dim);font-size:.85rem;padding:6px 12px;border:1px solid #475569;border-radius:8px;background:rgba(30,41,59,.6);transition:all .2s;}
-.back-home:hover{color:var(--accent);border-color:var(--accent);}
+header{text-align:center;padding:18px 0 10px;}
+.topnav{display:flex;align-items:center;gap:14px;padding:10px 16px;background:rgba(30,41,59,.7);border:1px solid #334155;border-radius:12px;margin-bottom:14px;font-size:.86rem;}
+.nav-link{color:var(--dim);text-decoration:none;padding:6px 12px;border-radius:8px;transition:all .2s;}
+.nav-link:hover{color:var(--accent);background:rgba(56,189,248,.08);}
+.nav-link.active{color:var(--accent);background:rgba(56,189,248,.12);font-weight:600;}
+.nav-spacer{flex:1;}
+.nav-user{color:var(--dim);font-size:.82rem;}
+.nav-btn{padding:5px 12px;font-size:.78rem;border:1px solid #475569;border-radius:8px;background:transparent;color:var(--dim);cursor:pointer;transition:all .2s;}
+.nav-btn:hover{border-color:var(--accent);color:var(--accent);}
 h1{font-size:1.5rem;letter-spacing:1px;}
 .sub{color:var(--dim);font-size:.82rem;margin-top:6px;}
 .userbar{display:flex;justify-content:space-between;align-items:center;padding:0 4px 14px;color:var(--dim);font-size:.82rem;}
@@ -35,18 +41,23 @@ h1{font-size:1.5rem;letter-spacing:1px;}
 </head>
 <body>
 <div class="wrap">
+  <nav class="topnav">
+    <a href="index.html" class="nav-link">🏠 首页</a>
+    <a href="wrong.html" class="nav-link active">📕 错题集</a>
+    <span class="nav-spacer"></span>
+    <span class="nav-user">👤 <span id="userInfo">加载中…</span></span>
+    <button class="nav-btn" id="logoutBtn">退出</button>
+  </nav>
   <header>
-    <a href="index.html" class="back-home">← 首页</a>
     <h1>📕 错题集</h1>
     <div class="sub">汇总所有词集中答错的单词</div>
   </header>
-  <div class="userbar">
-    <span id="userInfo">加载中…</span>
-    <button class="btn" id="logoutBtn" style="padding:5px 12px;font-size:.78rem">退出登录</button>
-  </div>
   <div id="content" class="card"><div style="text-align:center;color:var(--dim);padding:40px 0">加载中…</div></div>
 </div>
 <script>
+// Remember last visited page for post-login redirect
+localStorage.setItem('vocab_last_page', 'wrong.html');
+
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 document.getElementById('logoutBtn').onclick = async () => {
@@ -59,7 +70,7 @@ document.getElementById('logoutBtn').onclick = async () => {
     const uRes = await fetch('/api/user');
     if(!uRes.ok){ location.href = 'login.html'; return; }
     const user = await uRes.json();
-    document.getElementById('userInfo').textContent = '👤 ' + user.email;
+    document.getElementById('userInfo').textContent = user.email;
 
     const res = await fetch('/api/wrong-words');
     if(!res.ok){ location.href = 'login.html'; return; }
@@ -71,7 +82,10 @@ document.getElementById('logoutBtn').onclick = async () => {
       return;
     }
 
-    let html = '<div style="margin-bottom:14px;color:var(--dim);font-size:.85rem">共 <b style="color:var(--bad)">' + words.length + '</b> 个错题</div>';
+    let html = '<div style="margin-bottom:14px;color:var(--dim);font-size:.85rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">' +
+      '<span>共 <b style="color:var(--bad)">' + words.length + '</b> 个错题</span>' +
+      '<button id="genSetBtn" class="btn btn-primary" style="padding:8px 16px;font-size:.82rem">📝 生成错题词集</button>' +
+      '</div>';
     words.forEach(w => {
       html += '<div class="w-item">' +
         '<span class="w-word">' + esc(w.word) + '</span>' +
@@ -84,6 +98,43 @@ document.getElementById('logoutBtn').onclick = async () => {
     });
     html += '<div class="tools"><a href="index.html" class="btn">← 返回首页</a></div>';
     box.innerHTML = html;
+
+    // Generate a new question bank from all wrong words
+    document.getElementById('genSetBtn').onclick = async () => {
+      const btn = document.getElementById('genSetBtn');
+      btn.disabled = true;
+      btn.textContent = '生成中…';
+      try {
+        // Deduplicate by word, keep first occurrence's data
+        const seen = new Set();
+        const items = [];
+        words.forEach(w => {
+          if (seen.has(w.word)) return;
+          seen.add(w.word);
+          items.push({
+            word: w.word,
+            def: w.def,
+            sentence: w.sentence || '',
+            translation: w.translation || '',
+            src: w.src || '',
+            englishDef: w.englishDef || ''
+          });
+        });
+        const id = 'wrong_' + Date.now().toString(36);
+        const name = '📕 错题集 · ' + new Date().toLocaleDateString('zh-CN') + ' · ' + items.length + '词';
+        const res = await fetch('/api/sets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, name, items })
+        });
+        if (!res.ok) throw new Error('创建失败');
+        location.href = 'trainer.html?id=' + encodeURIComponent(id);
+      } catch(e) {
+        alert('生成词集失败：' + e.message);
+        btn.disabled = false;
+        btn.textContent = '📝 生成错题词集';
+      }
+    };
   } catch(e) {
     location.href = 'login.html';
   }

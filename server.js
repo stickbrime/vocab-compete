@@ -40,10 +40,17 @@ async function initDb() {
     wrong TEXT DEFAULT '[]',
     pos INTEGER DEFAULT 0,
     quiz_order TEXT DEFAULT '[]',
+    retry_mode INTEGER DEFAULT 0,
+    retry_pos INTEGER DEFAULT 0,
+    retry_order TEXT DEFAULT '[]',
     created_at INTEGER NOT NULL,
     updated_at INTEGER NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`);
+  // Add columns for existing DBs (ignore error if already exists)
+  try { db.run('ALTER TABLE sets ADD COLUMN retry_mode INTEGER DEFAULT 0'); } catch(e) {}
+  try { db.run('ALTER TABLE sets ADD COLUMN retry_pos INTEGER DEFAULT 0'); } catch(e) {}
+  try { db.run('ALTER TABLE sets ADD COLUMN retry_order TEXT DEFAULT "[]"'); } catch(e) {}
   saveDb();
 }
 function saveDb() {
@@ -128,6 +135,9 @@ app.get('/api/sets', auth, (req, res) => {
       wrong: JSON.parse(r.wrong),
       pos: r.pos,
       order: JSON.parse(r.quiz_order),
+      retryMode: !!r.retry_mode,
+      retryPos: r.retry_pos || 0,
+      retryOrder: JSON.parse(r.retry_order || '[]'),
       createdAt: r.created_at,
       lastPlayed: r.updated_at,
     };
@@ -165,10 +175,12 @@ app.delete('/api/sets/:id', auth, (req, res) => {
 
 // ---------- Progress sync ----------
 app.put('/api/sets/:id/progress', auth, (req, res) => {
-  const { mastered, wrong, pos, order } = req.body || {};
+  const { mastered, wrong, pos, order, retryMode, retryPos, retryOrder } = req.body || {};
   const now = Date.now();
-  run('UPDATE sets SET mastered = ?, wrong = ?, pos = ?, quiz_order = ?, updated_at = ? WHERE id = ? AND user_id = ?',
-    [JSON.stringify(mastered || []), JSON.stringify(wrong || []), pos || 0, JSON.stringify(order || []), now, req.params.id, req.userId]);
+  run('UPDATE sets SET mastered = ?, wrong = ?, pos = ?, quiz_order = ?, retry_mode = ?, retry_pos = ?, retry_order = ?, updated_at = ? WHERE id = ? AND user_id = ?',
+    [JSON.stringify(mastered || []), JSON.stringify(wrong || []), pos || 0, JSON.stringify(order || []),
+     retryMode ? 1 : 0, retryPos || 0, JSON.stringify(retryOrder || []),
+     now, req.params.id, req.userId]);
   res.json({ ok: true });
 });
 

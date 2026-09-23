@@ -53,6 +53,14 @@
   .btn-danger { color: var(--danger); }
   .btn-danger:hover { background: rgba(248,113,113,.1); border-color: rgba(248,113,113,.3); }
   .toolbar { display: flex; gap: 10px; flex-wrap: wrap; }
+  .topnav { display: flex; align-items: center; gap: 14px; padding: 10px 16px; background: rgba(30,41,59,.7); border: 1px solid #334155; border-radius: 12px; margin-bottom: 18px; font-size: .86rem; }
+  .nav-link { color: var(--muted); text-decoration: none; padding: 6px 12px; border-radius: 8px; transition: all .2s; }
+  .nav-link:hover { color: var(--accent); background: rgba(56,189,248,.08); }
+  .nav-link.active { color: var(--accent); background: rgba(56,189,248,.12); font-weight: 600; }
+  .nav-spacer { flex: 1; }
+  .nav-user { color: var(--muted); font-size: .82rem; }
+  .nav-btn { padding: 5px 12px; font-size: .78rem; border: 1px solid #475569; border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer; transition: all .2s; }
+  .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
 
   .empty {
     text-align: center; padding: 64px 20px; color: var(--muted);
@@ -159,13 +167,14 @@
       <button class="btn btn-primary" id="uploadBtn">上传/粘贴创建词集</button>
     </div>
   </header>
-  <div class="userbar" style="display:flex;justify-content:space-between;align-items:center;padding:0 4px 14px;color:var(--muted);font-size:.82rem">
-    <span>👤 <span id="userInfo">加载中…</span></span>
-    <div style="display:flex;gap:8px">
-      <button class="btn" id="migrateBtn" style="padding:5px 12px;font-size:.78rem">📥 导入本地数据</button>
-      <button class="btn" id="logoutBtn" style="padding:5px 12px;font-size:.78rem">退出登录</button>
-    </div>
-  </div>
+  <nav class="topnav">
+    <a href="index.html" class="nav-link active">🏠 首页</a>
+    <a href="wrong.html" class="nav-link">📕 错题集</a>
+    <span class="nav-spacer"></span>
+    <span class="nav-user">👤 <span id="userInfo">加载中…</span></span>
+    <button class="nav-btn" id="migrateBtn">📥 导入</button>
+    <button class="nav-btn" id="logoutBtn">退出</button>
+  </nav>
 
   <div id="setsContainer"></div>
 </div>
@@ -869,6 +878,9 @@ async function migrateLocalStorage() {
   }
 }
 document.getElementById('migrateBtn').onclick = migrateLocalStorage;
+
+// Remember last visited page for post-login redirect
+localStorage.setItem('vocab_last_page', 'index.html' + location.search);
 
 // Auth check + load sets from backend + auto-migrate on first login
 (async function init(){

@@ -12,6 +12,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Micr
 header{text-align:center;padding:18px 0 10px;position:relative;}
 .back-home{position:absolute;left:0;top:18px;text-decoration:none;color:var(--dim);font-size:.85rem;padding:6px 12px;border:1px solid #475569;border-radius:8px;background:rgba(30,41,59,.6);transition:all .2s;}
 .back-home:hover{color:var(--accent);border-color:var(--accent);}
+.topnav{display:flex;align-items:center;gap:14px;padding:10px 16px;background:rgba(30,41,59,.7);border:1px solid #334155;border-radius:12px;margin-bottom:14px;font-size:.86rem;}
+.nav-link{color:var(--dim);text-decoration:none;padding:6px 12px;border-radius:8px;transition:all .2s;}
+.nav-link:hover{color:var(--accent);background:rgba(56,189,248,.08);}
+.nav-link.active{color:var(--accent);background:rgba(56,189,248,.12);font-weight:600;}
+.nav-spacer{flex:1;}
+.nav-user{color:var(--dim);font-size:.82rem;}
+.nav-btn{padding:5px 12px;font-size:.78rem;border:1px solid #475569;border-radius:8px;background:transparent;color:var(--dim);cursor:pointer;transition:all .2s;}
+.nav-btn:hover{border-color:var(--accent);color:var(--accent);}
 h1{font-size:1.5rem;letter-spacing:1px;}
 .sub{color:var(--dim);font-size:.82rem;margin-top:6px;}
 .bar{height:10px;background:#334155;border-radius:99px;overflow:hidden;margin:14px 0 4px;}
@@ -49,8 +57,13 @@ footer{margin-top:18px;text-align:center;color:#64748b;font-size:.72rem;line-hei
 </head>
 <body>
 <div class="wrap">
+<nav class="topnav">
+<a href="index.html" class="nav-link">🏠 首页</a>
+<a href="wrong.html" class="nav-link">📕 错题集</a>
+<span class="nav-spacer"></span>
+<button class="nav-btn" id="logoutBtn">退出</button>
+</nav>
 <header>
-<a href="index.html" class="back-home" title="返回首页">← 首页</a>
 <h1>📚 词汇闯关训练</h1>
 <div class="sub" id="setSub">例句来自真实出版物 / 新闻媒体 / 词典语料库</div>
 </header>
@@ -60,6 +73,9 @@ footer{margin-top:18px;text-align:center;color:#64748b;font-size:.72rem;line-hei
 <footer>每题含目标句 + 英文释义提示 · 来源标注于题下 · 中文翻译可隐藏/显示 · 答错题自动进入通关后重练</footer>
 </div>
 <script>
+// Remember last visited page for post-login redirect
+localStorage.setItem('vocab_last_page', 'trainer.html' + location.search);
+
 const params = new URLSearchParams(location.search);
 const setId = params.get('id');
 
@@ -125,30 +141,51 @@ function startQuiz(set){
   let curOpts = [];
   let masteredSet = new Set();
   let wrongSet = new Set();
+  let retryMode = false;
+  let origPos = 0, origOrder = [];
 
-  // Load saved progress for this set (mastered/wrong words + quiz position)
+  // Load saved progress for this set (mastered/wrong words + quiz position + retry state)
   function loadProgress() {
     masteredSet = new Set(set.mastered || []);
-    wrongSet = new Set(set.wrong || []);
-    if (typeof set.pos === 'number' && set.pos < DATA.length) {
+    wrongSet = new Set((set.wrong || []).filter(i => typeof i === 'number' && i >= 0 && i < DATA.length));
+    // Clean: remove any wrong indices that are also mastered
+    masteredSet.forEach(i => wrongSet.delete(i));
+    if (typeof set.pos === 'number' && set.pos >= 0 && set.pos <= DATA.length) {
       pos = set.pos;
     }
     if (Array.isArray(set.order) && set.order.length === DATA.length) {
       order = set.order;
     }
+    // Restore retry state if previously in retry mode
+    if (set.retryMode && Array.isArray(set.retryOrder) && set.retryOrder.length > 0) {
+      retryMode = true;
+      origPos = pos;
+      origOrder = order.slice();
+      order = set.retryOrder.filter(i => typeof i === 'number' && i >= 0 && i < DATA.length);
+      pos = (typeof set.retryPos === 'number' && set.retryPos >= 0 && set.retryPos < order.length) ? set.retryPos : 0;
+    }
   }
-  // Save progress after each answer (mastered/wrong + current position) to backend
+  // Save progress after each answer (mastered/wrong + current position + retry state) to backend
   function saveProgress() {
+    const payload = JSON.stringify({
+      mastered: Array.from(masteredSet),
+      wrong: Array.from(wrongSet),
+      pos: retryMode ? origPos : pos,
+      order: retryMode ? origOrder : order,
+      retryMode: retryMode,
+      retryPos: retryMode ? pos : 0,
+      retryOrder: retryMode ? order : []
+    });
     fetch('/api/sets/'+encodeURIComponent(set.id)+'/progress', {
       method:'PUT', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        mastered: Array.from(masteredSet),
-        wrong: Array.from(wrongSet),
-        pos: pos,
-        order: order
-      })
+      body: payload,
+      keepalive: true
     }).catch(()=>{});
   }
+  // Save on page close / navigation
+  window.addEventListener('beforeunload', saveProgress);
+  // Also save periodically (every 5s) in case beforeunload is unreliable
+  setInterval(saveProgress, 5000);
   loadProgress();
   // Show resume indicator if continuing from saved position
   if (pos > 0) {
@@ -183,8 +220,9 @@ function startQuiz(set){
     return shuffle(pool).slice(0,3).map(d=>d.w);
   }
   function updateMeta(){
-    document.getElementById('barfill').style.width = (pos/DATA.length*100)+'%';
-    document.getElementById('pos').textContent = '第 ' + Math.min(pos+1,DATA.length) + ' / ' + DATA.length + ' 题';
+    const total = order.length;
+    document.getElementById('barfill').style.width = (pos/total*100)+'%';
+    document.getElementById('pos').textContent = '第 ' + Math.min(pos+1,total) + ' / ' + total + ' 题' + (retryMode?' （错题重练）':'');
     document.getElementById('score').textContent = '已掌握 ' + masteredSet.size + ' · 错题 ' + wrongSet.size + ' · 本轮答对 ' + correct;
   }
   function render(){
@@ -194,7 +232,7 @@ function startQuiz(set){
     const b = blankSentence(item);
     const opts = shuffle([item.w, ...distractors(item)]);
     curOpts = opts;
-    const lvl = Math.floor(pos/LEVEL)+1, totalInLvl = Math.min(LEVEL, DATA.length-(lvl-1)*LEVEL), inLvl = pos%LEVEL+1;
+    const lvl = Math.floor(pos/LEVEL)+1, totalInLvl = Math.min(LEVEL, order.length-(lvl-1)*LEVEL), inLvl = pos%LEVEL+1;
     document.getElementById('quiz').innerHTML =
       '<span class="leveltag">第 '+lvl+' 关 · '+inLvl+'/'+totalInLvl+'</span>'+
       '<div class="sent">'+(b.hit?b.html:'选出与下列释义对应的单词：<br><span style="color:var(--gold)">'+esc(item.m)+'</span>')+'</div>'+
@@ -210,6 +248,7 @@ function startQuiz(set){
     document.querySelectorAll('.opts button').forEach(btn=>btn.onclick=()=>pick(btn,item));
     document.getElementById('tglDef').onclick = toggleDef;
     document.getElementById('next').onclick = ()=>{pos++; saveProgress(); updateMeta(); render();};
+    // Also save when the question is answered (before pos changes) via beforeunload + interval
     updateMeta();
   }
   function toggleDef(){
@@ -226,7 +265,6 @@ function startQuiz(set){
     const fb=document.getElementById('fb');
     if(!ok){btn.classList.add('wrong'); wrongPool.push(idx); wrongSet.add(idx); masteredSet.delete(idx);}
     else { correct++; masteredSet.add(idx); wrongSet.delete(idx); }
-    saveProgress(); // save per-question progress
     fb.className='feedback '+(ok?'ok':'no');
     fb.innerHTML = (ok?'✅ 正确！　':'❌ 你选的是 <b>'+esc(btn.dataset.w)+'</b>　')
       + '<div style="margin-top:6px;color:#cbd5e1">📖 '+esc(item.w)+'　'+esc(item.m)+'</div>'
@@ -243,23 +281,47 @@ function startQuiz(set){
   }
   function finish(){
     saveProgress();
-    document.getElementById('barfill').style.width='100%';
     const mastered = masteredSet.size;
     const wrong = wrongSet.size;
     const perfect = wrong === 0 && mastered === DATA.length;
-    let html = '<div class="result"><div class="big">'+(perfect?'🏆':'🎉')+'</div>'+
-      '<h2>'+(perfect?'全部掌握！':'本轮完成！')+'</h2>'+
+    const retryDone = retryMode;
+    if(retryMode) {
+      // Restore main quiz state
+      pos = origPos;
+      order = origOrder;
+      retryMode = false;
+    }
+    // Progress bar shows main quiz progress, not 100%
+    document.getElementById('barfill').style.width = (pos/DATA.length*100)+'%';
+    let html = '<div class="result"><div class="big">'+(perfect?'🏆':(retryDone?'✅':'🎉'))+'</div>'+
+      '<h2>'+(perfect?'全部掌握！':(retryDone?'错题重练完成！':'本轮完成！'))+'</h2>'+
       '<p style="margin-top:10px;color:var(--dim)">共 '+DATA.length+' 词 · 已掌握 '+mastered+' · 错题 '+wrong+'</p>';
     if(wrong>0){
       html += '<div class="wronglist"><b>📌 错题回顾</b>';
       Array.from(wrongSet).forEach(i=>{const d=DATA[i];
         html+='<div>▸ <b style="color:#fca5a5">'+esc(d.w)+'</b>　<span class="mean">'+esc(d.m)+'</span>'+(d.s?'<br><span class="trans">'+esc(d.s)+'</span>':'')+'</div>';});
-      html+='</div><div class="tools" style="margin-top:20px"><button id="retry">🔁 重练错题</button></div>';
+      html+='</div><div class="tools" style="margin-top:20px"><button id="retry">🔁 重练错题（共 '+wrongSet.size+' 词）</button></div>';
     }
     html+='<div class="tools" style="margin-top:20px;justify-content:center"><a href="index.html" class="ghost" style="background:transparent;border:1px solid #475569;color:var(--dim);text-decoration:none;padding:11px 18px;border-radius:10px">← 返回首页</a></div></div>';
     document.getElementById('quiz').innerHTML=html;
     const r=document.getElementById('retry');
-    if(r) r.onclick=()=>{order=shuffle(Array.from(wrongSet));pos=0;wrongPool=[];correct=0;updateMeta();render();};
+    if(r) r.onclick=()=>{
+      // Only retry words that are in wrongSet AND not mastered, with valid indices
+      const wrongIndices = Array.from(wrongSet)
+        .filter(i => typeof i === 'number' && i >= 0 && i < DATA.length && !masteredSet.has(i));
+      if (wrongIndices.length === 0) {
+        alert('没有错题需要重练！');
+        return;
+      }
+      retryMode = true;
+      origPos = pos;
+      origOrder = order.slice();
+      order = shuffle(wrongIndices);
+      pos = 0; wrongPool = []; correct = 0;
+      saveProgress();
+      updateMeta();
+      render();
+    };
   }
   // Keyboard shortcuts: Enter → next question (after answering), 1-4 → pick option
   document.addEventListener('keydown', function(e){
@@ -274,6 +336,12 @@ function startQuiz(set){
   });
   updateMeta(); render();
 }
+
+// Logout button in nav
+document.getElementById('logoutBtn').onclick = async () => {
+  try { await fetch('/api/logout', {method:'POST'}); } catch(e){}
+  location.href = 'login.html';
+};
 </script>
 </body>
 </html>

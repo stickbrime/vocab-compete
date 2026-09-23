@@ -78,7 +78,9 @@ form.onsubmit = async (e) => {
     });
     const data = await res.json();
     if(!res.ok){ errEl.textContent = data.error || '操作失败'; return; }
-    location.href = 'index.html';
+    // Redirect to last visited page if saved, otherwise index
+    const last = localStorage.getItem('vocab_last_page');
+    location.href = (last && last !== 'login.html') ? last : 'index.html';
   } catch(e) {
     errEl.textContent = '网络错误，请检查服务器是否运行';
   } finally {
