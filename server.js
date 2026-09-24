@@ -211,6 +211,18 @@ app.get('/api/wrong-words', auth, (req, res) => {
   res.json(result);
 });
 
+// Remove a specific wrong word from a set (by setId + item index)
+app.delete('/api/sets/:id/wrong/:idx', auth, (req, res) => {
+  const setId = req.params.id;
+  const idx = parseInt(req.params.idx);
+  const set = query('SELECT wrong FROM sets WHERE id = ? AND user_id = ?', [setId, req.userId]);
+  if (!set.length) return res.status(404).json({ error: '词集不存在' });
+  const wrong = JSON.parse(set[0].wrong || '[]').filter(i => i !== idx);
+  run('UPDATE sets SET wrong = ?, updated_at = ? WHERE id = ? AND user_id = ?',
+    [JSON.stringify(wrong), Date.now(), setId, req.userId]);
+  res.json({ ok: true });
+});
+
 // Serve index.html for the root
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
