@@ -53,6 +53,13 @@ h1{font-size:1.5rem;letter-spacing:1px;}
 .wronglist div{padding:6px 0;border-bottom:1px dashed #334155;}
 footer{margin-top:18px;text-align:center;color:#64748b;font-size:.72rem;line-height:1.8;}
 @media(max-width:560px){.opts{grid-template-columns:1fr;}}
+.rate-btn{border-radius:10px;padding:10px 16px;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.rate-btn:hover{transform:translateY(-2px);filter:brightness(1.1);}
+.rate-btn small{font-size:.65rem;opacity:.7;}
+.rate-again{background:rgba(239,68,68,.2);color:#fca5a5;border:1px solid var(--bad);}
+.rate-hard{background:rgba(245,158,11,.18);color:#fcd34d;border:1px solid #f59e0b;}
+.rate-good{background:rgba(34,197,94,.18);color:#86efac;border:1px solid var(--good);}
+.rate-easy{background:rgba(59,130,246,.18);color:#93c5fd;border:1px solid #3b82f6;}
 </style>
 </head>
 <body>
@@ -60,6 +67,7 @@ footer{margin-top:18px;text-align:center;color:#64748b;font-size:.72rem;line-hei
 <nav class="topnav">
 <a href="index.html" class="nav-link">🏠 首页</a>
 <a href="wrong.html" class="nav-link">📕 错题集</a>
+<a href="account.html" class="nav-link">👤 账户</a>
 <span class="nav-spacer"></span>
 <button class="nav-btn" id="logoutBtn">退出</button>
 </nav>
@@ -242,12 +250,10 @@ function startQuiz(set){
       '<div class="feedback" id="fb"></div>'+
       '<div class="tools">'+
         '<button class="ghost" id="tglDef">📖 显示答案释义</button>'+
-        '<button id="next" class="hidden">下一题 ➜</button>'+
       '</div>'+
       '<div id="defBox" class="hidden" style="margin-top:14px;font-size:.9rem;line-height:1.8;color:#cbd5e1">📖 答案释义：'+esc(item.m)+'</div>';
     document.querySelectorAll('.opts button').forEach(btn=>btn.onclick=()=>pick(btn,item));
     document.getElementById('tglDef').onclick = toggleDef;
-    document.getElementById('next').onclick = ()=>{pos++; saveProgress(); updateMeta(); render();};
     // Also save when the question is answered (before pos changes) via beforeunload + interval
     updateMeta();
   }
@@ -276,8 +282,62 @@ function startQuiz(set){
             +'<div style="margin-top:2px"><span style="color:var(--dim)">英文：</span><span class="trans">'+esc(d.en||'-')+'</span></div></div>';}).join('')
       + '</div>';
     if(!showDef){showDef=true;toggleDef();}
-    document.getElementById('next').classList.remove('hidden');
+
+    // Anki-style rating buttons (appear after answering)
+    const toolsEl = document.querySelector('.tools');
+    // Remove old next button and rating area
+    const oldNext = document.getElementById('next');
+    if(oldNext) oldNext.remove();
+    toolsEl.insertAdjacentHTML('beforeend',
+      '<div id="rateArea" style="width:100%;margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center">'+
+        '<button class="rate-btn rate-again" data-rate="again"><span>🔁 重来</span><small>1</small></button>'+
+        '<button class="rate-btn rate-hard" data-rate="hard"><span>⚠️ 困难</span><small>2</small></button>'+
+        '<button class="rate-btn rate-good" data-rate="good"><span>✅ 良好</span><small>3</small></button>'+
+        '<button class="rate-btn rate-easy" data-rate="easy"><span>💎 简单</span><small>4</small></button>'+
+        '<button class="ghost" id="next" style="min-width:120px">下一题 ➜</button>'+
+      '</div>'
+    );
+
+    // Rating handlers — reorder queue based on rating
+    toolsEl.querySelectorAll('[data-rate]').forEach(rb => {
+      rb.onclick = () => {
+        const rating = rb.dataset.rate;
+        applyRating(rating, idx);
+      };
+    });
+    document.getElementById('next').onclick = ()=>{pos++; saveProgress(); updateMeta(); render();};
     updateMeta();
+  }
+
+  // Anki-style queue reordering
+  function applyRating(rating, currentIdx){
+    if(pos >= order.length) return;
+    // Remove current from order
+    const cur = order[pos];
+    order.splice(pos, 1);
+
+    if(rating === 'again'){
+      // Reinsert 3-5 cards ahead
+      const at = Math.min(pos + 3 + Math.floor(Math.random()*3), order.length);
+      order.splice(at, 0, cur);
+      if(at <= pos) pos++;
+    } else if(rating === 'hard'){
+      // Reinsert halfway to end
+      const at = Math.min(pos + Math.ceil((order.length - pos) / 2), order.length);
+      order.splice(at, 0, cur);
+      if(at <= pos) pos++;
+    } else if(rating === 'good'){
+      // Move to end
+      order.push(cur);
+      // pos stays
+    } else if(rating === 'easy'){
+      // Remove from queue entirely
+      order.splice(pos, 0); // already removed, just don't reinsert
+      // pos stays — next card slides in
+    }
+    saveProgress();
+    updateMeta();
+    render();
   }
   function finish(){
     saveProgress();
@@ -323,15 +383,25 @@ function startQuiz(set){
       render();
     };
   }
-  // Keyboard shortcuts: Enter → next question (after answering), 1-4 → pick option
+  // Keyboard shortcuts: Enter → next question, 1-4 → pick option (before answer) or rate (after answer)
   document.addEventListener('keydown', function(e){
     if(e.key === 'Enter' && answered){
       const nxt = document.getElementById('next');
-      if(nxt && !nxt.classList.contains('hidden')){ e.preventDefault(); nxt.click(); }
-    } else if(['1','2','3','4'].includes(e.key) && !answered){
-      const btns = document.querySelectorAll('.opts button');
-      const idx = parseInt(e.key)-1;
-      if(btns[idx]){ e.preventDefault(); btns[idx].click(); }
+      if(nxt){ e.preventDefault(); nxt.click(); }
+    } else if(['1','2','3','4'].includes(e.key)){
+      if(!answered){
+        const btns = document.querySelectorAll('.opts button');
+        const idx = parseInt(e.key)-1;
+        if(btns[idx]){ e.preventDefault(); btns[idx].click(); }
+      } else {
+        // After answering, 1-4 triggers rating
+        const rateMap = {'1':'again','2':'hard','3':'good','4':'easy'};
+        const rating = rateMap[e.key];
+        if(rating){
+          const rb = document.querySelector('[data-rate="'+rating+'"]');
+          if(rb){ e.preventDefault(); rb.click(); }
+        }
+      }
     }
   });
   updateMeta(); render();

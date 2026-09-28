@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocab Trainer · 单词卡片</title>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--card2:#273549;--accent:#38bdf8;--accent2:#8b5cf6;--good:#22c55e;--bad:#ef4444;--warn:#f59e0b;--easy:#3b82f6;--txt:#e2e8f0;--dim:#94a3b8;--gold:#fbbf24;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:linear-gradient(160deg,#0f172a 0%,#1e1b4b 100%);color:var(--txt);min-height:100vh;padding:16px;}
+.wrap{max-width:760px;margin:0 auto;}
+.topnav{display:flex;align-items:center;gap:14px;padding:10px 16px;background:rgba(30,41,59,.7);border:1px solid #334155;border-radius:12px;margin-bottom:14px;font-size:.86rem;}
+.nav-link{color:var(--dim);text-decoration:none;padding:6px 12px;border-radius:8px;transition:all .2s;}
+.nav-link:hover{color:var(--accent);background:rgba(56,189,248,.08);}
+.nav-link.active{color:var(--accent);background:rgba(56,189,248,.12);font-weight:600;}
+.nav-spacer{flex:1;}
+.nav-btn{padding:5px 12px;font-size:.78rem;border:1px solid #475569;border-radius:8px;background:transparent;color:var(--dim);cursor:pointer;transition:all .2s;}
+.nav-btn:hover{border-color:var(--accent);color:var(--accent);}
+header{text-align:center;padding:14px 0 10px;}
+h1{font-size:1.5rem;letter-spacing:1px;}
+.sub{color:var(--dim);font-size:.82rem;margin-top:6px;}
+
+.bar{height:10px;background:#334155;border-radius:99px;overflow:hidden;margin:14px 0 4px;}
+.bar>i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#818cf8);transition:width .35s ease;border-radius:99px;}
+.barmeta{display:flex;justify-content:space-between;font-size:.75rem;color:var(--dim);margin-bottom:16px;}
+
+/* Flashcard */
+.card-area{perspective:1200px;margin-bottom:20px;}
+.flashcard{
+  position:relative;width:100%;min-height:300px;
+  cursor:pointer;
+  transition:transform .5s cubic-bezier(.4,0,.2,1);
+  transform-style:preserve-3d;
+}
+.flashcard.flipped{transform:rotateY(180deg);}
+.card-face{
+  position:absolute;inset:0;
+  border-radius:18px;padding:32px 28px;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  text-align:center;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  box-shadow:0 12px 40px rgba(0,0,0,.4);
+}
+.card-front{background:linear-gradient(145deg,#1e293b,#273549);border:1px solid #334155;}
+.card-back{background:linear-gradient(145deg,#1a1d2e,#222640);border:1px solid var(--accent);transform:rotateY(180deg);}
+.word{font-size:2.2rem;font-weight:700;color:var(--accent);letter-spacing:.5px;margin-bottom:8px;}
+.tap-hint{font-size:.75rem;color:#64748b;margin-top:20px;}
+
+.def{font-size:1.15rem;color:#c4b5fd;line-height:1.8;margin-bottom:12px;max-width:560px;}
+.def-en{font-size:.88rem;color:var(--dim);margin-bottom:14px;line-height:1.6;max-width:560px;}
+.sent-box{
+  background:rgba(56,189,248,.06);border-left:3px solid var(--accent);
+  border-radius:0 8px 8px 0;padding:12px 14px;margin-top:12px;
+  font-size:.92rem;line-height:1.7;color:#cbd5e1;text-align:left;
+  max-width:560px;width:100%;
+}
+.sent-src{font-size:.72rem;color:var(--dim);margin-top:6px;}
+
+/* Rating buttons (Anki-style) */
+.rate-row{display:flex;gap:8px;justify-content:center;margin-bottom:16px;flex-wrap:wrap;}
+.rate-btn{
+  border:none;border-radius:12px;padding:14px 20px;cursor:pointer;
+  font-size:.88rem;font-weight:600;transition:all .15s;
+  display:flex;flex-direction:column;align-items:center;gap:3px;min-width:90px;
+}
+.rate-btn:hover{transform:translateY(-2px);filter:brightness(1.1);}
+.rate-btn:disabled{opacity:.3;cursor:default;transform:none;}
+.rate-btn .rate-label{font-size:.9rem;font-weight:700;}
+.rate-btn .rate-hint{font-size:.68rem;opacity:.8;}
+.rate-again{background:rgba(239,68,68,.2);color:#fca5a5;border:1px solid var(--bad);}
+.rate-hard{background:rgba(245,158,11,.18);color:#fcd34d;border:1px solid var(--warn);}
+.rate-good{background:rgba(34,197,94,.18);color:#86efac;border:1px solid var(--good);}
+.rate-easy{background:rgba(59,130,246,.18);color:#93c5fd;border:1px solid var(--easy);}
+
+/* Nav controls */
+.controls{display:flex;gap:10px;align-items:center;justify-content:center;margin-bottom:16px;flex-wrap:wrap;}
+.ctrl-btn{
+  background:var(--card2);border:1px solid #3b4a63;color:var(--txt);
+  border-radius:10px;padding:10px 18px;font-size:.88rem;cursor:pointer;
+  transition:all .15s;font-weight:500;
+}
+.ctrl-btn:hover{border-color:var(--accent);background:#304460;}
+.ctrl-btn:disabled{opacity:.4;cursor:default;}
+.flip-btn{
+  background:linear-gradient(135deg,var(--accent2),#6366f1);border:none;color:#fff;
+  border-radius:10px;padding:10px 28px;font-size:.9rem;cursor:pointer;font-weight:600;
+  transition:all .15s;
+}
+.flip-btn:hover{opacity:.9;}
+
+/* Settings */
+.settings{display:flex;gap:16px;justify-content:center;align-items:center;margin-bottom:14px;flex-wrap:wrap;font-size:.82rem;color:var(--dim);}
+.settings label{display:flex;align-items:center;gap:6px;cursor:pointer;}
+.settings input[type=checkbox]{accent-color:var(--accent);}
+.settings select{background:var(--card2);border:1px solid #3b4a63;color:var(--txt);border-radius:8px;padding:5px 10px;font-size:.82rem;outline:none;}
+
+/* Stats line */
+.stats-line{display:flex;gap:14px;justify-content:center;font-size:.78rem;color:var(--dim);margin-bottom:16px;flex-wrap:wrap;}
+.stats-line span b{color:var(--txt);}
+.stats-line .s-again b{color:#fca5a5;}
+.stats-line .s-hard b{color:#fcd34d;}
+.stats-line .s-good b{color:#86efac;}
+.stats-line .s-easy b{color:#93c5fd;}
+
+/* Queue info */
+.queue-info{text-align:center;font-size:.78rem;color:var(--dim);margin-bottom:12px;}
+.queue-info b{color:var(--accent);}
+
+.result{text-align:center;padding:40px 10px;}
+.result .big{font-size:2.4rem;margin-bottom:8px;}
+footer{margin-top:18px;text-align:center;color:#64748b;font-size:.72rem;line-height:1.8;}
+
+@media(max-width:560px){
+  .word{font-size:1.6rem;}
+  .def{font-size:1rem;}
+  .flashcard{min-height:260px;}
+  .rate-btn{padding:10px 12px;min-width:70px;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav">
+<a href="index.html" class="nav-link">🏠 首页</a>
+<a href="wrong.html" class="nav-link">📕 错题集</a>
+<a href="account.html" class="nav-link">👤 账户</a>
+<span class="nav-spacer"></span>
+<button class="nav-btn" id="logoutBtn">退出</button>
+</nav>
+<header>
+<h1>🎴 单词卡片</h1>
+<div class="sub" id="setSub">翻牌后评分 · 空格翻牌 · 1/2/3/4 评分 · ← → 切换</div>
+</header>
+
+<div id="mainContent">
+<div class="bar"><i id="barfill"></i></div>
+<div class="barmeta"><span id="posLabel">—</span><span id="modeLabel"></span></div>
+
+<div class="settings">
+  <label><input type="checkbox" id="optShuffle" checked> 随机顺序</label>
+  <label><input type="checkbox" id="optAutoDef"> 自动显示释义</label>
+  <label>模式
+    <select id="optMode">
+      <option value="all">全部单词</option>
+      <option value="unmastered">未掌握</option>
+      <option value="wrong">仅错题</option>
+    </select>
+  </label>
+</div>
+
+<div class="stats-line">
+  <span>📖 队列 <b id="queueCount">0</b></span>
+  <span>👀 已看 <b id="seenCount">0</b></span>
+  <span class="s-again">🔁 重来 <b id="againCount">0</b></span>
+  <span class="s-hard">⚠️ 困难 <b id="hardCount">0</b></span>
+  <span class="s-good">✅ 良好 <b id="goodCount">0</b></span>
+  <span class="s-easy">💎 简单 <b id="easyCount">0</b></span>
+</div>
+
+<div class="queue-info" id="queueInfo"></div>
+
+<div class="card-area">
+<div class="flashcard" id="flashcard">
+  <div class="card-face card-front">
+    <div class="word" id="cardWord">loading…</div>
+    <div class="tap-hint"><span>🔄</span> 点击或空格键翻牌</div>
+  </div>
+  <div class="card-face card-back">
+    <div class="def" id="cardDef"></div>
+    <div class="def-en" id="cardEn"></div>
+    <div class="sent-box" id="cardSent" style="display:none">
+      <div id="cardSentText"></div>
+      <div class="sent-src" id="cardSentSrc"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Rating buttons (shown after flip) -->
+<div class="rate-row" id="rateRow" style="display:none">
+  <button class="rate-btn rate-again" id="rateAgain">
+    <span class="rate-label">🔁 重来</span>
+    <span class="rate-hint">1 · 重新出现</span>
+  </button>
+  <button class="rate-btn rate-hard" id="rateHard">
+    <span class="rate-label">⚠️ 困难</span>
+    <span class="rate-hint">2 · 稍后出现</span>
+  </button>
+  <button class="rate-btn rate-good" id="rateGood">
+    <span class="rate-label">✅ 良好</span>
+    <span class="rate-hint">3 · 正常进度</span>
+  </button>
+  <button class="rate-btn rate-easy" id="rateEasy">
+    <span class="rate-label">💎 简单</span>
+    <span class="rate-hint">4 · 移出队列</span>
+  </button>
+</div>
+
+<!-- Nav controls (shown before flip) -->
+<div class="controls" id="navControls">
+  <button class="ctrl-btn" id="prevBtn">← 上一张</button>
+  <button class="flip-btn" id="flipBtn">🔄 翻牌</button>
+  <button class="ctrl-btn primary" id="skipBtn">跳过 →</button>
+</div>
+
+<footer>空格 = 翻牌 · 1/2/3/4 = 评分 · ←/→ = 上下张</footer>
+</div>
+</div>
+
+<script>
+localStorage.setItem('vocab_last_page', 'flashcard.html' + location.search);
+
+const params = new URLSearchParams(location.search);
+const setId = params.get('id');
+
+// Anki-style spaced repetition state
+let DATA = [];          // all filtered items
+let queue = [];         // array of { dataIdx, rating } — rating: null=unseen, 'again', 'hard', 'good', 'easy'
+let qPos = 0;           // current position in queue
+let flipped = false;
+let fullSet = null;
+let stats = { seen: 0, again: 0, hard: 0, good: 0, easy: 0 };
+let completedIndices = new Set(); // removed from queue (easy)
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+(async function init(){
+  if(!setId){ document.getElementById('mainContent').innerHTML = '<div class="result"><div class="big">⚠️</div><p style="color:var(--dim)">缺少词集 ID</p><p style="margin-top:14px"><a href="index.html" style="color:var(--accent)">← 返回首页</a></p></div>'; return; }
+  try {
+    const res = await fetch('/api/sets');
+    if(!res.ok){ location.href='login.html'; return; }
+    const sets = await res.json();
+    fullSet = sets[setId];
+    if(!fullSet){ document.getElementById('mainContent').innerHTML = '<div class="result"><div class="big">⚠️</div><p style="color:var(--dim)">找不到这个词集</p><p style="margin-top:14px"><a href="index.html" style="color:var(--accent)">← 返回首页</a></p></div>'; return; }
+    document.getElementById('setSub').textContent = fullSet.name + ' · 翻牌后评分 · 空格翻牌 · 1/2/3/4 评分';
+    rebuildDeck();
+  } catch(e) {
+    location.href = 'login.html';
+  }
+})();
+
+function rebuildDeck(){
+  const mode = document.getElementById('optMode').value;
+  const doShuffle = document.getElementById('optShuffle').checked;
+
+  let items = fullSet.items
+    .filter(it => it.word && !/[\u4e00-\u9fff]/.test(it.word))
+    .filter(it => it.def && /[\u4e00-\u9fff]/.test(it.def))
+    .map((it, idx) => ({
+      w: it.word, m: it.def, s: it.sentence||'', src: it.src||'', t: it.translation||'', en: it.englishDef||'',
+      _origIdx: idx
+    }));
+
+  if(mode === 'unmastered'){
+    const mastered = new Set(fullSet.mastered||[]);
+    items = items.filter(it => !mastered.has(it._origIdx));
+  } else if(mode === 'wrong'){
+    const wrong = new Set(fullSet.wrong||[]);
+    items = items.filter(it => wrong.has(it._origIdx));
+  }
+
+  DATA = items;
+  // Build queue: each entry tracks its rating
+  let indices = DATA.map((_,i)=>i);
+  if(doShuffle) indices.sort(()=>Math.random()-0.5);
+  queue = indices.map(i => ({ dataIdx: i, rating: null }));
+  qPos = 0;
+  flipped = false;
+  stats = { seen: 0, again: 0, hard: 0, good: 0, easy: 0 };
+  completedIndices.clear();
+
+  document.getElementById('queueCount').textContent = queue.length;
+  renderCard();
+}
+
+function renderCard(){
+  // Skip completed cards
+  while(qPos < queue.length && completedIndices.has(queue[qPos].dataIdx)){
+    qPos++;
+  }
+
+  if(qPos >= queue.length){
+    showResult();
+    return;
+  }
+
+  const entry = queue[qPos];
+  const item = DATA[entry.dataIdx];
+  flipped = false;
+  document.getElementById('flashcard').classList.remove('flipped');
+  document.getElementById('rateRow').style.display = 'none';
+  document.getElementById('navControls').style.display = 'flex';
+
+  document.getElementById('cardWord').textContent = item.w;
+  document.getElementById('cardDef').textContent = item.m;
+  document.getElementById('cardEn').textContent = item.en ? '📘 ' + item.en : '';
+
+  const sentEl = document.getElementById('cardSent');
+  if(item.s){
+    sentEl.style.display = 'block';
+    document.getElementById('cardSentText').innerHTML = esc(item.s).replace(
+      new RegExp(esc(item.w),'gi'),
+      m => '<span style="color:var(--gold);font-weight:700">'+m+'</span>'
+    );
+    document.getElementById('cardSentSrc').textContent = item.src ? '📰 ' + item.src : '';
+    if(item.t) document.getElementById('cardSentSrc').textContent += (item.src ? ' · ' : '') + item.t;
+  } else {
+    sentEl.style.display = 'none';
+  }
+
+  // Auto-flip if enabled
+  if(document.getElementById('optAutoDef').checked){
+    setTimeout(()=>{ if(qPos < queue.length){ doFlip(); } }, 400);
+  }
+
+  // Progress
+  const remaining = queue.length - qPos;
+  const pct = queue.length ? Math.round((qPos) / queue.length * 100) : 0;
+  document.getElementById('barfill').style.width = pct + '%';
+  document.getElementById('posLabel').textContent = '第 ' + (qPos+1) + '/' + queue.length + ' 张';
+  const modeEl = document.getElementById('optMode');
+  document.getElementById('modeLabel').textContent = modeEl.options[modeEl.selectedIndex].text;
+
+  document.getElementById('prevBtn').disabled = qPos === 0;
+  document.getElementById('skipBtn').disabled = qPos >= queue.length - 1;
+
+  // Queue info
+  const againPending = queue.filter((e,i) => i > qPos && e.rating === 'again').length;
+  const hardPending = queue.filter((e,i) => i > qPos && e.rating === 'hard').length;
+  let qi = '剩余 <b>' + remaining + '</b> 张';
+  if(againPending) qi += ' · 🔁 待重来 ' + againPending;
+  if(hardPending) qi += ' · ⚠️ 待困难 ' + hardPending;
+  document.getElementById('queueInfo').innerHTML = qi;
+
+  updateStats();
+}
+
+function showResult(){
+  const total = stats.seen;
+  document.getElementById('mainContent').innerHTML =
+    '<div class="result"><div class="big">🎉</div>' +
+    '<div style="font-size:18px;margin-bottom:6px">卡片复习完成！</div>' +
+    '<div style="color:var(--dim);font-size:.88rem;margin-bottom:18px">' +
+    '共 ' + total + ' 张已复习<br>' +
+    '<span style="color:#fca5a5">🔁 重来 ' + stats.again + '</span> · ' +
+    '<span style="color:#fcd34d">⚠️ 困难 ' + stats.hard + '</span> · ' +
+    '<span style="color:#86efac">✅ 良好 ' + stats.good + '</span> · ' +
+    '<span style="color:#93c5fd">💎 简单 ' + stats.easy + '</span>' +
+    '</div>' +
+    '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">' +
+      '<button class="ctrl-btn" onclick="location.reload()" style="padding:10px 20px;background:linear-gradient(135deg,#38bdf8,#818cf8);border:none;color:#082f49;font-weight:700">🔄 再来一遍</button>' +
+      '<a href="index.html" class="ctrl-btn" style="padding:10px 20px;text-decoration:none">← 返回首页</a>' +
+      '<a href="trainer.html?id=' + encodeURIComponent(setId) + '" class="ctrl-btn" style="padding:10px 20px;text-decoration:none">📚 去闯关训练</a>' +
+    '</div></div>';
+}
+
+function updateStats(){
+  document.getElementById('seenCount').textContent = stats.seen;
+  document.getElementById('againCount').textContent = stats.again;
+  document.getElementById('hardCount').textContent = stats.hard;
+  document.getElementById('goodCount').textContent = stats.good;
+  document.getElementById('easyCount').textContent = stats.easy;
+}
+
+function doFlip(){
+  flipped = !flipped;
+  document.getElementById('flashcard').classList.toggle('flipped', flipped);
+  if(flipped){
+    document.getElementById('rateRow').style.display = 'flex';
+    document.getElementById('navControls').style.display = 'none';
+  } else {
+    document.getElementById('rateRow').style.display = 'none';
+    document.getElementById('navControls').style.display = 'flex';
+  }
+}
+
+// Anki-style rating: reorder queue based on rating
+function rate(rating){
+  if(qPos >= queue.length) return;
+  const entry = queue[qPos];
+  entry.rating = rating;
+  stats.seen++;
+
+  if(rating === 'again'){
+    // Reinsert a few cards ahead (3-5 cards forward, or at end if near end)
+    stats.again++;
+    const reinsertAt = Math.min(qPos + 3 + Math.floor(Math.random()*3), queue.length);
+    // Remove from current position and reinsert
+    queue.splice(qPos, 1);
+    queue.splice(reinsertAt - 1, 0, entry);
+    // Don't advance qPos since we removed current — next card is already at qPos
+    // But if reinsertAt <= qPos, we need to adjust
+    if(reinsertAt - 1 < qPos) qPos++;
+  } else if(rating === 'hard'){
+    // Reinsert sooner than normal — halfway to end
+    stats.hard++;
+    const reinsertAt = Math.min(qPos + Math.ceil((queue.length - qPos) / 2), queue.length);
+    queue.splice(qPos, 1);
+    queue.splice(reinsertAt - 1, 0, entry);
+    if(reinsertAt - 1 < qPos) qPos++;
+  } else if(rating === 'good'){
+    // Normal — move to end of queue
+    stats.good++;
+    queue.splice(qPos, 1);
+    queue.push(entry);
+    // qPos stays, next card slides in
+  } else if(rating === 'easy'){
+    // Remove from queue entirely
+    stats.easy++;
+    completedIndices.add(entry.dataIdx);
+    queue.splice(qPos, 1);
+    // qPos stays, next card slides in
+  }
+
+  // Update queue count (completed cards are still in queue array but marked done)
+  const activeRemaining = queue.length - qPos - Array.from(completedIndices).filter(ci => {
+    return queue.slice(qPos+1).some(e => e.dataIdx === ci);
+  }).length;
+  document.getElementById('queueCount').textContent = queue.length - completedIndices.size;
+
+  renderCard();
+}
+
+function next(){
+  if(qPos < queue.length - 1){ qPos++; renderCard(); }
+}
+function prev(){
+  if(qPos > 0){ qPos--; renderCard(); }
+}
+
+// Event listeners
+document.getElementById('flashcard').onclick = doFlip;
+document.getElementById('flipBtn').onclick = doFlip;
+document.getElementById('skipBtn').onclick = next;
+document.getElementById('prevBtn').onclick = prev;
+document.getElementById('rateAgain').onclick = ()=>rate('again');
+document.getElementById('rateHard').onclick = ()=>rate('hard');
+document.getElementById('rateGood').onclick = ()=>rate('good');
+document.getElementById('rateEasy').onclick = ()=>rate('easy');
+document.getElementById('optShuffle').onchange = rebuildDeck;
+document.getElementById('optMode').onchange = rebuildDeck;
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if(e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
+  switch(e.key){
+    case ' ': case 'Enter': e.preventDefault(); doFlip(); break;
+    case 'ArrowRight': next(); break;
+    case 'ArrowLeft': prev(); break;
+    case '1': if(flipped) rate('again'); break;
+    case '2': if(flipped) rate('hard'); break;
+    case '3': if(flipped) rate('good'); break;
+    case '4': if(flipped) rate('easy'); break;
+  }
+});
+
+// Logout
+document.getElementById('logoutBtn').onclick = async () => {
+  try { await fetch('/api/logout', {method:'POST'}); } catch(e){}
+  location.href = 'login.html';
+};
+</script>
+</body>
+</html>

@@ -170,6 +170,7 @@
   <nav class="topnav">
     <a href="index.html" class="nav-link active">🏠 首页</a>
     <a href="wrong.html" class="nav-link">📕 错题集</a>
+    <a href="account.html" class="nav-link">👤 账户</a>
     <span class="nav-spacer"></span>
     <span class="nav-user">👤 <span id="userInfo">加载中…</span></span>
     <button class="nav-btn" id="migrateBtn">📥 导入</button>
@@ -538,6 +539,7 @@ function renderSets() {
         <div class="set-progress"><div style="width:${pct}%"></div></div>
         <div class="card-actions" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn btn-primary" data-resume="${k}" style="flex:1;min-width:110px;padding:9px 12px;font-size:.85rem">${hasProgress ? '⏯ 继续进度' : '▶ 开始训练'}</button>
+          <button class="btn" data-flashcard="${k}" title="卡片模式浏览" style="padding:9px 10px;font-size:.82rem;background:#2a2f3a">🎴 卡片</button>
           <button class="btn" data-rename="${k}" title="重命名词集" style="padding:9px 10px;font-size:.82rem;background:#2a2f3a">✎ 重命名</button>
           <button class="btn" data-reset="${k}" title="清除进度，从头开始" style="padding:9px 10px;font-size:.82rem;background:#2a2f3a;color:#f87171;border-color:#3a414f">↻ 重练</button>
         </div>
@@ -674,6 +676,14 @@ document.getElementById('setsContainer').addEventListener('click', e => {
     flushSaves().then(() => {
       location.href = `trainer.html?id=${encodeURIComponent(id)}`;
     });
+    return;
+  }
+  // Flashcard button → open flashcard mode
+  const flashBtn = e.target.closest('[data-flashcard]');
+  if (flashBtn) {
+    e.stopPropagation();
+    const id = flashBtn.dataset.flashcard;
+    location.href = `flashcard.html?id=${encodeURIComponent(id)}`;
     return;
   }
   // Rename button → rename this set

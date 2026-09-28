@@ -122,6 +122,35 @@ app.get('/api/user', auth, (req, res) => {
   res.json(user);
 });
 
+// Change password
+app.put('/api/user/password', auth, (req, res) => {
+  const { currentPassword, newPassword } = req.body || {};
+  if (!currentPassword || !newPassword) return res.status(400).json({ error: '请填写当前密码和新密码' });
+  if (newPassword.length < 6) return res.status(400).json({ error: '新密码至少 6 位' });
+  const user = query('SELECT password FROM users WHERE id = ?', [req.userId])[0];
+  if (!user || !bcrypt.compareSync(currentPassword, user.password)) {
+    return res.status(401).json({ error: '当前密码不正确' });
+  }
+  const hash = bcrypt.hashSync(newPassword, 10);
+  run('UPDATE users SET password = ? WHERE id = ?', [hash, req.userId]);
+  res.json({ ok: true });
+});
+
+// Get user stats
+app.get('/api/user/stats', auth, (req, res) => {
+  const rows = query('SELECT items, mastered, wrong FROM sets WHERE user_id = ?', [req.userId]);
+  let totalWords = 0, totalMastered = 0, totalWrong = 0, setCount = rows.length;
+  rows.forEach(r => {
+    const items = JSON.parse(r.items);
+    const mastered = JSON.parse(r.mastered);
+    const wrong = JSON.parse(r.wrong);
+    totalWords += items.length;
+    totalMastered += mastered.length;
+    totalWrong += wrong.length;
+  });
+  res.json({ setCount, totalWords, totalMastered, totalWrong });
+});
+
 // ---------- Sets routes ----------
 app.get('/api/sets', auth, (req, res) => {
   const rows = query('SELECT * FROM sets WHERE user_id = ? ORDER BY updated_at DESC', [req.userId]);
