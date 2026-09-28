@@ -10,7 +10,13 @@ const DB = (() => {
     if (_online !== null) return _online;
     try {
       const r = await fetch('/api/user', { credentials: 'same-origin' });
-      _online = r.ok || r.status === 401; // 401 means server is running, just not logged in
+      // Check content-type to distinguish real API from static host returning index.html
+      const ct = r.headers.get('content-type') || '';
+      if (ct.includes('application/json')) {
+        _online = true; // Real backend responding with JSON
+      } else {
+        _online = false; // Static host returned HTML (SPA redirect)
+      }
     } catch(e) {
       _online = false;
     }
