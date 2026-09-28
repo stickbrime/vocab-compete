@@ -228,6 +228,7 @@
 <script src="extract_lib.js"></script>
 <script src="sat_vocab_200.js"></script>
 <script src="vocab_100.js"></script>
+<script src="db.js"></script>
 <script>
 const STORAGE_KEY = 'vocab_sets_v1';
 const PENDING_KEY = 'vocab_pending_extract';
@@ -254,15 +255,11 @@ async function flushSaves() {
   await Promise.allSettled(Array.from(_pendingSaves));
 }
 async function apiSaveSet(set) {
-  try {
-    await fetch('/api/sets', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ id: set.id, name: set.name, items: set.items })
-    });
-  } catch(e) { console.warn('saveSet failed', e); }
+  try { await DB.saveSet({ id: set.id, name: set.name, items: set.items }); }
+  catch(e) { console.warn('saveSet failed', e); }
 }
 async function apiDeleteSet(id) {
-  try { await fetch('/api/sets/'+encodeURIComponent(id), {method:'DELETE'}); }
+  try { await DB.deleteSet(id); }
   catch(e) { console.warn('deleteSet failed', e); }
 }
 function uid() { return 's_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
@@ -696,10 +693,7 @@ document.getElementById('setsContainer').addEventListener('click', e => {
     const newName = prompt('重命名词集：', sets[id].name);
     if (!newName || !newName.trim() || newName.trim() === sets[id].name) return;
     sets[id].name = newName.trim();
-    fetch('/api/sets/'+encodeURIComponent(id), {
-      method:'PUT', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ name: newName.trim() })
-    }).catch(()=>{});
+    trackSave(DB.saveSet({ id, name: newName.trim(), items: sets[id].items }));
     saveSets(sets);
     renderSets();
     toast('已重命名', 'ok');
@@ -720,10 +714,7 @@ document.getElementById('setsContainer').addEventListener('click', e => {
     sets[id].wrong = [];
     sets[id].pos = 0;
     sets[id].order = [];
-    fetch('/api/sets/'+encodeURIComponent(id)+'/progress', {
-      method:'PUT', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ mastered: [], wrong: [], pos: 0, order: [] })
-    }).catch(()=>{});
+    trackSave(DB.saveProgress(id, { mastered: [], wrong: [], pos: 0, order: [] }));
     saveSets(sets);
     renderSets();
     toast(hasProgress ? '进度已清除，可从头开始' : '已是全新状态', 'ok');
@@ -839,7 +830,7 @@ document.getElementById('sampleBtn').onclick = () => {
 // --- Logout ---
 document.getElementById('logoutBtn').onclick = async () => {
   await flushSaves();
-  try { await fetch('/api/logout', {method:'POST'}); } catch(e){}
+  try { await DB.logout(); } catch(e){}
   location.href = 'login.html';
 };
 
@@ -862,21 +853,12 @@ async function migrateLocalStorage() {
       const os = oldSets[id];
       if (SETS[id]) {
         merged++;
-        await fetch('/api/sets/'+encodeURIComponent(id)+'/progress', {
-          method:'PUT', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ mastered: os.mastered||[], wrong: os.wrong||[], pos: os.pos||0, order: os.order||[] })
-        }).catch(()=>{});
+        await DB.saveProgress(id, { mastered: os.mastered||[], wrong: os.wrong||[], pos: os.pos||0, order: os.order||[] }).catch(()=>{});
         Object.assign(SETS[id], { mastered: os.mastered||[], wrong: os.wrong||[], pos: os.pos||0 });
       } else {
         migrated++;
-        await fetch('/api/sets', {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ id, name: os.name, items: os.items })
-        }).catch(()=>{});
-        await fetch('/api/sets/'+encodeURIComponent(id)+'/progress', {
-          method:'PUT', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ mastered: os.mastered||[], wrong: os.wrong||[], pos: os.pos||0, order: os.order||[] })
-        }).catch(()=>{});
+        await DB.saveSet({ id, name: os.name, items: os.items }).catch(()=>{});
+        await DB.saveProgress(id, { mastered: os.mastered||[], wrong: os.wrong||[], pos: os.pos||0, order: os.order||[] }).catch(()=>{});
         SETS[id] = { ...os };
       }
     }
@@ -895,12 +877,9 @@ localStorage.setItem('vocab_last_page', 'index.html' + location.search);
 // Auth check + load sets from backend + auto-migrate on first login
 (async function init(){
   try {
-    const res = await fetch('/api/user');
-    if (!res.ok) { location.href = 'login.html'; return; }
-    const user = await res.json();
+    const user = await DB.getUser();
     document.getElementById('userInfo').textContent = user.email;
-    const setsRes = await fetch('/api/sets');
-    if (setsRes.ok) SETS = await setsRes.json();
+    SETS = await DB.getSets();
     // Auto-migrate once if localStorage data exists
     if (localStorage.getItem('vocab_sets_v1')) await migrateLocalStorage();
     renderSets();

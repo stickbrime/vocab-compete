@@ -22,6 +22,7 @@ button.submit{width:100%;padding:13px;border:none;border-radius:10px;background:
 button.submit:hover{opacity:.9;}
 .err{color:var(--bad);font-size:.82rem;margin-top:10px;min-height:18px;text-align:center;}
 .hint{text-align:center;color:var(--dim);font-size:.76rem;margin-top:16px;line-height:1.6;}
+.mode-badge{text-align:center;font-size:.72rem;color:var(--dim);margin-top:12px;}
 </style>
 </head>
 <body>
@@ -41,9 +42,11 @@ button.submit:hover{opacity:.9;}
       <button type="submit" class="submit" id="submitBtn">登录</button>
       <div class="err" id="err"></div>
     </form>
-    <div class="hint">账号数据保存在本地服务器，仅用于学习进度同步</div>
+    <div class="hint" id="hintText">登录后可在本地创建账号，数据保存在浏览器中</div>
+    <div class="mode-badge" id="modeBadge"></div>
   </div>
 </div>
+<script src="db.js"></script>
 <script>
 let mode = 'login';
 const tabLogin = document.getElementById('tabLogin');
@@ -63,6 +66,14 @@ function setMode(m){
   errEl.textContent = '';
 }
 
+// Show mode badge
+DB.probe().then(online => {
+  document.getElementById('modeBadge').textContent = online ? '🔗 服务器模式' : '💾 本地存储模式';
+  document.getElementById('hintText').textContent = online
+    ? '账号数据保存在服务器，用于学习进度同步'
+    : '静态部署模式 · 数据保存在本地浏览器';
+});
+
 form.onsubmit = async (e) => {
   e.preventDefault();
   errEl.textContent = '';
@@ -71,18 +82,15 @@ form.onsubmit = async (e) => {
   submitBtn.disabled = true;
   submitBtn.textContent = '请稍候…';
   try {
-    const res = await fetch('/api/'+mode, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({email, password})
-    });
-    const data = await res.json();
-    if(!res.ok){ errEl.textContent = data.error || '操作失败'; return; }
-    // Redirect to last visited page if saved, otherwise index
+    if (mode === 'login') {
+      await DB.login(email, password);
+    } else {
+      await DB.register(email, password);
+    }
     const last = localStorage.getItem('vocab_last_page');
     location.href = (last && last !== 'login.html') ? last : 'index.html';
   } catch(e) {
-    errEl.textContent = '网络错误，请检查服务器是否运行';
+    errEl.textContent = e.message || '操作失败';
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = mode==='login' ? '登录' : '注册';

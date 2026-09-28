@@ -80,6 +80,7 @@ footer{margin-top:18px;text-align:center;color:#64748b;font-size:.72rem;line-hei
 <div id="quiz" class="card"><div style="text-align:center;color:var(--dim);padding:40px 0">加载中…</div></div>
 <footer>每题含目标句 + 英文释义提示 · 来源标注于题下 · 中文翻译可隐藏/显示 · 答错题自动进入通关后重练</footer>
 </div>
+<script src="db.js"></script>
 <script>
 // Remember last visited page for post-login redirect
 localStorage.setItem('vocab_last_page', 'trainer.html' + location.search);
@@ -97,9 +98,7 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random
     return;
   }
   try {
-    const setsRes = await fetch('/api/sets');
-    if(!setsRes.ok){ location.href = 'login.html'; return; }
-    const sets = await setsRes.json();
+    const sets = await DB.getSets();
     const set = sets[setId];
     if(!set){
       document.getElementById('quiz').innerHTML = '<div class="result"><div class="big">⚠️</div><p style="color:var(--dim)">找不到这个词集，可能已被删除。</p><p style="margin-top:14px"><a href="index.html" style="color:var(--accent)">← 返回首页</a></p></div>';
@@ -115,14 +114,11 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random
 function saveSets(sets){
   const s = sets[setId];
   if(!s) return;
-  fetch('/api/sets/'+encodeURIComponent(setId)+'/progress', {
-    method:'PUT', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({
-      mastered: s.mastered || [],
-      wrong: s.wrong || [],
-      pos: s.pos || 0,
-      order: s.order || []
-    })
+  DB.saveProgress(setId, {
+    mastered: s.mastered || [],
+    wrong: s.wrong || [],
+    pos: s.pos || 0,
+    order: s.order || []
   }).catch(()=>{});
 }
 function loadSets(){ return { [setId]: window._currentSet || {} }; }
@@ -175,7 +171,7 @@ function startQuiz(set){
   }
   // Save progress after each answer (mastered/wrong + current position + retry state) to backend
   function saveProgress() {
-    const payload = JSON.stringify({
+    DB.saveProgress(set.id, {
       mastered: Array.from(masteredSet),
       wrong: Array.from(wrongSet),
       pos: retryMode ? origPos : pos,
@@ -183,11 +179,6 @@ function startQuiz(set){
       retryMode: retryMode,
       retryPos: retryMode ? pos : 0,
       retryOrder: retryMode ? order : []
-    });
-    fetch('/api/sets/'+encodeURIComponent(set.id)+'/progress', {
-      method:'PUT', headers:{'Content-Type':'application/json'},
-      body: payload,
-      keepalive: true
     }).catch(()=>{});
   }
   // Save on page close / navigation
@@ -409,7 +400,7 @@ function startQuiz(set){
 
 // Logout button in nav
 document.getElementById('logoutBtn').onclick = async () => {
-  try { await fetch('/api/logout', {method:'POST'}); } catch(e){}
+  try { await DB.logout(); } catch(e){}
   location.href = 'login.html';
 };
 </script>

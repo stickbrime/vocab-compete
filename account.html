@@ -224,6 +224,7 @@
   </div>
 </div>
 
+<script src="db.js"></script>
 <script>
 // Remember last visited page
 localStorage.setItem('vocab_last_page', 'account.html');
@@ -231,22 +232,17 @@ localStorage.setItem('vocab_last_page', 'account.html');
 (async () => {
   try {
     // Load user info
-    const res = await fetch('/api/user');
-    if (!res.ok) { location.href = 'login.html'; return; }
-    const user = await res.json();
+    const user = await DB.getUser();
     document.getElementById('userInfo').textContent = user.email;
     document.getElementById('accEmail').textContent = user.email;
     document.getElementById('accId').textContent = user.id;
 
     // Load stats
-    const statsRes = await fetch('/api/user/stats');
-    if (statsRes.ok) {
-      const s = await statsRes.json();
-      document.getElementById('statSets').textContent = s.setCount;
-      document.getElementById('statWords').textContent = s.totalWords;
-      document.getElementById('statMastered').textContent = s.totalMastered;
-      document.getElementById('statWrong').textContent = s.totalWrong;
-    }
+    const s = await DB.getStats();
+    document.getElementById('statSets').textContent = s.setCount;
+    document.getElementById('statWords').textContent = s.totalWords;
+    document.getElementById('statMastered').textContent = s.totalMastered;
+    document.getElementById('statWrong').textContent = s.totalWrong;
   } catch(e) {
     location.href = 'login.html';
   }
@@ -267,19 +263,13 @@ document.getElementById('changePwdBtn').onclick = async () => {
   const btn = document.getElementById('changePwdBtn');
   btn.disabled = true; btn.textContent = '更新中…';
   try {
-    const res = await fetch('/api/user/password', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ currentPassword: cur, newPassword: pwd })
-    });
-    const data = await res.json();
-    if (!res.ok) { msg.className = 'msg err'; msg.textContent = data.error || '更新失败'; return; }
+    const data = await DB.changePassword(cur, pwd);
     msg.className = 'msg ok'; msg.textContent = '✅ 密码已更新';
     document.getElementById('curPwd').value = '';
     document.getElementById('newPwd').value = '';
     document.getElementById('confirmPwd').value = '';
   } catch(e) {
-    msg.className = 'msg err'; msg.textContent = '网络错误，请重试';
+    msg.className = 'msg err'; msg.textContent = e.message || '更新失败';
   } finally {
     btn.disabled = false; btn.textContent = '更新密码';
   }
@@ -287,7 +277,7 @@ document.getElementById('changePwdBtn').onclick = async () => {
 
 // Logout
 async function doLogout() {
-  try { await fetch('/api/logout', { method: 'POST' }); } catch(e) {}
+  try { await DB.logout(); } catch(e) {}
   location.href = 'login.html';
 }
 document.getElementById('logoutBtn').onclick = doLogout;

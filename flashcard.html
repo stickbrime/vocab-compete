@@ -206,6 +206,7 @@ footer{margin-top:18px;text-align:center;color:#64748b;font-size:.72rem;line-hei
 </div>
 </div>
 
+<script src="db.js"></script>
 <script>
 localStorage.setItem('vocab_last_page', 'flashcard.html' + location.search);
 
@@ -226,9 +227,7 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 (async function init(){
   if(!setId){ document.getElementById('mainContent').innerHTML = '<div class="result"><div class="big">⚠️</div><p style="color:var(--dim)">缺少词集 ID</p><p style="margin-top:14px"><a href="index.html" style="color:var(--accent)">← 返回首页</a></p></div>'; return; }
   try {
-    const res = await fetch('/api/sets');
-    if(!res.ok){ location.href='login.html'; return; }
-    const sets = await res.json();
+    const sets = await DB.getSets();
     fullSet = sets[setId];
     if(!fullSet){ document.getElementById('mainContent').innerHTML = '<div class="result"><div class="big">⚠️</div><p style="color:var(--dim)">找不到这个词集</p><p style="margin-top:14px"><a href="index.html" style="color:var(--accent)">← 返回首页</a></p></div>'; return; }
     document.getElementById('setSub').textContent = fullSet.name + ' · 翻牌后评分 · 空格翻牌 · 1/2/3/4 评分';
@@ -455,7 +454,7 @@ document.addEventListener('keydown', e => {
 
 // Logout
 document.getElementById('logoutBtn').onclick = async () => {
-  try { await fetch('/api/logout', {method:'POST'}); } catch(e){}
+  try { await DB.logout(); } catch(e){}
   location.href = 'login.html';
 };
 </script>

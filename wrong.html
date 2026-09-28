@@ -57,6 +57,7 @@ h1{font-size:1.5rem;letter-spacing:1px;}
   </header>
   <div id="content" class="card"><div style="text-align:center;color:var(--dim);padding:40px 0">加载中…</div></div>
 </div>
+<script src="db.js"></script>
 <script>
 // Remember last visited page for post-login redirect
 localStorage.setItem('vocab_last_page', 'wrong.html');
@@ -64,20 +65,28 @@ localStorage.setItem('vocab_last_page', 'wrong.html');
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 document.getElementById('logoutBtn').onclick = async () => {
-  try { await fetch('/api/logout', {method:'POST'}); } catch(e){}
+  try { await DB.logout(); } catch(e){}
   location.href = 'login.html';
 };
 
 (async function init(){
   try {
-    const uRes = await fetch('/api/user');
-    if(!uRes.ok){ location.href = 'login.html'; return; }
-    const user = await uRes.json();
+    const user = await DB.getUser();
     document.getElementById('userInfo').textContent = user.email;
 
-    const res = await fetch('/api/wrong-words');
-    if(!res.ok){ location.href = 'login.html'; return; }
-    const words = await res.json();
+    const rawWords = await DB.getWrongWords();
+    // Normalize: API returns { setId, setName, idx, item } — flatten to match UI
+    const words = rawWords.map(w => ({
+      word: w.item.word || w.word || '',
+      def: w.item.def || w.def || '',
+      sentence: w.item.sentence || w.sentence || '',
+      translation: w.item.translation || w.translation || '',
+      src: w.item.src || w.src || '',
+      englishDef: w.item.englishDef || w.englishDef || '',
+      setId: w.setId,
+      setName: w.setName,
+      index: w.idx ?? w.index
+    }));
     const box = document.getElementById('content');
 
     if(!words.length){
@@ -119,8 +128,7 @@ document.getElementById('logoutBtn').onclick = async () => {
           const idx = btn.dataset.idx;
           if (!confirm('确定要从错题集移除这个单词吗？')) return;
           try {
-            const res = await fetch('/api/sets/' + encodeURIComponent(setId) + '/wrong/' + idx, { method: 'DELETE' });
-            if (!res.ok) throw new Error('删除失败');
+            await DB.removeWrong(setId, parseInt(idx));
             // Remove from local list and re-render
             const wi = parseInt(btn.closest('.w-item').dataset.wi);
             list.splice(wi, 1);
@@ -149,12 +157,7 @@ document.getElementById('logoutBtn').onclick = async () => {
           });
           const id = 'wrong_' + Date.now().toString(36);
           const name = '📕 错题集 · ' + new Date().toLocaleDateString('zh-CN') + ' · ' + items.length + '词';
-          const res = await fetch('/api/sets', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id, name, items })
-          });
-          if (!res.ok) throw new Error('创建失败');
+          await DB.saveSet({ id, name, items });
           location.href = 'trainer.html?id=' + encodeURIComponent(id);
         } catch(e) {
           alert('生成词集失败：' + e.message);
