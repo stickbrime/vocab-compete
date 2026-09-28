@@ -143,6 +143,7 @@ function startQuiz(set){
   let order = shuffle([...Array(DATA.length).keys()]);
   let pos = 0, correct = 0, wrongPool = [], answered = false, showDef = false;
   let curOpts = [];
+  let curHasSentence = false; // whether current question is sentence-blank type
   let masteredSet = new Set();
   let wrongSet = new Set();
   let retryMode = false;
@@ -169,8 +170,17 @@ function startQuiz(set){
       pos = (typeof set.retryPos === 'number' && set.retryPos >= 0 && set.retryPos < order.length) ? set.retryPos : 0;
     }
   }
-  // Save progress after each answer (mastered/wrong + current position + retry state) to backend
-  function saveProgress() {
+  // Save progress after each answer (mastered/wrong + current position + retry state) to backend.
+  // Debounced to avoid race conditions: only the LATEST state is ever written, never an older
+  // in-flight save overwriting a newer one.
+  let _saveTimer = null;
+  let _saveInFlight = false;
+  let _dirty = false;
+
+  function _doSave() {
+    if (_saveInFlight) return; // never start concurrent saves
+    _saveInFlight = true;
+    _dirty = false;
     DB.saveProgress(set.id, {
       mastered: Array.from(masteredSet),
       wrong: Array.from(wrongSet),
@@ -179,12 +189,35 @@ function startQuiz(set){
       retryMode: retryMode,
       retryPos: retryMode ? pos : 0,
       retryOrder: retryMode ? order : []
-    }).catch(()=>{});
+    }).catch(()=>{}).finally(() => {
+      _saveInFlight = false;
+      // If state changed again while saving, save the latest state now
+      if (_dirty) _doSave();
+    });
   }
-  // Save on page close / navigation
-  window.addEventListener('beforeunload', saveProgress);
-  // Also save periodically (every 5s) in case beforeunload is unreliable
-  setInterval(saveProgress, 5000);
+
+  function saveProgress() {
+    _dirty = true;
+    if (_saveInFlight) return; // wait for current save to finish; it will re-trigger via _dirty
+    if (_saveTimer) clearTimeout(_saveTimer);
+    _saveTimer = setTimeout(_doSave, 400); // debounce 400ms
+  }
+
+  // Immediate save (no debounce) — used on page unload
+  function flushSave() {
+    if (_saveTimer) { clearTimeout(_saveTimer); _saveTimer = null; }
+    if (!_saveInFlight) _doSave();
+  }
+
+  // Save on page close / navigation (immediate, must not be debounced).
+  // beforeunload + pagehide + visibilitychange cover all modern browsers.
+  window.addEventListener('beforeunload', flushSave);
+  window.addEventListener('pagehide', flushSave);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flushSave();
+  });
+  // Also save periodically (every 10s) as a safety net — debounced so it won't race
+  setInterval(saveProgress, 10000);
   loadProgress();
   // Show resume indicator if continuing from saved position
   if (pos > 0) {
@@ -227,8 +260,11 @@ function startQuiz(set){
   function render(){
     if(pos>=order.length){return finish();}
     answered=false; showDef=false;
+    // Clear focus from any button left over from the previous question
+    if(document.activeElement && document.activeElement.tagName === 'BUTTON') document.activeElement.blur();
     const item = DATA[order[pos]];
     const b = blankSentence(item);
+    curHasSentence = b.hit;
     const opts = shuffle([item.w, ...distractors(item)]);
     curOpts = opts;
     const lvl = Math.floor(pos/LEVEL)+1, totalInLvl = Math.min(LEVEL, order.length-(lvl-1)*LEVEL), inLvl = pos%LEVEL+1;
@@ -260,8 +296,17 @@ function startQuiz(set){
     const idx = order[pos];
     document.querySelectorAll('.opts button').forEach(b=>{b.disabled=true; if(b.dataset.w===item.w) b.classList.add('correct');});
     const fb=document.getElementById('fb');
-    if(!ok){btn.classList.add('wrong'); wrongPool.push(idx); wrongSet.add(idx); masteredSet.delete(idx);}
-    else { correct++; masteredSet.add(idx); wrongSet.delete(idx); }
+    if(!ok){
+      btn.classList.add('wrong'); wrongPool.push(idx);
+      // Only mark as wrong if NOT previously mastered — once you've answered correctly,
+      // a later miss shouldn't un-master the card or add it to 错题.
+      if(!masteredSet.has(idx)) wrongSet.add(idx);
+    } else {
+      // Only count as a new correct answer if not already mastered (avoids double-counting
+      // when a card is re-asked via 重来/困难 rating).
+      if(!masteredSet.has(idx)) correct++;
+      masteredSet.add(idx); wrongSet.delete(idx);
+    }
     fb.className='feedback '+(ok?'ok':'no');
     fb.innerHTML = (ok?'✅ 正确！　':'❌ 你选的是 <b>'+esc(btn.dataset.w)+'</b>　')
       + '<div style="margin-top:6px;color:#cbd5e1">📖 '+esc(item.w)+'　'+esc(item.m)+'</div>'
@@ -274,28 +319,31 @@ function startQuiz(set){
       + '</div>';
     if(!showDef){showDef=true;toggleDef();}
 
-    // Anki-style rating buttons (appear after answering)
+    // Anki-style rating buttons only for sentence-blank questions.
+    // For definition-only questions, just show a simple "next" button.
     const toolsEl = document.querySelector('.tools');
-    // Remove old next button and rating area
     const oldNext = document.getElementById('next');
     if(oldNext) oldNext.remove();
-    toolsEl.insertAdjacentHTML('beforeend',
-      '<div id="rateArea" style="width:100%;margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center">'+
-        '<button class="rate-btn rate-again" data-rate="again"><span>🔁 重来</span><small>1</small></button>'+
-        '<button class="rate-btn rate-hard" data-rate="hard"><span>⚠️ 困难</span><small>2</small></button>'+
-        '<button class="rate-btn rate-good" data-rate="good"><span>✅ 良好</span><small>3</small></button>'+
-        '<button class="rate-btn rate-easy" data-rate="easy"><span>💎 简单</span><small>4</small></button>'+
-        '<button class="ghost" id="next" style="min-width:120px">下一题 ➜</button>'+
-      '</div>'
-    );
-
-    // Rating handlers — reorder queue based on rating
-    toolsEl.querySelectorAll('[data-rate]').forEach(rb => {
-      rb.onclick = () => {
-        const rating = rb.dataset.rate;
-        applyRating(rating, idx);
-      };
-    });
+    if(curHasSentence){
+      toolsEl.insertAdjacentHTML('beforeend',
+        '<div id="rateArea" style="width:100%;margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center">'+
+          '<button class="rate-btn rate-again" data-rate="again"><span>🔁 重来</span><small>1</small></button>'+
+          '<button class="rate-btn rate-hard" data-rate="hard"><span>⚠️ 困难</span><small>2</small></button>'+
+          '<button class="rate-btn rate-good" data-rate="good"><span>✅ 良好</span><small>3</small></button>'+
+          '<button class="rate-btn rate-easy" data-rate="easy"><span>💎 简单</span><small>4</small></button>'+
+          '<button class="ghost" id="next" style="min-width:120px">下一题 ➜</button>'+
+        '</div>'
+      );
+      toolsEl.querySelectorAll('[data-rate]').forEach(rb => {
+        rb.onclick = () => { applyRating(rb.dataset.rate, idx); };
+      });
+    } else {
+      toolsEl.insertAdjacentHTML('beforeend',
+        '<div id="rateArea" style="width:100%;margin-top:14px;display:flex;justify-content:center">'+
+          '<button class="ghost" id="next" style="min-width:160px">下一题 ➜</button>'+
+        '</div>'
+      );
+    }
     document.getElementById('next').onclick = ()=>{pos++; saveProgress(); updateMeta(); render();};
     updateMeta();
   }
@@ -374,18 +422,24 @@ function startQuiz(set){
       render();
     };
   }
-  // Keyboard shortcuts: Enter → next question, 1-4 → pick option (before answer) or rate (after answer)
+  // Keyboard shortcuts: Enter → next (after answering), 1-4 → pick option (before) or rate (after)
   document.addEventListener('keydown', function(e){
-    if(e.key === 'Enter' && answered){
-      const nxt = document.getElementById('next');
-      if(nxt){ e.preventDefault(); nxt.click(); }
-    } else if(['1','2','3','4'].includes(e.key)){
+    // Always prevent Enter from clicking a focused button — we handle it explicitly
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      if(answered){
+        const nxt = document.getElementById('next');
+        if(nxt) nxt.click();
+      }
+      return; // never let the browser handle Enter
+    }
+    if(['1','2','3','4'].includes(e.key)){
       if(!answered){
         const btns = document.querySelectorAll('.opts button');
         const idx = parseInt(e.key)-1;
         if(btns[idx]){ e.preventDefault(); btns[idx].click(); }
       } else {
-        // After answering, 1-4 triggers rating
+        // After answering, 1-4 triggers rating (only for sentence-type with rating buttons)
         const rateMap = {'1':'again','2':'hard','3':'good','4':'easy'};
         const rating = rateMap[e.key];
         if(rating){

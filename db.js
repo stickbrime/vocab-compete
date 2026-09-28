@@ -149,6 +149,24 @@ const DB = (() => {
       }
       const s = lsCurrentUser();
       const sets = lsGetSets(s.id);
+      const set = sets[id];
+      // Archive wrong words before deleting
+      if (set && (set.wrong || []).length) {
+        const archived = lsGet('archived_wrong_' + s.id, []);
+        set.wrong.forEach(idx => {
+          const item = set.items && set.items[idx];
+          if (item) {
+            archived.push({
+              id: 'aw_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+              setName: set.name + ' (已删除)',
+              word: item.word, def: item.def,
+              sentence: item.sentence || '', translation: item.translation || '',
+              src: item.src || '', englishDef: item.englishDef || '',
+            });
+          }
+        });
+        lsSet('archived_wrong_' + s.id, archived);
+      }
       delete sets[id];
       lsSetSets(s.id, sets);
     },
@@ -165,6 +183,26 @@ const DB = (() => {
       const sets = lsGetSets(s.id);
       if (sets[id]) {
         Object.assign(sets[id], data);
+        lsSetSets(s.id, sets);
+      }
+    },
+
+    // Physically delete all progress for one set (mastered / wrong / pos / order / retry state)
+    async clearProgress(id) {
+      if (await probe()) {
+        await fetch('/api/sets/' + encodeURIComponent(id) + '/progress', { method: 'DELETE' });
+        return;
+      }
+      const s = lsCurrentUser();
+      const sets = lsGetSets(s.id);
+      if (sets[id]) {
+        sets[id].mastered = [];
+        sets[id].wrong = [];
+        sets[id].pos = 0;
+        sets[id].order = [];
+        delete sets[id].retryMode;
+        delete sets[id].retryPos;
+        delete sets[id].retryOrder;
         lsSetSets(s.id, sets);
       }
     },
@@ -194,10 +232,30 @@ const DB = (() => {
       Object.entries(sets).forEach(([id, set]) => {
         (set.wrong || []).forEach(idx => {
           const item = set.items && set.items[idx];
-          if (item) result.push({ setId: id, setName: set.name, idx, item });
+          if (item) result.push({
+            setId: id, setName: set.name, index: idx, archived: false,
+            word: item.word, def: item.def, sentence: item.sentence || '',
+            translation: item.translation || '', src: item.src || '',
+            englishDef: item.englishDef || ''
+          });
         });
       });
+      // Include archived wrong words
+      const archived = lsGet('archived_wrong_' + s.id, []);
+      archived.forEach(a => {
+        result.push({ ...a, setId: a.id, index: -1, archived: true, archId: a.id });
+      });
       return result;
+    },
+
+    async removeArchivedWrong(archId) {
+      if (await probe()) {
+        await fetch('/api/archived-wrong/' + encodeURIComponent(archId), { method: 'DELETE' });
+        return;
+      }
+      const s = lsCurrentUser();
+      const archived = lsGet('archived_wrong_' + s.id, []);
+      lsSet('archived_wrong_' + s.id, archived.filter(a => a.id !== archId));
     },
 
     async getStats() {

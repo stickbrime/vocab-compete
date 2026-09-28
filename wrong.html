@@ -104,13 +104,14 @@ document.getElementById('logoutBtn').onclick = async () => {
         '<button id="genSetBtn" class="btn btn-primary" style="padding:8px 16px;font-size:.82rem">📝 生成错题词集</button>' +
         '</div>';
       list.forEach((w, wi) => {
-        html += '<div class="w-item" data-wi="' + wi + '">' +
+        const archTag = w.archived ? ' <span style="font-size:10px;background:rgba(248,113,113,.15);color:#f87171;padding:1px 6px;border-radius:4px">已删除词集</span>' : '';
+        html += '<div class="w-item" data-wi="' + wi + '"' + (w.archived ? ' data-arch="' + esc(w.archId || '') + '"' : '') + '>' +
           '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">' +
             '<div style="flex:1">' +
               '<span class="w-word">' + esc(w.word) + '</span>' +
-              '<span class="w-set">📂 ' + esc(w.setName) + '</span>' +
+              '<span class="w-set">📂 ' + esc(w.setName) + '</span>' + archTag +
             '</div>' +
-            '<button class="del-btn" data-set="' + esc(w.setId) + '" data-idx="' + w.index + '" title="从错题集移除">✕</button>' +
+            '<button class="del-btn" data-set="' + esc(w.setId) + '" data-idx="' + w.index + '"' + (w.archived ? ' data-arch="' + esc(w.archId || '') + '"' : '') + ' title="从错题集移除">✕</button>' +
           '</div>' +
           '<div class="w-def">' + esc(w.def) + '</div>' +
           (w.sentence ? '<div class="w-sent">' + esc(w.sentence) + '</div>' : '') +
@@ -126,10 +127,14 @@ document.getElementById('logoutBtn').onclick = async () => {
         btn.onclick = async () => {
           const setId = btn.dataset.set;
           const idx = btn.dataset.idx;
+          const archId = btn.dataset.arch;
           if (!confirm('确定要从错题集移除这个单词吗？')) return;
           try {
-            await DB.removeWrong(setId, parseInt(idx));
-            // Remove from local list and re-render
+            if (archId) {
+              await DB.removeArchivedWrong(archId);
+            } else {
+              await DB.removeWrong(setId, parseInt(idx));
+            }
             const wi = parseInt(btn.closest('.w-item').dataset.wi);
             list.splice(wi, 1);
             renderList(list);
@@ -169,7 +174,8 @@ document.getElementById('logoutBtn').onclick = async () => {
 
     renderList(words);
   } catch(e) {
-    location.href = 'login.html';
+    document.getElementById('userInfo').textContent = '未登录';
+    document.getElementById('content').innerHTML = '<div class="empty"><div class="big">🔒</div><div>请先登录以查看你的错题集</div><div class="tools"><a href="login.html" class="btn btn-primary">前往登录</a> <a href="index.html" class="btn">返回首页</a></div></div>';
   }
 })();
 </script>

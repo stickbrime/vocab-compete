@@ -47,6 +47,13 @@ async function initDb() {
     updated_at INTEGER NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`);
+  db.run(`CREATE TABLE IF NOT EXISTS archived_wrong (
+    id TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    set_name TEXT NOT NULL,
+    word TEXT, def TEXT, sentence TEXT, translation TEXT, src TEXT, englishDef TEXT,
+    created_at INTEGER NOT NULL
+  )`);
   // Add columns for existing DBs (ignore error if already exists)
   try { db.run('ALTER TABLE sets ADD COLUMN retry_mode INTEGER DEFAULT 0'); } catch(e) {}
   try { db.run('ALTER TABLE sets ADD COLUMN retry_pos INTEGER DEFAULT 0'); } catch(e) {}
@@ -198,6 +205,20 @@ app.put('/api/sets/:id', auth, (req, res) => {
 });
 
 app.delete('/api/sets/:id', auth, (req, res) => {
+  // Archive wrong words before deleting the set
+  const set = query('SELECT name, items, wrong FROM sets WHERE id = ? AND user_id = ?', [req.params.id, req.userId]);
+  if (set.length) {
+    const wrongIdx = JSON.parse(set[0].wrong || '[]');
+    const items = JSON.parse(set[0].items || '[]');
+    wrongIdx.forEach(i => {
+      if (items[i]) {
+        const item = items[i];
+        const archId = 'aw_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        run('INSERT INTO archived_wrong (id, user_id, set_name, word, def, sentence, translation, src, englishDef, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+          [archId, req.userId, set[0].name, item.word || '', item.def || '', item.sentence || '', item.translation || '', item.src || '', item.englishDef || '', Date.now()]);
+      }
+    });
+  }
   run('DELETE FROM sets WHERE id = ? AND user_id = ?', [req.params.id, req.userId]);
   res.json({ ok: true });
 });
@@ -210,6 +231,14 @@ app.put('/api/sets/:id/progress', auth, (req, res) => {
     [JSON.stringify(mastered || []), JSON.stringify(wrong || []), pos || 0, JSON.stringify(order || []),
      retryMode ? 1 : 0, retryPos || 0, JSON.stringify(retryOrder || []),
      now, req.params.id, req.userId]);
+  res.json({ ok: true });
+});
+
+// Physically delete/reset all progress fields for one set
+app.delete('/api/sets/:id/progress', auth, (req, res) => {
+  const now = Date.now();
+  run('UPDATE sets SET mastered = ?, wrong = ?, pos = ?, quiz_order = ?, retry_mode = ?, retry_pos = ?, retry_order = ?, updated_at = ? WHERE id = ? AND user_id = ?',
+    ['[]', '[]', 0, '[]', 0, 0, '[]', now, req.params.id, req.userId]);
   res.json({ ok: true });
 });
 
@@ -233,8 +262,26 @@ app.get('/api/wrong-words', auth, (req, res) => {
           src: items[i].src || '',
           englishDef: items[i].englishDef || '',
           index: i,
+          archived: false,
         });
       }
+    });
+  });
+  // Include archived wrong words from deleted sets
+  const archived = query('SELECT * FROM archived_wrong WHERE user_id = ?', [req.userId]);
+  archived.forEach(a => {
+    result.push({
+      setId: a.id,
+      setName: a.set_name + ' (已删除)',
+      word: a.word,
+      def: a.def,
+      sentence: a.sentence || '',
+      translation: a.translation || '',
+      src: a.src || '',
+      englishDef: a.englishDef || '',
+      index: -1,
+      archived: true,
+      archId: a.id,
     });
   });
   res.json(result);
@@ -249,6 +296,12 @@ app.delete('/api/sets/:id/wrong/:idx', auth, (req, res) => {
   const wrong = JSON.parse(set[0].wrong || '[]').filter(i => i !== idx);
   run('UPDATE sets SET wrong = ?, updated_at = ? WHERE id = ? AND user_id = ?',
     [JSON.stringify(wrong), Date.now(), setId, req.userId]);
+  res.json({ ok: true });
+});
+
+// Remove an archived wrong word
+app.delete('/api/archived-wrong/:id', auth, (req, res) => {
+  run('DELETE FROM archived_wrong WHERE id = ? AND user_id = ?', [req.params.id, req.userId]);
   res.json({ ok: true });
 });
 
