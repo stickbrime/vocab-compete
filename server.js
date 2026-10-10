@@ -54,6 +54,20 @@ async function initDb() {
     word TEXT, def TEXT, sentence TEXT, translation TEXT, src TEXT, englishDef TEXT,
     created_at INTEGER NOT NULL
   )`);
+  db.run(`CREATE TABLE IF NOT EXISTS community_banks (
+    id TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    author_email TEXT NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT,
+    tags TEXT DEFAULT '[]',
+    thumbnail TEXT,
+    items TEXT NOT NULL,
+    downloads INTEGER DEFAULT 0,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  )`);
   // Add columns for existing DBs (ignore error if already exists)
   try { db.run('ALTER TABLE sets ADD COLUMN retry_mode INTEGER DEFAULT 0'); } catch(e) {}
   try { db.run('ALTER TABLE sets ADD COLUMN retry_pos INTEGER DEFAULT 0'); } catch(e) {}
@@ -303,6 +317,141 @@ app.delete('/api/sets/:id/wrong/:idx', auth, (req, res) => {
 app.delete('/api/archived-wrong/:id', auth, (req, res) => {
   run('DELETE FROM archived_wrong WHERE id = ? AND user_id = ?', [req.params.id, req.userId]);
   res.json({ ok: true });
+});
+
+// ---------- Community workshop ----------
+// List all published banks (public, no auth needed)
+app.get('/api/community', (req, res) => {
+  const sort = req.query.sort || 'top'; // top | new | downloads
+  let orderBy = 'downloads DESC, created_at DESC';
+  if (sort === 'new') orderBy = 'created_at DESC';
+  else if (sort === 'downloads') orderBy = 'downloads DESC';
+  const rows = query(`SELECT id, user_id, author_email, title, description, tags, thumbnail, downloads, created_at, updated_at FROM community_banks ORDER BY ${orderBy}`);
+  const result = rows.map(r => ({
+    id: r.id,
+    authorId: r.user_id,
+    author: r.author_email,
+    title: r.title,
+    description: r.description || '',
+    tags: JSON.parse(r.tags || '[]'),
+    thumbnail: r.thumbnail || '',
+    downloads: r.downloads || 0,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  }));
+  res.json(result);
+});
+
+// Get a single bank with full items for preview (public)
+app.get('/api/community/:id', (req, res) => {
+  const rows = query('SELECT * FROM community_banks WHERE id = ?', [req.params.id]);
+  if (!rows.length) return res.status(404).json({ error: '词集不存在' });
+  const r = rows[0];
+  res.json({
+    id: r.id,
+    authorId: r.user_id,
+    author: r.author_email,
+    title: r.title,
+    description: r.description || '',
+    tags: JSON.parse(r.tags || '[]'),
+    thumbnail: r.thumbnail || '',
+    items: JSON.parse(r.items || '[]'),
+    downloads: r.downloads || 0,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  });
+});
+
+// Publish a bank (auth required)
+app.post('/api/community/publish', auth, (req, res) => {
+  const { id, title, description, tags, thumbnail, items } = req.body || {};
+  if (!id || !title || !Array.isArray(items) || !items.length) {
+    return res.status(400).json({ error: '标题和词条必填' });
+  }
+  const user = query('SELECT email FROM users WHERE id = ?', [req.userId])[0];
+  if (!user) return res.status(401).json({ error: '用户不存在' });
+  const now = Date.now();
+  const tagArr = Array.isArray(tags) ? tags.slice(0, 8) : [];
+  const thumb = thumbnail || '';
+  // If this id already exists and belongs to this user → update
+  const existing = query('SELECT id FROM community_banks WHERE id = ? AND user_id = ?', [id, req.userId]);
+  if (existing.length) {
+    run('UPDATE community_banks SET title = ?, description = ?, tags = ?, thumbnail = ?, items = ?, updated_at = ? WHERE id = ? AND user_id = ?',
+      [title, description || '', JSON.stringify(tagArr), thumb, JSON.stringify(items), now, id, req.userId]);
+  } else {
+    run('INSERT INTO community_banks (id, user_id, author_email, title, description, tags, thumbnail, items, downloads, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)',
+      [id, req.userId, user.email, title, description || '', JSON.stringify(tagArr), thumb, JSON.stringify(items), now, now]);
+  }
+  res.json({ ok: true, id });
+});
+
+// Import a published bank into the user's own sets (auth required)
+app.post('/api/community/:id/import', auth, (req, res) => {
+  const rows = query('SELECT * FROM community_banks WHERE id = ?', [req.params.id]);
+  if (!rows.length) return res.status(404).json({ error: '词集不存在' });
+  const bank = rows[0];
+  const newId = 'imp_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const now = Date.now();
+  const items = JSON.parse(bank.items || '[]');
+  run('INSERT INTO sets (id, user_id, name, items, mastered, wrong, pos, quiz_order, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    [newId, req.userId, bank.title, JSON.stringify(items), '[]', '[]', 0, '[]', now, now]);
+  // Increment download count
+  run('UPDATE community_banks SET downloads = downloads + 1 WHERE id = ?', [req.params.id]);
+  res.json({ ok: true, newId, name: bank.title });
+});
+
+// Delete own published bank (auth required)
+app.delete('/api/community/:id', auth, (req, res) => {
+  run('DELETE FROM community_banks WHERE id = ? AND user_id = ?', [req.params.id, req.userId]);
+  res.json({ ok: true });
+});
+
+// ---------- PDF / text parsing via Python (pdfplumber + ENTRY_RE parser) ----------
+const { spawnSync } = require('child_process');
+const os = require('os');
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } });
+
+// Parse text (already extracted) using the Python parser
+app.post('/api/parse-text', (req, res) => {
+  const { text } = req.body || {};
+  if (!text) return res.status(400).json({ error: '文本不能为空' });
+  const result = spawnSync('python3', [path.join(__dirname, 'parse_vocab.py'), '--stdin'], {
+    input: text, encoding: 'utf-8', timeout: 30000
+  });
+  if (result.status !== 0) {
+    return res.status(500).json({ error: '解析失败: ' + (result.stderr || '').slice(0, 200) });
+  }
+  try {
+    const items = JSON.parse(result.stdout || '[]');
+    res.json({ items });
+  } catch(e) {
+    res.status(500).json({ error: '解析结果无效' });
+  }
+});
+
+// Parse a PDF file (multipart upload) using pdfplumber + Python parser.
+// Returns { items, rawText } so the frontend can show raw text for debugging.
+app.post('/api/parse-pdf', upload.single('pdf'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'PDF 文件不能为空' });
+  const tmpDir = os.tmpdir();
+  const tmpPdf = path.join(tmpDir, 'vocab_upload_' + Date.now() + '.pdf');
+  try {
+    fs.writeFileSync(tmpPdf, req.file.buffer);
+    // Use --full mode to get both parsed items and raw extracted text
+    const result = spawnSync('python3', [path.join(__dirname, 'parse_vocab.py'), '--full', tmpPdf], {
+      encoding: 'utf-8', timeout: 60000, maxBuffer: 50 * 1024 * 1024
+    });
+    if (result.status !== 0) {
+      return res.status(500).json({ error: 'PDF 解析失败: ' + (result.stderr || '').slice(0, 300) });
+    }
+    const data = JSON.parse(result.stdout || '{"items":[],"rawText":""}');
+    res.json(data);
+  } catch(e) {
+    res.status(500).json({ error: 'PDF 解析出错: ' + e.message });
+  } finally {
+    try { fs.unlinkSync(tmpPdf); } catch(e) {}
+  }
 });
 
 // Serve index.html for the root

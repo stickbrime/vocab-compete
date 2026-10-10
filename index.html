@@ -135,6 +135,19 @@
     margin-top: 12px; font-size: 13px; color: var(--muted);
   }
   .preview b { color: var(--ok); }
+  .preview-table {
+    margin-top: 10px; max-height: 320px; overflow-y: auto;
+    border: 1px solid var(--border); border-radius: 10px; background: var(--panel-2);
+  }
+  .preview-row {
+    display: flex; gap: 12px; padding: 8px 12px; border-bottom: 1px solid var(--border);
+    font-size: 12px; align-items: flex-start;
+  }
+  .preview-row:last-child { border-bottom: none; }
+  .preview-row .pw { font-weight: 600; color: var(--accent); min-width: 110px; flex-shrink: 0; }
+  .preview-row .plbl { color: var(--muted); font-size: 11px; min-width: 26px; flex-shrink: 0; }
+  .preview-row .pd { color: var(--text); flex: 1; word-break: break-word; }
+  .preview-row .pchk { color: var(--ok); flex-shrink: 0; }
   .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
   .toast {
     position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
@@ -169,6 +182,7 @@
   </header>
   <nav class="topnav">
     <a href="index.html" class="nav-link active">🏠 首页</a>
+    <a href="workshop.html" class="nav-link">🌐 创意工坊</a>
     <a href="wrong.html" class="nav-link">📕 错题集</a>
     <a href="account.html" class="nav-link">👤 账户</a>
     <span class="nav-spacer"></span>
@@ -196,13 +210,15 @@
       <div>点击选择文件，或拖拽到此</div>
       <div class="filename" id="filename"></div>
     </div>
-    <input type="file" id="fileInput" accept=".txt,.csv,.md,.tsv,.pdf,.docx" style="display:none">
+    <input type="file" id="fileInput" accept=".txt,.csv,.md,.tsv,.pdf,.docx,.json" style="display:none">
 
     <div class="format-help">
-      <b>支持格式</b>：.txt / .csv / .md / .tsv（直接读取）· .pdf / .docx（自动提取文本）<br>
+      <b>支持格式</b>：.txt / .csv / .md / .tsv（直接读取）· .pdf / .docx（自动提取文本）· .json（直接导入词条）<br>
+      <b>解析方式</b>：PDF 和文本文件默认使用服务器端 Python 解析器（pdfplumber + 编号词条识别，支持双栏排版和 OCR 断词）；粘贴文本使用浏览器端解析。<br>
       <b>词条格式</b>（每行一条，制表符或 <code>|</code> 分隔，列顺序任意）：<br>
       <code>word&nbsp;&nbsp;词性 + 释义</code> → 释义模式<br>
       <code>word&nbsp;&nbsp;释义&nbsp;&nbsp;英文例句&nbsp;&nbsp;中文翻译</code> → 例句挖空模式（推荐）<br>
+      <b>JSON 格式</b>：<code>[{ "word": "abase", "def": "贬低", "sentence": "...", "translation": "..." }]</code> 或 <code>{ "name": "...", "items": [...] }</code><br>
       也可粘贴到下方文本框（会覆盖文件解析）。
     </div>
 
@@ -234,6 +250,7 @@ const STORAGE_KEY = 'vocab_sets_v1';
 const PENDING_KEY = 'vocab_pending_extract';
 let pendingText = '';
 let pendingFilename = '';
+let pendingJsonItems = null;
 let SETS = {}; // in-memory cache, synced to backend
 const _pendingSaves = new Set();
 
@@ -342,7 +359,9 @@ function parseVocab(text) {
   // ===== Step 2: POS-anchored parsing =====
   // Find all POS tokens (n./v./adj./etc.), then extract word before + definition after
   const fullText = lines.join('\n');
-  const posRe = /(?:^|[\s\n])(n|v|vt|vi|adj|adv|prep|pron|conj|int|art|num)\.?\s+/gi;
+  // POS regex: word-boundary + POS token + optional period + (whitespace OR CJK OR end-of-string)
+  // The lookahead allows "vt.贬低" (no space after period) which is common in PDF-extracted text.
+  const posRe = /(?:^|[\s\n])(n|v|vt|vi|adj|adv|prep|pron|conj|int|art|num)\.?(?=\s|[\u4e00-\u9fff]|$)/gi;
   const posPositions = [];
   let pm;
   while ((pm = posRe.exec(fullText)) !== null) {
@@ -350,9 +369,6 @@ function parseVocab(text) {
     const leadingWs = pm[0].match(/^[\s\n]+/);
     const wsLen = leadingWs ? leadingWs[0].length : 0;
     const actualStart = pm.index + wsLen;
-    // Skip if CJK text is immediately before (likely part of definition, not a POS)
-    const before = fullText.slice(Math.max(0, actualStart - 3), actualStart);
-    if (hasCJK(before)) continue;
     posPositions.push({ posStart: actualStart, posEnd: pm.index + pm[0].length });
   }
 
@@ -569,50 +585,187 @@ const setNameInput = document.getElementById('setName');
 
 function openModal() {
   modal.classList.add('show');
-  pendingText = ''; pendingFilename = '';
+  pendingText = ''; pendingFilename = ''; pendingJsonItems = null;
   filenameEl.textContent = ''; pasteArea.value = ''; previewEl.innerHTML = '';
   setNameInput.value = '';
   setTimeout(() => setNameInput.focus(), 50);
 }
 function closeModal() { modal.classList.remove('show'); }
 
-function showPreview(text) {
-  const items = parseVocab(text);
+function showPreview(text, jsonItems) {
+  let items;
+  if (jsonItems) {
+    // JSON import: items already provided
+    items = jsonItems;
+  } else {
+    items = parseVocab(text);
+  }
+  // Save last parsed items + text for debug download
+  window._lastParsed = { items, text: text || '' };
   if (items.length === 0) {
-    previewEl.innerHTML = '<span style="color:var(--danger)">⚠ 未解析到有效词条，请检查格式</span>';
+    previewEl.innerHTML = '<span style="color:var(--danger)">⚠ 未解析到有效词条，请检查格式</span>' + debugBtns();
     return;
   }
   const withSent = items.filter(i => i.sentence && i.sentence.trim()).length;
-  const sample = items.slice(0, 2).map(i => {
-    let html = `<code><b>${escapeHtml(i.word)}</b> — ${escapeHtml(i.def.slice(0,30))}${i.def.length>30?'…':''}</code>`;
-    if (i.sentence && i.sentence.trim()) {
-      html += `<div style="color:var(--muted);font-size:12px;margin:2px 0 0 14px">📝 ${escapeHtml(i.sentence.slice(0,60))}${i.sentence.length>60?'…':''}</div>`;
-    }
-    if (i.translation && i.translation.trim()) {
-      html += `<div style="color:var(--muted);font-size:12px;margin:0 0 6px 14px">🇨🇳 ${escapeHtml(i.translation.slice(0,40))}${i.translation.length>40?'…':''}</div>`;
-    }
-    return html;
-  }).join('<br>');
   const sentNote = withSent > 0
     ? `<span style="color:var(--ok)">· ${withSent} 条含例句</span>`
     : `<span style="color:var(--warn)">· 无例句（将使用释义模式）</span>`;
-  previewEl.innerHTML = `✓ 解析到 <b>${items.length}</b> 条词条 ${sentNote}<br>${sample}${items.length>2?'<br>…':''}`;
+  // Build full preview table (all items)
+  const rows = items.map(it => {
+    const lbl = it.label != null ? `<span class="plbl">#${it.label}</span>` : '';
+    const sentMark = it.sentence && it.sentence.trim() ? '<span class="pchk" title="含例句">📝</span>' : '';
+    return `<div class="preview-row">${lbl}<span class="pw">${escapeHtml(it.word)}</span><span class="pd">${escapeHtml(it.def || '')}</span>${sentMark}</div>`;
+  }).join('');
+  previewEl.innerHTML =
+    `✓ 解析到 <b>${items.length}</b> 条词条 ${sentNote}` +
+    `<div class="preview-table">${rows}</div>` +
+    debugBtns();
+}
+
+// Debug: download raw extracted text + parsed JSON so you can inspect what the parser sees
+function debugBtns() {
+  return `<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn" style="padding:6px 12px;font-size:12px" onclick="downloadRawText()">📄 下载原始文本</button>
+    <button class="btn" style="padding:6px 12px;font-size:12px" onclick="downloadParsedJson()">📋 下载解析 JSON</button>
+  </div>`;
+}
+function downloadRawText() {
+  const d = window._lastParsed;
+  if (!d) { toast('请先解析文件', 'err'); return; }
+  if (!d.text) { toast('服务器解析的 PDF 无原始文本，请下载 JSON', 'err'); return; }
+  const blob = new Blob([d.text], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (pendingFilename || 'raw') + '.txt';
+  a.click();
+}
+function downloadParsedJson() {
+  const d = window._lastParsed;
+  if (!d) { toast('请先解析文件', 'err'); return; }
+  const blob = new Blob([JSON.stringify(d.items, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (pendingFilename || 'parsed') + '.json';
+  a.click();
 }
 
 function readFile(file) {
   pendingFilename = file.name;
   filenameEl.textContent = '📎 ' + file.name + ' · 解析中…';
   previewEl.innerHTML = '<span style="color:var(--accent)">⏳ 正在解析文件…</span>';
+  const ext = file.name.split('.').pop().toLowerCase();
+
+  if (ext === 'json') {
+    // JSON import: parse the file directly as items
+    file.text().then(raw => {
+      try {
+        const data = JSON.parse(raw);
+        // Support: array of items, or {name, items:[...]} set object
+        let items;
+        if (Array.isArray(data)) items = data;
+        else if (data && Array.isArray(data.items)) items = data.items;
+        else throw new Error('JSON 格式应为词条数组或 {name, items:[...]}');
+        // Validate items: each needs word + def
+        items = items.filter(it => it && it.word && (it.def || it.definition));
+        items = items.map(it => ({
+          word: String(it.word),
+          def: it.def || it.definition || '',
+          sentence: it.sentence || it.example || '',
+          translation: it.translation || it.translationZh || '',
+          src: it.src || it.source || '',
+          englishDef: it.englishDef || it.enDef || '',
+          label: it.label
+        }));
+        filenameEl.textContent = '📎 ' + file.name;
+        pendingText = raw;
+        pendingJsonItems = items;
+        pasteArea.value = '';
+        if (!setNameInput.value) setNameInput.value = file.name.replace(/\.[^.]+$/, '');
+        showPreview(raw, items);
+      } catch(e) {
+        filenameEl.textContent = '📎 ' + file.name;
+        previewEl.innerHTML = `<span style="color:var(--danger)">⚠ JSON 解析失败：${escapeHtml(e.message || String(e))}</span>`;
+      }
+    });
+    return;
+  }
+
+  // For PDFs, try the server-side parser (pdfplumber + Python) which handles
+  // 2-column layouts and OCR word-splitting better than the browser pdf.js parser.
+  if (ext === 'pdf') {
+    parsePdfServerSide(file);
+    return;
+  }
+
+  // Text files (.txt/.tsv/.csv/.md): try server parser first (ENTRY_RE approach),
+  // fall back to JS parser if server is unavailable.
   readFileSmart(file).then(text => {
-    filenameEl.textContent = '📎 ' + file.name;
-    pendingText = text;
-    pasteArea.value = '';
-    if (!setNameInput.value) setNameInput.value = file.name.replace(/\.[^.]+$/, '');
-    showPreview(text);
+    parseTextServerSide(text, file.name);
   }).catch(err => {
     filenameEl.textContent = '📎 ' + file.name;
     previewEl.innerHTML = `<span style="color:var(--danger)">⚠ ${escapeHtml(err.message || String(err))}</span>`;
   });
+}
+
+// Parse text on the server using the Python ENTRY_RE parser
+async function parseTextServerSide(text, filename) {
+  try {
+    const r = await fetch('/api/parse-text', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+    if (!r.ok) throw new Error('服务器解析失败');
+    const { items } = await r.json();
+    if (items.length === 0) throw new Error('服务器未解析到词条');
+    filenameEl.textContent = '📎 ' + (filename || '');
+    pendingText = text;
+    pendingJsonItems = items;
+    pasteArea.value = '';
+    if (!setNameInput.value) setNameInput.value = (filename || '').replace(/\.[^.]+$/, '');
+    showPreview(text, items);
+  } catch(err) {
+    // Fall back to JS parser
+    filenameEl.textContent = '📎 ' + (filename || '') + '（服务器解析失败，改用本地解析）';
+    pendingText = text; pendingJsonItems = null; pasteArea.value = '';
+    if (!setNameInput.value) setNameInput.value = (filename || '').replace(/\.[^.]+$/, '');
+    showPreview(text);
+  }
+}
+
+// Parse PDF on the server using pdfplumber + Python parser (better 2-column handling)
+async function parsePdfServerSide(file) {
+  try {
+    // Use multipart/form-data to avoid base64 encoding overhead and
+    // the String.fromCharCode stack overflow on large PDFs.
+    const formData = new FormData();
+    formData.append('pdf', file);
+    formData.append('filename', file.name);
+    const r = await fetch('/api/parse-pdf', {
+      method: 'POST',
+      body: formData
+    });
+    if (!r.ok) {
+      const d = await r.json().catch(() => ({}));
+      throw new Error(d.error || '服务器解析失败');
+    }
+    const { items, rawText } = await r.json();
+    filenameEl.textContent = '📎 ' + file.name;
+    pendingText = rawText || '';
+    pendingJsonItems = items;
+    pasteArea.value = '';
+    if (!setNameInput.value) setNameInput.value = file.name.replace(/\.[^.]+$/, '');
+    showPreview(rawText || '', items);
+  } catch(err) {
+    // Fall back to browser-side pdf.js extraction + JS parser
+    filenameEl.textContent = '📎 ' + file.name + '（服务器解析失败，改用本地解析）';
+    readFileSmart(file).then(text => {
+      pendingText = text; pendingJsonItems = null; pasteArea.value = '';
+      if (!setNameInput.value) setNameInput.value = file.name.replace(/\.[^.]+$/, '');
+      showPreview(text);
+    }).catch(e2 => {
+      previewEl.innerHTML = `<span style="color:var(--danger)">⚠ ${escapeHtml(e2.message || String(e2))}</span>`;
+    });
+  }
 }
 
 async function readFileSmart(file) {
@@ -641,9 +794,17 @@ pasteArea.addEventListener('input', () => {
 });
 
 document.getElementById('confirmBtn').onclick = () => {
-  const text = pasteArea.value.trim() || pendingText;
-  if (!text) { toast('请提供文件或粘贴文本', 'err'); return; }
-  const items = parseVocab(text);
+  let items;
+  // If user typed in paste area, use that; else pendingJsonItems (JSON import); else pendingText
+  if (pasteArea.value.trim()) {
+    items = parseVocab(pasteArea.value.trim());
+  } else if (pendingJsonItems) {
+    items = pendingJsonItems;
+  } else if (pendingText) {
+    items = parseVocab(pendingText);
+  } else {
+    toast('请提供文件或粘贴文本', 'err'); return;
+  }
   if (items.length === 0) { toast('未解析到有效词条', 'err'); return; }
   const name = setNameInput.value.trim() || `词集 ${new Date().toLocaleString('zh-CN')}`;
   const id = uid();

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>创意工坊 · Vocab Trainer</title>
+<style>
+  :root {
+    --bg: #0f1115; --panel: #1a1d24; --panel-2: #22262f;
+    --text: #e7e9ee; --muted: #9aa0aa; --accent: #6ea8ff; --accent-2: #8b5cf6;
+    --ok: #4ade80; --warn: #fbbf24; --danger: #f87171; --border: #2a2f3a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text);
+    min-height: 100vh; line-height: 1.6;
+  }
+  .container { max-width: 1080px; margin: 0 auto; padding: 24px 20px 80px; }
+  h1 {
+    margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .subtitle { color: var(--muted); font-size: 14px; margin-top: 4px; }
+  .topnav {
+    display: flex; align-items: center; gap: 14px; padding: 10px 16px;
+    background: rgba(30,41,59,.7); border: 1px solid #334155; border-radius: 12px;
+    margin: 16px 0; font-size: .86rem;
+  }
+  .nav-link { color: var(--muted); text-decoration: none; padding: 6px 12px; border-radius: 8px; transition: all .2s; }
+  .nav-link:hover { color: var(--accent); background: rgba(56,189,248,.08); }
+  .nav-link.active { color: var(--accent); background: rgba(56,189,248,.12); font-weight: 600; }
+  .nav-spacer { flex: 1; }
+  .nav-user { color: var(--muted); font-size: .82rem; }
+  .nav-btn { padding: 5px 12px; font-size: .78rem; border: 1px solid #475569; border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer; transition: all .2s; text-decoration: none; }
+  .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .header-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .btn {
+    background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+    padding: 10px 16px; border-radius: 10px; cursor: pointer; font-size: 14px;
+    font-weight: 500; transition: all .15s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+  }
+  .btn:hover { background: #2a2f3a; border-color: #3a414f; }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); border: none; color: #fff; }
+  .btn-primary:hover { opacity: .92; }
+
+  .tabs { display: flex; gap: 4px; margin-bottom: 18px; flex-wrap: wrap; align-items: center; }
+  .tab {
+    padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2);
+    color: var(--muted); cursor: pointer; font-size: 13px; transition: all .15s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+  .search-box {
+    flex: 1; min-width: 200px; max-width: 340px; padding: 8px 14px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--panel-2); color: var(--text); font-size: 13px;
+  }
+  .search-box:focus { outline: none; border-color: var(--accent); }
+
+  .bank-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;
+  }
+  .bank-card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+    overflow: hidden; cursor: pointer; transition: all .15s; display: flex; flex-direction: column;
+  }
+  .bank-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.3); }
+  .thumb {
+    height: 140px; background: linear-gradient(135deg, #2a2f3a, #1a1d24);
+    display: flex; align-items: center; justify-content: center; font-size: 48px; position: relative; overflow: hidden;
+  }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .thumb .word-count {
+    position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,.7); color: #fff;
+    padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600;
+  }
+  .card-body { padding: 14px; flex: 1; display: flex; flex-direction: column; }
+  .card-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; word-break: break-word; }
+  .card-author { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .card-desc { font-size: 12px; color: var(--muted); flex: 1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 8px; }
+  .card-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+  .tag {
+    padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 500;
+    background: rgba(110,168,255,.12); color: var(--accent);
+  }
+  .card-footer { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); }
+  .card-footer .dl { color: var(--ok); font-weight: 600; }
+
+  .empty { text-align: center; padding: 64px 20px; color: var(--muted); border: 1px dashed var(--border); border-radius: 14px; }
+  .empty .big { font-size: 48px; margin-bottom: 12px; }
+  .loading { text-align: center; padding: 60px 20px; color: var(--muted); }
+
+  /* Detail modal */
+  .modal-mask {
+    position: fixed; inset: 0; background: rgba(0,0,0,.7); backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center; padding: 20px; z-index: 100;
+  }
+  .modal-mask.show { display: flex; }
+  .detail-modal {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+    width: 100%; max-width: 720px; max-height: 88vh; overflow: auto;
+  }
+  .detail-thumb { height: 200px; background: linear-gradient(135deg, #2a2f3a, #1a1d24); display: flex; align-items: center; justify-content: center; font-size: 64px; position: relative; }
+  .detail-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .detail-close {
+    position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border-radius: 50%;
+    border: none; background: rgba(0,0,0,.6); color: #fff; cursor: pointer; font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .detail-close:hover { background: rgba(0,0,0,.8); }
+  .detail-body { padding: 24px; }
+  .detail-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  .detail-meta { display: flex; gap: 16px; flex-wrap: wrap; color: var(--muted); font-size: 13px; margin-bottom: 14px; }
+  .detail-meta span { display: inline-flex; align-items: center; gap: 4px; }
+  .detail-desc { color: var(--text); font-size: 14px; line-height: 1.7; margin-bottom: 16px; }
+  .detail-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+  .detail-section-title { font-size: 14px; font-weight: 600; color: var(--accent); margin-bottom: 10px; }
+  .preview-list {
+    max-height: 280px; overflow-y: auto; border: 1px solid var(--border); border-radius: 10px;
+    margin-bottom: 20px;
+  }
+  .preview-item { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .preview-item:last-child { border-bottom: none; }
+  .preview-word { font-weight: 600; color: var(--accent); }
+  .preview-def { color: var(--muted); margin-left: 8px; }
+  .detail-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--panel); border: 1px solid var(--border); color: var(--text);
+    padding: 10px 18px; border-radius: 10px; font-size: 14px; opacity: 0;
+    transition: opacity .25s, transform .25s; z-index: 200; pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+  .toast.ok { border-color: var(--ok); }
+  .toast.err { border-color: var(--danger); }
+</style>
+</head>
+<body>
+<div class="container">
+  <nav class="topnav">
+    <a href="index.html" class="nav-link">🏠 首页</a>
+    <a href="workshop.html" class="nav-link active">🌐 创意工坊</a>
+    <a href="wrong.html" class="nav-link">📕 错题集</a>
+    <a href="account.html" class="nav-link">👤 账户</a>
+    <span class="nav-spacer"></span>
+    <span class="nav-user">👤 <span id="userInfo">加载中…</span></span>
+    <a href="publish.html" class="nav-btn">📦 发布词集</a>
+    <button class="nav-btn" id="logoutBtn">退出</button>
+  </nav>
+
+  <div class="header-row">
+    <div>
+      <h1>🌐 创意工坊</h1>
+      <div class="subtitle">浏览社区分享的词集，一键导入到你的训练列表</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-sort="top">🔥 热门</button>
+    <button class="tab" data-sort="new">🆕 最新发布</button>
+    <button class="tab" data-sort="downloads">⬇️ 下载量</button>
+    <input type="text" class="search-box" id="searchBox" placeholder="🔍 搜索标题、作者或标签…">
+  </div>
+
+  <div id="grid"><div class="loading">加载中…</div></div>
+</div>
+
+<!-- Detail modal -->
+<div class="modal-mask" id="detailModal">
+  <div class="detail-modal" id="detailContent"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="db.js"></script>
+<script>
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmtDate(ts){const d=new Date(ts);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+
+function toast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show ' + (type||'');
+  setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+document.getElementById('logoutBtn').onclick = async () => {
+  try { await DB.logout(); } catch(e){}
+  location.href = 'login.html';
+};
+
+let allBanks = [];
+let currentSort = 'top';
+
+async function loadBanks(sort) {
+  currentSort = sort;
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '<div class="loading">加载中…</div>';
+  try {
+    allBanks = await DB.listBanks(sort);
+    renderGrid();
+  } catch(e) {
+    grid.innerHTML = '<div class="empty"><div class="big">⚠️</div><div>' + esc(e.message) + '</div><div style="margin-top:14px"><a href="index.html" class="btn">← 返回首页</a></div></div>';
+  }
+}
+
+function renderGrid() {
+  const grid = document.getElementById('grid');
+  const q = (document.getElementById('searchBox').value || '').toLowerCase().trim();
+  let banks = allBanks;
+  if (q) {
+    banks = banks.filter(b =>
+      (b.title||'').toLowerCase().includes(q) ||
+      (b.author||'').toLowerCase().includes(q) ||
+      (b.tags||[]).some(t => t.toLowerCase().includes(q)) ||
+      (b.description||'').toLowerCase().includes(q)
+    );
+  }
+  if (!banks.length) {
+    grid.innerHTML = '<div class="empty"><div class="big">📭</div><div>' + (q ? '没有匹配的词集' : '还没有发布的词集，快来发布第一个吧！') + '</div><div style="margin-top:14px"><a href="publish.html" class="btn btn-primary">📦 发布词集</a></div></div>';
+    return;
+  }
+  grid.innerHTML = '<div class="bank-grid">' + banks.map(b => {
+    const thumb = b.thumbnail
+      ? '<img src="' + esc(b.thumbnail) + '" alt="">'
+      : '📚';
+    const tags = (b.tags||[]).slice(0,3).map(t => '<span class="tag">' + esc(t) + '</span>').join('');
+    return '<div class="bank-card" data-id="' + esc(b.id) + '">' +
+      '<div class="thumb">' + thumb + '</div>' +
+      '<div class="card-body">' +
+        '<div class="card-title">' + esc(b.title) + '</div>' +
+        '<div class="card-author">👤 ' + esc(b.author) + ' · ' + fmtDate(b.createdAt) + '</div>' +
+        '<div class="card-desc">' + esc(b.description || '暂无描述') + '</div>' +
+        (tags ? '<div class="card-tags">' + tags + '</div>' : '') +
+        '<div class="card-footer"><span>📅 ' + fmtDate(b.createdAt) + '</span><span class="dl">⬇ ' + (b.downloads||0) + ' 导入</span></div>' +
+      '</div>' +
+    '</div>';
+  }).join('') + '</div>';
+
+  grid.querySelectorAll('.bank-card').forEach(card => {
+    card.onclick = () => showDetail(card.dataset.id);
+  });
+}
+
+async function showDetail(id) {
+  const modal = document.getElementById('detailModal');
+  const content = document.getElementById('detailContent');
+  modal.classList.add('show');
+  content.innerHTML = '<div style="padding:60px;text-align:center;color:var(--muted)">加载中…</div>';
+  try {
+    const bank = await DB.getBank(id);
+    const items = bank.items || [];
+    const thumb = bank.thumbnail
+      ? '<img src="' + esc(bank.thumbnail) + '" alt="">'
+      : '📚';
+    const tags = (bank.tags||[]).map(t => '<span class="tag">' + esc(t) + '</span>').join('');
+    const previewItems = items.slice(0, 30);
+    content.innerHTML =
+      '<div class="detail-thumb">' + thumb +
+        '<button class="detail-close" id="closeDetail">✕</button>' +
+      '</div>' +
+      '<div class="detail-body">' +
+        '<div class="detail-title">' + esc(bank.title) + '</div>' +
+        '<div class="detail-meta">' +
+          '<span>👤 ' + esc(bank.author) + '</span>' +
+          '<span>📅 发布于 ' + fmtDate(bank.createdAt) + '</span>' +
+          '<span>⬇ ' + (bank.downloads||0) + ' 次导入</span>' +
+          '<span>📝 ' + items.length + ' 词</span>' +
+        '</div>' +
+        (tags ? '<div class="detail-tags">' + tags + '</div>' : '') +
+        '<div class="detail-desc">' + esc(bank.description || '暂无描述') + '</div>' +
+        '<div class="detail-section-title">📋 词条预览（前 ' + previewItems.length + ' 个）</div>' +
+        '<div class="preview-list">' +
+          previewItems.map(it =>
+            '<div class="preview-item"><span class="preview-word">' + esc(it.word) + '</span>' +
+            '<span class="preview-def">' + esc(it.def || '') + '</span></div>'
+          ).join('') +
+        '</div>' +
+        '<div class="detail-actions">' +
+          '<button class="btn btn-primary" id="importBtn">📥 导入到我的词集</button>' +
+          '<a href="trainer.html?id=' + encodeURIComponent(id) + '" class="btn" id="tryBtn">▶ 试练（只读）</a>' +
+          '<button class="btn" id="closeBtn2">关闭</button>' +
+        '</div>' +
+      '</div>';
+
+    document.getElementById('closeDetail').onclick = () => modal.classList.remove('show');
+    document.getElementById('closeBtn2').onclick = () => modal.classList.remove('show');
+    document.getElementById('importBtn').onclick = async () => {
+      const btn = document.getElementById('importBtn');
+      btn.disabled = true; btn.textContent = '导入中…';
+      try {
+        const result = await DB.importBank(id);
+        toast('✓ 导入成功！已添加到你的词集', 'ok');
+        setTimeout(() => { location.href = 'index.html'; }, 1200);
+      } catch(e) {
+        toast('导入失败：' + e.message, 'err');
+        btn.disabled = false; btn.textContent = '📥 导入到我的词集';
+      }
+    };
+  } catch(e) {
+    content.innerHTML = '<div style="padding:40px;text-align:center;color:var(--danger)">加载失败：' + esc(e.message) + '</div>';
+  }
+}
+
+document.getElementById('detailModal').onclick = (e) => {
+  if (e.target.id === 'detailModal') e.target.classList.remove('show');
+};
+
+// Tab switching
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.onclick = () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    loadBanks(tab.dataset.sort);
+  };
+});
+
+// Search
+document.getElementById('searchBox').oninput = renderGrid;
+
+// Init
+(async function() {
+  try {
+    const user = await DB.getUser();
+    document.getElementById('userInfo').textContent = user.email;
+  } catch(e) {
+    document.getElementById('userInfo').textContent = '未登录';
+  }
+  loadBanks('top');
+})();
+</script>
+</body>
+</html>

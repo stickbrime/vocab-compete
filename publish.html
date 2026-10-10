@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>发布词集 · 创意工坊</title>
+<style>
+  :root {
+    --bg: #0f1115; --panel: #1a1d24; --panel-2: #22262f;
+    --text: #e7e9ee; --muted: #9aa0aa; --accent: #6ea8ff; --accent-2: #8b5cf6;
+    --ok: #4ade80; --danger: #f87171; --border: #2a2f3a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text);
+    min-height: 100vh; line-height: 1.6;
+  }
+  .container { max-width: 680px; margin: 0 auto; padding: 24px 20px 80px; }
+  h1 {
+    margin: 0 0 4px; font-size: 24px; font-weight: 700; letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .subtitle { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+  .topnav {
+    display: flex; align-items: center; gap: 14px; padding: 10px 16px;
+    background: rgba(30,41,59,.7); border: 1px solid #334155; border-radius: 12px;
+    margin-bottom: 20px; font-size: .86rem;
+  }
+  .nav-link { color: var(--muted); text-decoration: none; padding: 6px 12px; border-radius: 8px; transition: all .2s; }
+  .nav-link:hover { color: var(--accent); background: rgba(56,189,248,.08); }
+  .nav-link.active { color: var(--accent); background: rgba(56,189,248,.12); font-weight: 600; }
+  .nav-spacer { flex: 1; }
+  .nav-user { color: var(--muted); font-size: .82rem; }
+  .nav-btn { padding: 5px 12px; font-size: .78rem; border: 1px solid #475569; border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer; transition: all .2s; }
+  .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 16px; }
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
+  .field input[type=text], .field textarea, .field select {
+    width: 100%; background: var(--panel-2); border: 1px solid var(--border);
+    color: var(--text); padding: 10px 12px; border-radius: 8px; font-size: 14px; font-family: inherit;
+  }
+  .field input[type=text]:focus, .field textarea:focus, .field select:focus {
+    outline: none; border-color: var(--accent);
+  }
+  .field textarea { resize: vertical; min-height: 80px; }
+  .field .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  .set-picker { display: flex; flex-direction: column; gap: 8px; }
+  .set-option {
+    display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+    background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px;
+    cursor: pointer; transition: all .15s;
+  }
+  .set-option:hover { border-color: var(--accent); }
+  .set-option.selected { border-color: var(--accent); background: rgba(110,168,255,.08); }
+  .set-option input { accent-color: var(--accent); }
+  .set-option .info { flex: 1; }
+  .set-option .name { font-weight: 600; font-size: 14px; }
+  .set-option .meta { font-size: 12px; color: var(--muted); }
+
+  .thumb-section { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+  .thumb-preview {
+    width: 160px; height: 110px; border-radius: 10px; border: 1px solid var(--border);
+    background: linear-gradient(135deg, #2a2f3a, #1a1d24); display: flex; align-items: center;
+    justify-content: center; font-size: 40px; overflow: hidden; flex-shrink: 0;
+  }
+  .thumb-preview img { width: 100%; height: 100%; object-fit: cover; }
+  .thumb-controls { flex: 1; min-width: 200px; }
+  .preset-thumbs { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .preset-thumb {
+    width: 44px; height: 44px; border-radius: 8px; border: 2px solid transparent;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px;
+    transition: all .15s;
+  }
+  .preset-thumb:hover { border-color: var(--accent); }
+  .preset-thumb.selected { border-color: var(--accent); background: rgba(110,168,255,.12); }
+  .upload-btn {
+    display: inline-block; padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--panel-2); color: var(--text); cursor: pointer; font-size: 13px; transition: all .15s;
+  }
+  .upload-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .actions { display: flex; gap: 10px; justify-content: flex-end; }
+  .btn {
+    background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+    padding: 10px 18px; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 500;
+    transition: all .15s; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:hover { background: #2a2f3a; }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); border: none; color: #fff; }
+  .btn-primary:hover { opacity: .92; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--panel); border: 1px solid var(--border); color: var(--text);
+    padding: 10px 18px; border-radius: 10px; font-size: 14px; opacity: 0;
+    transition: opacity .25s, transform .25s; z-index: 200; pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+  .toast.ok { border-color: var(--ok); }
+  .toast.err { border-color: var(--danger); }
+
+  .preview-items {
+    max-height: 200px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; margin-top: 8px;
+  }
+  .preview-item { padding: 8px 12px; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .preview-item:last-child { border-bottom: none; }
+  .preview-word { font-weight: 600; color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="container">
+  <nav class="topnav">
+    <a href="index.html" class="nav-link">🏠 首页</a>
+    <a href="workshop.html" class="nav-link">🌐 创意工坊</a>
+    <a href="wrong.html" class="nav-link">📕 错题集</a>
+    <a href="account.html" class="nav-link">👤 账户</a>
+    <span class="nav-spacer"></span>
+    <span class="nav-user">👤 <span id="userInfo">加载中…</span></span>
+    <button class="nav-btn" id="logoutBtn">退出</button>
+  </nav>
+
+  <h1>📦 发布词集到创意工坊</h1>
+  <div class="subtitle">选择你的词集，填写信息后发布到社区供他人导入</div>
+
+  <div class="card">
+    <div class="field">
+      <label>① 选择要发布的词集</label>
+      <div class="set-picker" id="setPicker"><div style="color:var(--muted);padding:12px">加载中…</div></div>
+    </div>
+  </div>
+
+  <div class="card" id="formCard" style="display:none">
+    <div class="field">
+      <label>② 标题</label>
+      <input type="text" id="title" placeholder="例如：SAT 高频词汇 200">
+    </div>
+    <div class="field">
+      <label>③ 描述</label>
+      <textarea id="description" rows="3" placeholder="简要介绍这个词集的内容、难度、适用场景…"></textarea>
+    </div>
+    <div class="field">
+      <label>④ 标签（用逗号分隔，最多 8 个）</label>
+      <input type="text" id="tags" placeholder="SAT, 高频, 核心">
+      <div class="hint">例如：SAT, GRE, 托福, 高频, 核心</div>
+    </div>
+    <div class="field">
+      <label>⑤ 缩略图</label>
+      <div class="thumb-section">
+        <div class="thumb-preview" id="thumbPreview">📚</div>
+        <div class="thumb-controls">
+          <label class="upload-btn">
+            📁 上传图片
+            <input type="file" id="thumbUpload" accept="image/*" style="display:none">
+          </label>
+          <div style="font-size:12px;color:var(--muted);margin-top:8px">或选择预设：</div>
+          <div class="preset-thumbs" id="presetThumbs"></div>
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <label>⑥ 词条预览</label>
+      <div class="preview-items" id="previewItems"></div>
+    </div>
+    <div class="actions">
+      <a href="workshop.html" class="btn">取消</a>
+      <button class="btn btn-primary" id="publishBtn">📦 发布</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="db.js"></script>
+<script>
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function toast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show ' + (type||'');
+  setTimeout(()=>t.classList.remove('show'), 2800);
+}
+
+document.getElementById('logoutBtn').onclick = async () => {
+  try { await DB.logout(); } catch(e){}
+  location.href = 'login.html';
+};
+
+const PRESETS = ['📚','🎓','🔥','⭐','📝','🧠','💡','🏆','📖','🎯','✨','🚀'];
+let selectedSetId = null;
+let selectedSet = null;
+let thumbnailData = '';
+
+// Build preset thumbnails
+const presetEl = document.getElementById('presetThumbs');
+PRESETS.forEach((emoji, i) => {
+  const d = document.createElement('div');
+  d.className = 'preset-thumb' + (i === 0 ? ' selected' : '');
+  d.textContent = emoji;
+  d.onclick = () => {
+    document.querySelectorAll('.preset-thumb').forEach(p => p.classList.remove('selected'));
+    d.classList.add('selected');
+    thumbnailData = '';
+    document.getElementById('thumbPreview').innerHTML = emoji;
+  };
+  presetEl.appendChild(d);
+});
+
+// Thumbnail upload with client-side resize
+document.getElementById('thumbUpload').onchange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { toast('图片不能超过 5MB', 'err'); return; }
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const img = new Image();
+    img.onload = () => {
+      // Resize to max 400x300, JPEG quality 0.8
+      const canvas = document.createElement('canvas');
+      const maxW = 400, maxH = 300;
+      let w = img.width, h = img.height;
+      if (w > maxW) { h = h * maxW / w; w = maxW; }
+      if (h > maxH) { w = w * maxH / h; h = maxH; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      thumbnailData = canvas.toDataURL('image/jpeg', 0.8);
+      document.getElementById('thumbPreview').innerHTML = '<img src="' + thumbnailData + '">';
+      document.querySelectorAll('.preset-thumb').forEach(p => p.classList.remove('selected'));
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+};
+
+// Load user's sets
+(async function() {
+  try {
+    const user = await DB.getUser();
+    document.getElementById('userInfo').textContent = user.email;
+  } catch(e) {
+    location.href = 'login.html';
+    return;
+  }
+
+  try {
+    const sets = await DB.getSets();
+    const setList = Object.entries(sets).sort((a,b) => (b[1].lastPlayed||0) - (a[1].lastPlayed||0));
+    const picker = document.getElementById('setPicker');
+
+    if (!setList.length) {
+      picker.innerHTML = '<div style="color:var(--muted);padding:12px">你还没有词集。<a href="index.html" style="color:var(--accent)">去创建一个</a></div>';
+      return;
+    }
+
+    picker.innerHTML = '';
+    setList.forEach(([id, set]) => {
+      const total = (set.items || []).length;
+      const mastered = (set.mastered || []).length;
+      const div = document.createElement('div');
+      div.className = 'set-option';
+      div.innerHTML =
+        '<input type="radio" name="setPick" value="' + esc(id) + '">' +
+        '<div class="info">' +
+          '<div class="name">' + esc(set.name) + '</div>' +
+          '<div class="meta">' + total + ' 词 · 已掌握 ' + mastered + '</div>' +
+        '</div>';
+      div.onclick = (e) => {
+        if (e.target.tagName === 'INPUT') e.stopPropagation();
+        document.querySelectorAll('.set-option').forEach(o => o.classList.remove('selected'));
+        div.classList.add('selected');
+        div.querySelector('input').checked = true;
+        selectSet(id, set);
+      };
+      picker.appendChild(div);
+    });
+  } catch(e) {
+    document.getElementById('setPicker').innerHTML = '<div style="color:var(--danger);padding:12px">加载失败：' + esc(e.message) + '</div>';
+  }
+})();
+
+function selectSet(id, set) {
+  selectedSetId = id;
+  selectedSet = set;
+  document.getElementById('formCard').style.display = '';
+  // Pre-fill title
+  document.getElementById('title').value = set.name || '';
+  // Show preview items
+  const items = (set.items || []).slice(0, 15);
+  document.getElementById('previewItems').innerHTML = items.map(it =>
+    '<div class="preview-item"><span class="preview-word">' + esc(it.word) + '</span> ' +
+    '<span style="color:var(--muted)">' + esc(it.def || '') + '</span></div>'
+  ).join('');
+}
+
+document.getElementById('publishBtn').onclick = async () => {
+  if (!selectedSetId || !selectedSet) { toast('请先选择词集', 'err'); return; }
+  const title = document.getElementById('title').value.trim();
+  const description = document.getElementById('description').value.trim();
+  const tagsStr = document.getElementById('tags').value.trim();
+  if (!title) { toast('请填写标题', 'err'); return; }
+
+  const tags = tagsStr ? tagsStr.split(/[,，]/).map(t => t.trim()).filter(Boolean).slice(0, 8) : [];
+
+  const btn = document.getElementById('publishBtn');
+  btn.disabled = true; btn.textContent = '发布中…';
+  try {
+    const pubId = 'pub_' + Date.now().toString(36);
+    await DB.publishBank({
+      id: pubId,
+      title: title,
+      description: description,
+      tags: tags,
+      thumbnail: thumbnailData,
+      items: selectedSet.items
+    });
+    toast('✓ 发布成功！', 'ok');
+    setTimeout(() => { location.href = 'workshop.html'; }, 1200);
+  } catch(e) {
+    toast('发布失败：' + e.message, 'err');
+    btn.disabled = false; btn.textContent = '📦 发布';
+  }
+};
+</script>
+</body>
+</html>

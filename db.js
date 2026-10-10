@@ -294,6 +294,48 @@ const DB = (() => {
       users[s.email] = u;
       lsSetUsers(users);
       return { ok: true };
+    },
+
+    // ---------- Community workshop (requires backend) ----------
+    async listBanks(sort) {
+      if (!(await probe())) throw new Error('社区功能需要后端服务器支持');
+      const r = await fetch('/api/community' + (sort ? '?sort=' + encodeURIComponent(sort) : ''));
+      if (!r.ok) throw new Error('加载失败');
+      return await r.json();
+    },
+
+    async getBank(id) {
+      if (!(await probe())) throw new Error('社区功能需要后端服务器支持');
+      const r = await fetch('/api/community/' + encodeURIComponent(id));
+      if (!r.ok) throw new Error('词集不存在');
+      return await r.json();
+    },
+
+    async publishBank(data) {
+      if (!(await probe())) throw new Error('社区功能需要后端服务器支持');
+      const r = await fetch('/api/community/publish', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || '发布失败');
+      return d;
+    },
+
+    async importBank(id) {
+      if (!(await probe())) throw new Error('社区功能需要后端服务器支持');
+      const r = await fetch('/api/community/' + encodeURIComponent(id) + '/import', { method: 'POST' });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || '导入失败');
+      return d;
+    },
+
+    async deleteBank(id) {
+      if (!(await probe())) throw new Error('社区功能需要后端服务器支持');
+      const r = await fetch('/api/community/' + encodeURIComponent(id), { method: 'DELETE' });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || '删除失败');
+      return d;
     }
   };
 })();
