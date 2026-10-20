@@ -336,6 +336,48 @@ const DB = (() => {
       const d = await r.json();
       if (!r.ok) throw new Error(d.error || '删除失败');
       return d;
+    },
+
+    // ---------- Avatar ----------
+    async uploadAvatar(dataUrl) {
+      if (await probe()) {
+        const r = await fetch('/api/avatar', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ avatar: dataUrl })
+        });
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || '上传失败');
+        // Update session cache
+        const s = lsCurrentUser();
+        if (s) { s.avatar = dataUrl; lsSetUser(s); }
+        return d;
+      }
+      const s = lsCurrentUser();
+      if (!s) throw new Error('not logged in');
+      const users = lsGetUsers();
+      if (users[s.email]) users[s.email].avatar = dataUrl;
+      lsSetUsers(users);
+      s.avatar = dataUrl;
+      lsSetUser(s);
+      return { ok: true, avatar: dataUrl };
+    },
+
+    async deleteAvatar() {
+      if (await probe()) {
+        const r = await fetch('/api/avatar', { method: 'DELETE' });
+        if (!r.ok) throw new Error('删除失败');
+        const s = lsCurrentUser();
+        if (s) { delete s.avatar; lsSetUser(s); }
+        return { ok: true };
+      }
+      const s = lsCurrentUser();
+      if (!s) return { ok: true };
+      const users = lsGetUsers();
+      if (users[s.email]) delete users[s.email].avatar;
+      lsSetUsers(users);
+      delete s.avatar;
+      lsSetUser(s);
+      return { ok: true };
     }
   };
 })();

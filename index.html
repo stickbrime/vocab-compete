@@ -6,17 +6,19 @@
 <title>Vocab Trainer — 单词集首页</title>
 <style>
   :root {
-    --bg: #0f1115;
-    --panel: #1a1d24;
-    --panel-2: #22262f;
-    --text: #e7e9ee;
-    --muted: #9aa0aa;
-    --accent: #6ea8ff;
-    --accent-2: #8b5cf6;
-    --ok: #4ade80;
-    --warn: #fbbf24;
-    --danger: #f87171;
-    --border: #2a2f3a;
+    --bg: #101013;
+    --panel: #17171B;
+    --panel-2: #1D1D22;
+    --text: #F4F4F1;
+    --muted: #8E8E96;
+    --accent: #D8F43C;
+    --accent-ink: #111100;
+    --accent-2: #FFD23F;
+    --ok: #6FDD8B;
+    --warn: #FFD23F;
+    --danger: #FF5449;
+    --bad: #FF5449;
+    --border: #2B2B31;
   }
   * { box-sizing: border-box; }
   body {
@@ -34,78 +36,105 @@
     gap: 16px; flex-wrap: wrap; margin-bottom: 28px;
   }
   h1 {
-    margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.02em;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    -webkit-background-clip: text; background-clip: text; color: transparent;
+    margin: 0; font-size: 1.02rem; font-weight: 800;
+    letter-spacing: .14em; text-transform: uppercase;
   }
-  .subtitle { color: var(--muted); font-size: 14px; margin-top: 4px; }
+  .subtitle { color: var(--muted); font-size: .78rem; margin-top: 4px; }
   .btn {
-    background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
-    padding: 10px 16px; border-radius: 10px; cursor: pointer; font-size: 14px;
-    font-weight: 500; transition: all .15s; display: inline-flex; align-items: center; gap: 8px;
+    background: transparent; color: var(--muted); border: 1px solid var(--border);
+    padding: 10px 16px; cursor: pointer; font-size: 14px;
+    font-weight: 500; transition: color .15s, border-color .15s;
+    display: inline-flex; align-items: center; gap: 8px;
   }
-  .btn:hover { background: #2a2f3a; border-color: #3a414f; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
   .btn-primary {
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    border: none; color: #fff;
+    background: var(--accent); border: 1px solid var(--accent);
+    color: var(--accent-ink); font-weight: 700;
   }
-  .btn-primary:hover { opacity: .92; }
-  .btn-danger { color: var(--danger); }
-  .btn-danger:hover { background: rgba(248,113,113,.1); border-color: rgba(248,113,113,.3); }
+  .btn-primary:hover { border-color: var(--accent); color: var(--accent-ink); }
+  .btn-danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
+  .btn-danger:hover { border-color: var(--danger); color: var(--danger); }
   .toolbar { display: flex; gap: 10px; flex-wrap: wrap; }
-  .topnav { display: flex; align-items: center; gap: 14px; padding: 10px 16px; background: rgba(30,41,59,.7); border: 1px solid #334155; border-radius: 12px; margin-bottom: 18px; font-size: .86rem; }
-  .nav-link { color: var(--muted); text-decoration: none; padding: 6px 12px; border-radius: 8px; transition: all .2s; }
-  .nav-link:hover { color: var(--accent); background: rgba(56,189,248,.08); }
-  .nav-link.active { color: var(--accent); background: rgba(56,189,248,.12); font-weight: 600; }
+  .topnav { display: flex; align-items: center; gap: 14px; padding: 10px 16px; background: var(--panel); border: 1px solid var(--border); margin-bottom: 18px; font-size: .86rem; }
+  .nav-link { color: var(--muted); text-decoration: none; padding: 6px 12px; transition: color .15s, background-color .15s; }
+  .nav-link:hover { color: var(--accent); background: #1B1E24; }
+  .nav-link.active { color: var(--accent); background: #1B1E24; font-weight: 600; }
   .nav-spacer { flex: 1; }
   .nav-user { color: var(--muted); font-size: .82rem; }
-  .nav-btn { padding: 5px 12px; font-size: .78rem; border: 1px solid #475569; border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer; transition: all .2s; }
+  .nav-btn { padding: 5px 12px; font-size: .78rem; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: color .15s, border-color .15s; }
   .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
 
   .empty {
     text-align: center; padding: 64px 20px; color: var(--muted);
-    border: 1px dashed var(--border); border-radius: 14px;
+    border: 1px dashed var(--border);
   }
-  .empty .big { font-size: 48px; margin-bottom: 12px; }
+  .empty .big { font-size: 48px; margin-bottom: 12px; color: var(--accent); line-height: 1; }
 
   .set-grid {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 14px;
   }
   .set-card {
-    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
-    padding: 18px; cursor: pointer; transition: all .15s; position: relative;
+    background: var(--panel); border: 1px solid var(--border);
+    padding: 18px; cursor: pointer; transition: border-color .15s; position: relative;
   }
-  .set-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .set-card:hover { border-color: var(--accent); }
   .set-name { font-size: 16px; font-weight: 600; margin-bottom: 6px; word-break: break-word; padding-right: 28px; }
-  .set-meta { color: var(--muted); font-size: 13px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .set-meta {
+    color: var(--muted); font-size: .72rem;
+    font-family: "SF Mono", ui-monospace, Menlo, monospace;
+    letter-spacing: .06em; font-feature-settings: "tnum";
+    display: flex; gap: 14px; flex-wrap: wrap;
+  }
   .set-meta span { display: inline-flex; align-items: center; gap: 4px; }
   .set-progress {
-    margin-top: 10px; height: 6px; background: var(--panel-2); border-radius: 3px; overflow: hidden;
+    margin-top: 10px; height: 6px; background: var(--panel-2); overflow: hidden;
   }
   .set-progress > div {
-    height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2));
-    transition: width .3s;
+    height: 100%; background: var(--accent);
+    transition: width .15s;
   }
   .set-delete {
     position: absolute; top: 12px; right: 12px; width: 26px; height: 26px;
     border: none; background: transparent; color: var(--muted); cursor: pointer;
-    border-radius: 6px; font-size: 16px; line-height: 1;
+    font-size: 16px; line-height: 1;
   }
-  .set-delete:hover { background: rgba(248,113,113,.15); color: var(--danger); }
+  .set-delete:hover { background: #1F1113; color: var(--danger); }
+  .gen-overlay {
+    position: absolute; inset: 0; z-index: 10;
+    background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; cursor: wait;
+  }
+  .gen-overlay .spin {
+    width: 34px; height: 34px;
+    border: 3px solid var(--border); border-top-color: var(--accent);
+    animation: genspin .8s linear infinite;
+  }
+  @keyframes genspin { to { transform: rotate(360deg); } }
+  .gen-overlay .gen-status {
+    font-size: .72rem; color: var(--accent); font-weight: 600;
+    font-family: "SF Mono", ui-monospace, Menlo, monospace;
+    letter-spacing: .06em; font-feature-settings: "tnum";
+  }
+  .gen-overlay .gen-sub {
+    font-size: .72rem; color: var(--muted);
+    font-family: "SF Mono", ui-monospace, Menlo, monospace; letter-spacing: .06em;
+  }
   .badge {
-    display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px;
-    background: rgba(110,168,255,.12); color: var(--accent); font-weight: 500;
+    display: inline-block; padding: 2px 8px; font-size: .72rem;
+    background: #1B1E24; color: var(--accent); font-weight: 500;
+    font-family: "SF Mono", ui-monospace, Menlo, monospace; letter-spacing: .06em;
   }
 
   /* Modal */
   .modal-mask {
-    position: fixed; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(4px);
+    position: fixed; inset: 0; background: #0B0B0E;
     display: none; align-items: center; justify-content: center; padding: 20px; z-index: 100;
   }
   .modal-mask.show { display: flex; }
   .modal {
-    background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+    background: var(--panel); border: 1px solid var(--border);
     width: 100%; max-width: 640px; padding: 24px; max-height: 88vh; overflow: auto;
   }
   .modal h2 { margin: 0 0 6px; font-size: 20px; }
@@ -114,21 +143,21 @@
   .field label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
   .field input[type=text] {
     width: 100%; background: var(--panel-2); border: 1px solid var(--border);
-    color: var(--text); padding: 10px 12px; border-radius: 8px; font-size: 14px;
+    color: var(--text); padding: 10px 12px; font-size: 14px;
   }
   .field input[type=text]:focus { outline: none; border-color: var(--accent); }
   .dropzone {
-    border: 2px dashed var(--border); border-radius: 12px; padding: 28px;
-    text-align: center; color: var(--muted); cursor: pointer; transition: all .15s;
+    border: 2px dashed var(--border); padding: 28px;
+    text-align: center; color: var(--muted); cursor: pointer; transition: color .15s, border-color .15s;
     background: var(--panel-2);
   }
   .dropzone:hover, .dropzone.drag { border-color: var(--accent); color: var(--text); }
-  .dropzone .icon { font-size: 32px; margin-bottom: 8px; }
+  .dropzone .icon { font-size: 32px; margin-bottom: 8px; color: var(--accent); line-height: 1; }
   .dropzone .filename { color: var(--accent); font-weight: 500; }
   .format-help {
-    background: var(--panel-2); border-radius: 8px; padding: 12px 14px;
+    background: var(--panel-2); padding: 12px 14px;
     font-size: 12px; color: var(--muted); margin-top: 12px; line-height: 1.7;
-    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-family: "SF Mono", ui-monospace, Menlo, monospace;
   }
   .format-help code { color: var(--accent); }
   .preview {
@@ -137,7 +166,7 @@
   .preview b { color: var(--ok); }
   .preview-table {
     margin-top: 10px; max-height: 320px; overflow-y: auto;
-    border: 1px solid var(--border); border-radius: 10px; background: var(--panel-2);
+    border: 1px solid var(--border); background: var(--panel-2);
   }
   .preview-row {
     display: flex; gap: 12px; padding: 8px 12px; border-bottom: 1px solid var(--border);
@@ -145,27 +174,27 @@
   }
   .preview-row:last-child { border-bottom: none; }
   .preview-row .pw { font-weight: 600; color: var(--accent); min-width: 110px; flex-shrink: 0; }
-  .preview-row .plbl { color: var(--muted); font-size: 11px; min-width: 26px; flex-shrink: 0; }
+  .preview-row .plbl { color: var(--muted); font-size: 11px; min-width: 26px; flex-shrink: 0; font-feature-settings: "tnum"; }
   .preview-row .pd { color: var(--text); flex: 1; word-break: break-word; }
   .preview-row .pchk { color: var(--ok); flex-shrink: 0; }
   .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
   .toast {
     position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
     background: var(--panel); border: 1px solid var(--border); color: var(--text);
-    padding: 10px 18px; border-radius: 10px; font-size: 14px; opacity: 0;
-    transition: opacity .25s, transform .25s; z-index: 200; pointer-events: none;
+    padding: 10px 18px; font-size: 14px; opacity: 0;
+    transition: opacity .15s; z-index: 200; pointer-events: none;
   }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+  .toast.show { opacity: 1; }
   .toast.ok { border-color: var(--ok); }
   .toast.err { border-color: var(--danger); }
 
   @media (max-width: 560px) {
-    h1 { font-size: 22px; }
     .container { padding: 20px 14px 60px; }
   }
 </style>
 </head>
 <body>
+<script src="shared.js"></script>
 <div class="container">
   <header>
     <div>
@@ -173,7 +202,7 @@
       <div class="subtitle">上传文档创建词集，闯关式训练 SAT / GRE / 任意词汇</div>
     </div>
     <div class="toolbar">
-      <button class="btn" id="wrongBtn" title="查看所有错题">📕 错题集</button>
+      <button class="btn" id="wrongBtn" title="查看所有错题">错题集</button>
       <button class="btn" id="vocab100Btn" title="加载本次抓取的 100 个词汇（含真实外刊例句 + 中文翻译）">+ 新词 100 词</button>
       <button class="btn" id="satBtn" title="加载从文档解析的 200 个 SAT 词汇（含真实外刊例句）">+ SAT 200 词</button>
       <button class="btn" id="sampleBtn" title="加载示例词集">+ 示例词集</button>
@@ -181,13 +210,13 @@
     </div>
   </header>
   <nav class="topnav">
-    <a href="index.html" class="nav-link active">🏠 首页</a>
-    <a href="workshop.html" class="nav-link">🌐 创意工坊</a>
-    <a href="wrong.html" class="nav-link">📕 错题集</a>
-    <a href="account.html" class="nav-link">👤 账户</a>
+    <a href="index.html" class="nav-link active">首页</a>
+    <a href="workshop.html" class="nav-link">工坊</a>
+    <a href="wrong.html" class="nav-link">错题集</a>
+    <a href="account.html" class="nav-link">账户</a>
     <span class="nav-spacer"></span>
-    <span class="nav-user">👤 <span id="userInfo">加载中…</span></span>
-    <button class="nav-btn" id="migrateBtn">📥 导入</button>
+    <span class="nav-user"><span id="userInfo">加载中…</span></span>
+    <button class="nav-btn" id="migrateBtn">导入</button>
     <button class="nav-btn" id="logoutBtn">退出</button>
   </nav>
 
@@ -206,7 +235,7 @@
     </div>
 
     <div class="dropzone" id="dropzone">
-      <div class="icon">📄</div>
+      <div class="icon">■</div>
       <div>点击选择文件，或拖拽到此</div>
       <div class="filename" id="filename"></div>
     </div>
@@ -224,7 +253,7 @@
 
     <div class="field" style="margin-top:14px">
       <label>或直接粘贴文本</label>
-      <textarea id="pasteArea" rows="5" style="width:100%;background:var(--panel-2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-size:13px;font-family:ui-monospace,Menlo,monospace;resize:vertical" placeholder="abase&#9;vt. 表现卑微&#10;ponderous&#9;adj. 笨重的；沉闷的"></textarea>
+      <textarea id="pasteArea" rows="5" style="width:100%;background:var(--panel-2);border:1px solid var(--border);color:var(--text);padding:10px 12px;font-size:13px;font-family:ui-monospace,Menlo,monospace;resize:vertical" placeholder="abase&#9;vt. 表现卑微&#10;ponderous&#9;adj. 笨重的；沉闷的"></textarea>
     </div>
 
     <div class="preview" id="preview"></div>
@@ -467,156 +496,265 @@ function parseVocab(text) {
   return deduped;
 }
 
-// Build a POS-aware template sentence containing the word.
-// The Chinese definition is appended in parentheses as a meaning hint.
-// When the word is blanked out, the learner uses the definition + grammar to guess.
-function buildTemplateSentence(word, posStr) {
-  const p = (posStr || '').toLowerCase();
-  const hint = p.replace(/^[a-z.;；、\s]+/, '').trim(); // strip POS tokens, keep Chinese def
-  const suffix = hint ? `（${hint}）` : '';
-
-  // Pick a sentence frame based on the part of speech.
-  if (/vt|vi|aux|\bv\b/.test(p)) {
-    // verb
-    return `They will ${word} the idea carefully before making a decision.${suffix}`;
+// ---------- Real-sentence sources (magazines / journals / corpora) ----------
+// Each fetcher returns { sentence, translation, src } or null.
+async function fetchTatoeba(w, timeoutMs) {
+  const wLower = w.toLowerCase();
+  // Two stages: first only results that have Chinese translations,
+  // then any English sentence (translation optional).
+  for (const qs of [
+    'from=eng&to=cmn&query=',
+    'from=eng&query='
+  ]) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+    try {
+      const r = await fetch(
+        'https://tatoeba.org/en/api_v0/search?' + qs + encodeURIComponent(w),
+        { signal: ctrl.signal }
+      );
+      clearTimeout(timer);
+      if (!r.ok) continue;
+      const data = await r.json();
+      const cands = (data.results || []).filter(res => {
+        const t = res.text || '';
+        return t.toLowerCase().includes(wLower) && t.length >= 25 && t.length < 180;
+      });
+      if (!cands.length) continue;
+      const res = cands[Math.floor(Math.random() * cands.length)];
+      let zh = '';
+      for (const group of res.translations || []) {
+        for (const t of group) {
+          if (/[\u4e00-\u9fff]/.test(t.text || '')) { zh = t.text; break; }
+        }
+        if (zh) break;
+      }
+      return { sentence: res.text, translation: zh, src: 'Tatoeba' };
+    } catch(e) { continue; }
+    finally { clearTimeout(timer); }
   }
-  if (/adj/.test(p)) {
-    // adjective
-    const art = /^[aeiou]/i.test(word) ? 'an' : 'a';
-    return `Everyone agreed that it was ${art} ${word} choice under the circumstances.${suffix}`;
-  }
-  if (/adv/.test(p)) {
-    // adverb
-    return `She handled the situation ${word}, surprising everyone in the room.${suffix}`;
-  }
-  if (/\bn\b|pron/.test(p)) {
-    // noun
-    return `The ${word} became a central topic of discussion at the meeting.${suffix}`;
-  }
-  if (/prep/.test(p)) {
-    return `The documents were placed ${word} the table for everyone to see.${suffix}`;
-  }
-  if (/conj/.test(p)) {
-    return `You can stay ${word} leave, whichever you prefer.${suffix}`;
-  }
-  if (/int|interj/.test(p)) {
-    return `${word}! I can't believe we finally made it.${suffix}`;
-  }
-  // default / unknown POS
-  return `The concept of ${word} is widely discussed in academic circles.${suffix}`;
+  return null;
 }
 
-// Generate example sentences for words in a set that don't have them.
-// Source priority: 1) VOCAB_100 / SAT_VOCAB_200 (real publication sentences)
-//                   2) Free Dictionary API (api.dictionaryapi.dev)
-//                   3) Glosbe API (free example sentences + translations)
-//                   4) POS-based template fallback (real sentence frame + Chinese hint)
-// onProgress(done, total) is called after each word is processed.
-async function generateSentences(set, onProgress) {
+async function fetchWiki(w, timeoutMs) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const r = await fetch(
+      'https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&origin=*&srlimit=3&srsearch=' + encodeURIComponent(w),
+      { signal: ctrl.signal }
+    );
+    if (!r.ok) return null;
+    const data = await r.json();
+    const hits = (data.query && data.query.search) || [];
+    if (!hits.length) return null;
+    const ids = hits.map(h => h.pageid).join('|');
+    const r2 = await fetch(
+      'https://en.wikipedia.org/w/api.php?action=query&prop=extracts&explaintext=1&format=json&origin=*&pageids=' + ids,
+      { signal: ctrl.signal }
+    );
+    if (!r2.ok) return null;
+    const data2 = await r2.json();
+    const pages = (data2.query && data2.query.pages) || {};
+    const wLower = w.toLowerCase();
+    const cands = [];
+    for (const k of Object.keys(pages)) {
+      const extract = pages[k].extract || '';
+      for (const piece of extract.split(/(?<=[.!?])\s+(?=[A-Z0-9"'\u2018\u201c(])/)) {
+        const s = piece.trim();
+        if (s.length >= 35 && s.length < 220 && s.toLowerCase().includes(wLower)) {
+          cands.push({ sentence: s, translation: '', src: 'Wikipedia: ' + (pages[k].title || '') });
+        }
+      }
+    }
+    if (!cands.length) return null;
+    return cands[Math.floor(Math.random() * cands.length)];
+  } catch(e) { return null; }
+  finally { clearTimeout(timer); }
+}
+
+async function fetchDictApi(w, timeoutMs) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const r = await fetch(
+      'https://api.dictionaryapi.dev/api/v2/entries/en/' + encodeURIComponent(w),
+      { signal: ctrl.signal }
+    );
+    if (!r.ok) return null;
+    const data = await r.json();
+    const wLower = w.toLowerCase();
+    const examples = [];
+    for (const entry of data) {
+      for (const meaning of (entry.meanings || [])) {
+        for (const def of (meaning.definitions || [])) {
+          if (def.example && def.example.toLowerCase().includes(wLower) && def.example.length < 180) {
+            examples.push(def.example);
+          }
+        }
+      }
+    }
+    if (!examples.length) return null;
+    return { sentence: examples[Math.floor(Math.random() * examples.length)], translation: '', src: 'DictionaryAPI' };
+  } catch(e) { return null; }
+  finally { clearTimeout(timer); }
+}
+
+async function fetchGlosbe(w, timeoutMs) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const r = await fetch(
+      'https://glosbe.com/gapi/translate?from=en&dest=zh&format=json&phrase=' + encodeURIComponent(w),
+      { signal: ctrl.signal }
+    );
+    if (!r.ok) return null;
+    const data = await r.json();
+    const wLower = w.toLowerCase();
+    const cands = (data.examples || []).filter(ex => {
+      const f = (ex.first || '').toLowerCase();
+      return f.includes(wLower) && f.length < 180;
+    });
+    if (!cands.length) return null;
+    const ex = cands[Math.floor(Math.random() * cands.length)];
+    return { sentence: ex.first, translation: ex.second || '', src: 'Glosbe' };
+  } catch(e) { return null; }
+  finally { clearTimeout(timer); }
+}
+
+// Generate a NEW independent set whose sentences come ONLY from real sources
+// (publication DB, Wikipedia, Tatoeba, DictionaryAPI, Glosbe) — never repeats,
+// never machine-generates. A word that misses every source keeps its original
+// sentence if it had one; otherwise it stays sentence-less (definition-mode).
+// Old real sentences are kept as FALLBACK: freshly fetched sentences are
+// preferred, but a word that misses every source keeps its original sentence
+// instead of going sentence-less. Legacy machine-template sentences
+// (e.g. `The word "X" — ...`) are discarded, never reused.
+// Words/def/englishDef are copied from the original set; the original set is
+// left untouched. Returns a new set object (not yet saved).
+async function generateSentenceBank(set, onProgress) {
   const lookup = {};
   if (typeof VOCAB_100 !== 'undefined') VOCAB_100.forEach(v => { lookup[v.word.toLowerCase()] = v; });
   if (typeof SAT_VOCAB_200 !== 'undefined') SAT_VOCAB_200.forEach(v => { lookup[v.word.toLowerCase()] = v; });
 
-  // In-memory cache so repeated clicks don't re-fetch the same word.
-  if (!window._sentenceCache) window._sentenceCache = {};
-  const cache = window._sentenceCache;
+  // Global dedupe: no two items may share the same sentence.
+  const usedSents = new Set();
+  const norm = s => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 80);
+  // Legacy template detector (old 12-frame POS / "The word X" machine sentences)
+  const isTemplate = s => /^the word ["'“‘]/i.test((s || '').trim());
 
-  const itemsToGen = set.items.filter(it => !(it.sentence && it.sentence.trim()));
-  const total = itemsToGen.length;
+  const total = set.items.length;
   let done = 0;
-  let matched = 0, apiHits = 0, cached = 0, templated = 0;
+  let realHits = 0;
+  const misses = [];
 
-  // Try local DB + cache first (synchronous, fast)
-  for (const item of itemsToGen) {
+  // Fresh items: copy lexical fields AND keep any existing real sentence as
+  // fallback (overwritten below when a fresh sentence is found).
+  const newItems = set.items.map(it => {
+    const s = (it.sentence || '').trim();
+    const keep = s && !isTemplate(s);
+    return {
+      word: it.word || '',
+      def: it.def || '',
+      englishDef: it.englishDef || '',
+      sentence: keep ? s : '',
+      translation: keep ? (it.translation || '') : '',
+      src: keep ? (it.src || '') : ''
+    };
+  });
+  // Reserve kept originals so fetched sentences never duplicate them.
+  newItems.forEach(item => { if (item.sentence) usedSents.add(norm(item.sentence)); });
+
+  // Pass 1 (sync): local publication DB — curated magazine/journal sentences.
+  const remaining = [];
+  newItems.forEach(item => {
     const w = (item.word || '').trim();
-    if (!w) { done++; continue; }
-    const dbHit = lookup[w.toLowerCase()];
-    if (dbHit && dbHit.sentence) {
-      item.sentence = dbHit.sentence;
-      if (dbHit.translation) item.translation = dbHit.translation;
-      if (dbHit.src) item.src = dbHit.src;
-      cache[w.toLowerCase()] = item.sentence;
-      matched++; done++;
+    const hit = w ? lookup[w.toLowerCase()] : null;
+    if (hit && hit.sentence && !usedSents.has(norm(hit.sentence))) {
+      item.sentence = hit.sentence;
+      item.translation = hit.translation || '';
+      item.src = hit.src || '出版物例句';
+      usedSents.add(norm(hit.sentence));
+      realHits++; done++;
       if (onProgress) onProgress(done, total);
-    } else if (cache[w.toLowerCase()]) {
-      item.sentence = cache[w.toLowerCase()];
-      cached++; done++;
-      if (onProgress) onProgress(done, total);
+    } else {
+      remaining.push(item);
     }
-  }
+  });
 
-  // Remaining words need API or template — process with a concurrency pool.
-  const remaining = itemsToGen.filter(it => !(it.sentence && it.sentence.trim()));
+  // Pass 2: real-source fetching. When the backend is online, words go
+  // through /api/generate-sentences (Python: GDELT real news/magazine
+  // articles + Wikipedia + corpora) in chunks of 10 for live progress.
+  // Offline (static hosting): browser-side Wikipedia/Tatoeba/DictAPI/Glosbe.
+  const online = typeof DB !== 'undefined' && DB.probe ? await DB.probe() : false;
+
+  if (online) {
+    const CHUNK = 10;
+    for (let start = 0; start < remaining.length; start += CHUNK) {
+      const batch = remaining.slice(start, start + CHUNK);
+      let items = null;
+      try {
+        const r = await fetch('/api/generate-sentences', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ words: batch.map(it => ({ word: it.word, def: it.def })) })
+        });
+        if (r.ok) items = (await r.json()).items;
+      } catch(e) { /* server hiccup — batch falls to misses */ }
+      const byWord = {};
+      (items || []).forEach(it => { byWord[(it.word || '').toLowerCase()] = it; });
+      batch.forEach(item => {
+        const w = (item.word || '').trim();
+        const hit = w ? byWord[w.toLowerCase()] : null;
+        if (hit && hit.sentence && !usedSents.has(norm(hit.sentence))) {
+          item.sentence = hit.sentence;
+          item.translation = hit.translation || '';
+          item.src = hit.src || '';
+          usedSents.add(norm(hit.sentence));
+          realHits++;
+        } else if (!item.sentence) {
+          // No fresh hit AND no original fallback — truly sentence-less.
+          misses.push(w || '?');
+        }
+        done++;
+        if (onProgress) onProgress(done, total);
+      });
+    }
+  } else {
+  // Browser-side pooled chain (offline mode)
   const CONCURRENCY = 6;
-  const TIMEOUT_MS = 6000;
+  const TIMEOUT_MS = 5000;
   let idx = 0;
 
   async function worker() {
     while (idx < remaining.length) {
-      const i = idx++;
-      const item = remaining[i];
+      const item = remaining[idx++];
       const w = (item.word || '').trim();
-      if (!w) { done++; if (onProgress) onProgress(done, total); continue; }
+      if (!w) { misses.push(item.word || '?'); done++; if (onProgress) onProgress(done, total); continue; }
 
-      let found = null;
-      // Try Free Dictionary API first
-      try {
-        const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
-        const r = await fetch(
-          'https://api.dictionaryapi.dev/api/v2/entries/en/' + encodeURIComponent(w),
-          { signal: ctrl.signal }
-        );
-        clearTimeout(timer);
-        if (r.ok) {
-          const data = await r.json();
-          outer:
-          for (const entry of data) {
-            for (const meaning of (entry.meanings || [])) {
-              for (const def of (meaning.definitions || [])) {
-                if (def.example) { found = def.example; break outer; }
-              }
-            }
-          }
+      const results = await Promise.allSettled([
+        fetchWiki(w, TIMEOUT_MS),
+        fetchTatoeba(w, TIMEOUT_MS),
+        fetchDictApi(w, TIMEOUT_MS),
+        fetchGlosbe(w, TIMEOUT_MS)
+      ]);
+      let hit = null;
+      for (const r of results) {
+        if (r.status === 'fulfilled' && r.value && !usedSents.has(norm(r.value.sentence))) {
+          hit = r.value; break;
         }
-      } catch(e) { /* timeout or network error */ }
-
-      // Fall back to Glosbe API for example sentences (free, no key)
-      if (!found) {
-        try {
-          const ctrl = new AbortController();
-          const timer = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
-          const r = await fetch(
-            'https://glosbe.com/gapi/translate?from=en&dest=zh&format=json&phrase=' + encodeURIComponent(w),
-            { signal: ctrl.signal }
-          );
-          clearTimeout(timer);
-          if (r.ok) {
-            const data = await r.json();
-            const examples = data.examples || [];
-            // Prefer examples that contain the exact word (case-insensitive)
-            const wLower = w.toLowerCase();
-            const match = examples.find(ex => {
-              const first = (ex.first || '').toLowerCase();
-              return first.includes(wLower);
-            });
-            if (match) {
-              found = match.first;
-              if (match.second) item.translation = match.second;
-            }
-          }
-        } catch(e) { /* fallback to template */ }
       }
 
-      if (found) {
-        item.sentence = found;
-        cache[w.toLowerCase()] = found;
-        apiHits++;
-      } else {
-        // POS-based template: a real grammatical sentence where the word fits,
-        // with the Chinese definition in parentheses as a hint.
-        item.sentence = buildTemplateSentence(w, item.def || item.pos || '');
-        templated++;
+      if (hit) {
+        item.sentence = hit.sentence;
+        item.translation = hit.translation || '';
+        item.src = hit.src;
+        usedSents.add(norm(hit.sentence));
+        realHits++;
+      } else if (!item.sentence) {
+        // No real sentence found and no original fallback — stays empty.
+        misses.push(w);
       }
       done++;
       if (onProgress) onProgress(done, total);
@@ -624,9 +762,19 @@ async function generateSentences(set, onProgress) {
   }
 
   await Promise.all(Array.from({ length: CONCURRENCY }, () => worker()));
+  } // end offline browser-chain branch
 
-  console.log(`Sentence generation: ${matched} matched, ${cached} cached, ${apiHits} from API, ${templated} templated`);
-  return set;
+  const baseName = (set.name || '词集').replace(/\s*·\s*例句版.*$/, '');
+  const newSet = {
+    id: 'sent_' + Date.now().toString(36),
+    name: baseName + ' · 例句版 ' + new Date().toLocaleDateString('zh-CN'),
+    items: newItems,
+    createdAt: Date.now()
+  };
+  const fallbackCount = total - realHits - misses.length;
+  console.log(`Sentence bank: ${realHits}/${total} fresh, ${fallbackCount} kept original, misses:`, misses);
+  newSet._stats = { realHits, missCount: misses.length, fallbackCount, total };
+  return newSet;
 }
 
 function renderSets() {
@@ -636,7 +784,7 @@ function renderSets() {
   if (keys.length === 0) {
     container.innerHTML = `
       <div class="empty">
-        <div class="big">📚</div>
+        <div class="big">■</div>
         <div style="font-size:16px;color:var(--text);margin-bottom:6px">还没有词集</div>
         <div>点击右上角 <b>+ 上传文档创建词集</b>，或加载 <b>示例词集</b> 试试看</div>
       </div>`;
@@ -655,17 +803,17 @@ function renderSets() {
         <button class="set-delete" data-del="${k}" title="删除">×</button>
         <div class="set-name">${escapeHtml(s.name)}</div>
         <div class="set-meta">
-          <span>📖 ${total} 词</span>
-          <span>✅ ${pct}%</span>
-          <span>🕐 ${last}</span>
+          <span>${total} 词</span>
+          <span>正确 · ${pct}%</span>
+          <span>${last}</span>
         </div>
         <div class="set-progress"><div style="width:${pct}%"></div></div>
         <div class="card-actions" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn btn-primary" data-resume="${k}" style="flex:1;min-width:110px;padding:9px 12px;font-size:.85rem">${hasProgress ? '⏯ 继续进度' : '▶ 开始训练'}</button>
-          <button class="btn" data-flashcard="${k}" title="卡片模式浏览" style="padding:9px 10px;font-size:.82rem;background:#2a2f3a">🎴 卡片</button>
-          <button class="btn" data-rename="${k}" title="重命名词集" style="padding:9px 10px;font-size:.82rem;background:#2a2f3a">✎ 重命名</button>
-          <button class="btn" data-gensent="${k}" title="为没有例句的单词生成例句" style="padding:9px 10px;font-size:.82rem;background:#2a2f3a">📝 生成例句</button>
-          <button class="btn" data-reset="${k}" title="清除进度，从头开始" style="padding:9px 10px;font-size:.82rem;background:#2a2f3a;color:#f87171;border-color:#3a414f">↻ 重练</button>
+          <button class="btn btn-primary" data-resume="${k}" style="flex:1;min-width:110px;padding:9px 12px;font-size:.85rem">${hasProgress ? '继续进度' : '开始训练'}</button>
+          <button class="btn" data-flashcard="${k}" title="卡片模式浏览" style="padding:9px 10px;font-size:.82rem">卡片</button>
+          <button class="btn" data-rename="${k}" title="重命名词集" style="padding:9px 10px;font-size:.82rem">重命名</button>
+          <button class="btn" data-gensent="${k}" title="仅从真实来源（外刊/维基/语料库）抓取例句生成独立词集，无机器生成，原词集不受影响" style="padding:9px 10px;font-size:.82rem">例句词集</button>
+          <button class="btn" data-reset="${k}" title="清除进度，从头开始" style="padding:9px 10px;font-size:.82rem;color:var(--danger);border-color:var(--border)">重练</button>
         </div>
       </div>`;
   }).join('');
@@ -708,7 +856,7 @@ function showPreview(text, jsonItems) {
   // Save last parsed items + text for debug download
   window._lastParsed = { items, text: text || '' };
   if (items.length === 0) {
-    previewEl.innerHTML = '<span style="color:var(--danger)">⚠ 未解析到有效词条，请检查格式</span>' + debugBtns();
+    previewEl.innerHTML = '<span style="color:var(--danger)">! 未解析到有效词条，请检查格式</span>' + debugBtns();
     return;
   }
   const withSent = items.filter(i => i.sentence && i.sentence.trim()).length;
@@ -718,11 +866,11 @@ function showPreview(text, jsonItems) {
   // Build full preview table (all items)
   const rows = items.map(it => {
     const lbl = it.label != null ? `<span class="plbl">#${it.label}</span>` : '';
-    const sentMark = it.sentence && it.sentence.trim() ? '<span class="pchk" title="含例句">📝</span>' : '';
+    const sentMark = it.sentence && it.sentence.trim() ? '<span class="pchk" title="含例句">■</span>' : '';
     return `<div class="preview-row">${lbl}<span class="pw">${escapeHtml(it.word)}</span><span class="pd">${escapeHtml(it.def || '')}</span>${sentMark}</div>`;
   }).join('');
   previewEl.innerHTML =
-    `✓ 解析到 <b>${items.length}</b> 条词条 ${sentNote}` +
+    `解析到 <b>${items.length}</b> 条词条 ${sentNote}` +
     `<div class="preview-table">${rows}</div>` +
     debugBtns();
 }
@@ -730,8 +878,8 @@ function showPreview(text, jsonItems) {
 // Debug: download raw extracted text + parsed JSON so you can inspect what the parser sees
 function debugBtns() {
   return `<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
-    <button class="btn" style="padding:6px 12px;font-size:12px" onclick="downloadRawText()">📄 下载原始文本</button>
-    <button class="btn" style="padding:6px 12px;font-size:12px" onclick="downloadParsedJson()">📋 下载解析 JSON</button>
+    <button class="btn" style="padding:6px 12px;font-size:12px" onclick="downloadRawText()">下载原始文本</button>
+    <button class="btn" style="padding:6px 12px;font-size:12px" onclick="downloadParsedJson()">下载解析 JSON</button>
   </div>`;
 }
 function downloadRawText() {
@@ -756,8 +904,8 @@ function downloadParsedJson() {
 
 function readFile(file) {
   pendingFilename = file.name;
-  filenameEl.textContent = '📎 ' + file.name + ' · 解析中…';
-  previewEl.innerHTML = '<span style="color:var(--accent)">⏳ 正在解析文件…</span>';
+  filenameEl.textContent = file.name + ' · 解析中…';
+  previewEl.innerHTML = '<span style="color:var(--accent)">正在解析文件…</span>';
   const ext = file.name.split('.').pop().toLowerCase();
 
   if (ext === 'json') {
@@ -781,15 +929,15 @@ function readFile(file) {
           englishDef: it.englishDef || it.enDef || '',
           label: it.label
         }));
-        filenameEl.textContent = '📎 ' + file.name;
+        filenameEl.textContent = file.name;
         pendingText = raw;
         pendingJsonItems = items;
         pasteArea.value = '';
         if (!setNameInput.value) setNameInput.value = file.name.replace(/\.[^.]+$/, '');
         showPreview(raw, items);
       } catch(e) {
-        filenameEl.textContent = '📎 ' + file.name;
-        previewEl.innerHTML = `<span style="color:var(--danger)">⚠ JSON 解析失败：${escapeHtml(e.message || String(e))}</span>`;
+        filenameEl.textContent = file.name;
+        previewEl.innerHTML = `<span style="color:var(--danger)">! JSON 解析失败：${escapeHtml(e.message || String(e))}</span>`;
       }
     });
     return;
@@ -807,8 +955,8 @@ function readFile(file) {
   readFileSmart(file).then(text => {
     parseTextServerSide(text, file.name);
   }).catch(err => {
-    filenameEl.textContent = '📎 ' + file.name;
-    previewEl.innerHTML = `<span style="color:var(--danger)">⚠ ${escapeHtml(err.message || String(err))}</span>`;
+    filenameEl.textContent = file.name;
+    previewEl.innerHTML = `<span style="color:var(--danger)">! ${escapeHtml(err.message || String(err))}</span>`;
   });
 }
 
@@ -822,7 +970,7 @@ async function parseTextServerSide(text, filename) {
     if (!r.ok) throw new Error('服务器解析失败');
     const { items } = await r.json();
     if (items.length === 0) throw new Error('服务器未解析到词条');
-    filenameEl.textContent = '📎 ' + (filename || '');
+    filenameEl.textContent = (filename || '');
     pendingText = text;
     pendingJsonItems = items;
     pasteArea.value = '';
@@ -830,7 +978,7 @@ async function parseTextServerSide(text, filename) {
     showPreview(text, items);
   } catch(err) {
     // Fall back to JS parser
-    filenameEl.textContent = '📎 ' + (filename || '') + '（服务器解析失败，改用本地解析）';
+    filenameEl.textContent = (filename || '') + '（服务器解析失败，改用本地解析）';
     pendingText = text; pendingJsonItems = null; pasteArea.value = '';
     if (!setNameInput.value) setNameInput.value = (filename || '').replace(/\.[^.]+$/, '');
     showPreview(text);
@@ -854,7 +1002,7 @@ async function parsePdfServerSide(file) {
       throw new Error(d.error || '服务器解析失败');
     }
     const { items, rawText } = await r.json();
-    filenameEl.textContent = '📎 ' + file.name;
+    filenameEl.textContent = file.name;
     pendingText = rawText || '';
     pendingJsonItems = items;
     pasteArea.value = '';
@@ -862,13 +1010,13 @@ async function parsePdfServerSide(file) {
     showPreview(rawText || '', items);
   } catch(err) {
     // Fall back to browser-side pdf.js extraction + JS parser
-    filenameEl.textContent = '📎 ' + file.name + '（服务器解析失败，改用本地解析）';
+    filenameEl.textContent = file.name + '（服务器解析失败，改用本地解析）';
     readFileSmart(file).then(text => {
       pendingText = text; pendingJsonItems = null; pasteArea.value = '';
       if (!setNameInput.value) setNameInput.value = file.name.replace(/\.[^.]+$/, '');
       showPreview(text);
     }).catch(e2 => {
-      previewEl.innerHTML = `<span style="color:var(--danger)">⚠ ${escapeHtml(e2.message || String(e2))}</span>`;
+      previewEl.innerHTML = `<span style="color:var(--danger)">! ${escapeHtml(e2.message || String(e2))}</span>`;
     });
   }
 }
@@ -918,7 +1066,7 @@ document.getElementById('confirmBtn').onclick = () => {
   saveSets(sets);
   closeModal();
   renderSets();
-  toast(`✓ 已创建「${name}」，共 ${items.length} 词`, 'ok');
+  toast(`已创建「${name}」，共 ${items.length} 词`, 'ok');
 };
 
 // --- Set card actions ---
@@ -996,7 +1144,8 @@ document.getElementById('setsContainer').addEventListener('click', e => {
     toast(hasProgress ? '进度已清除，可从头开始' : '已是全新状态', 'ok');
     return;
   }
-  // Generate sentences button → fill in example sentences for words that don't have them
+  // Generate sentence bank button → create a NEW independent set with
+  // real magazine/journal sentences (original set stays untouched)
   const genSentBtn = e.target.closest('[data-gensent]');
   if (genSentBtn) {
     e.stopPropagation();
@@ -1004,23 +1153,34 @@ document.getElementById('setsContainer').addEventListener('click', e => {
     const sets = loadSets();
     const set = sets[id];
     if (!set) return;
-    const needGen = set.items.filter(it => !it.sentence || !it.sentence.trim()).length;
-    if (needGen === 0) { toast('所有单词已有例句', 'ok'); return; }
-    const origText = genSentBtn.textContent;
+    const total = set.items.length;
+    // Lock the whole card with a spinner overlay while generation runs.
+    const card = genSentBtn.closest('.set-card');
+    const overlay = document.createElement('div');
+    overlay.className = 'gen-overlay';
+    overlay.innerHTML =
+      '<div class="spin"></div>' +
+      '<div class="gen-status">正在抓取真实例句 0/' + total + '</div>' +
+      '<div class="gen-sub">真实新闻/外刊/维基/语料库 · 无机器生成</div>';
+    if (card) card.appendChild(overlay);
     genSentBtn.disabled = true;
-    genSentBtn.textContent = '⏳ 0/' + needGen;
-    generateSentences(set, (done, total) => {
-      genSentBtn.textContent = `⏳ ${done}/${total}`;
-    }).then(updated => {
-      sets[id] = updated;
-      saveSets(sets);
-      const filled = updated.items.filter(it => it.sentence && it.sentence.trim()).length;
-      toast(`✓ 例句生成完成：${filled}/${updated.items.length} 词有例句`, 'ok');
+    generateSentenceBank(set, (done, t) => {
+      const st = overlay.querySelector('.gen-status');
+      if (st) st.textContent = `正在抓取真实例句 ${done}/${t}`;
+    }).then(async newSet => {
+      const stats = newSet._stats || { realHits: 0, missCount: 0, total };
+      delete newSet._stats;
+      await DB.saveSet(newSet);
+      SETS = await DB.getSets();
+      renderSets();
+      toast(`已生成「${newSet.name}」：新抓真实例句 ${stats.realHits}/${stats.total}` +
+        (stats.fallbackCount ? `，${stats.fallbackCount} 词保留原句` : '') +
+        (stats.missCount ? `，${stats.missCount} 词未找到（保持无例句）` : ''), 'ok');
     }).catch(err => {
-      toast('生成例句失败：' + err.message, 'err');
+      toast('生成例句词集失败：' + err.message, 'err');
     }).finally(() => {
+      overlay.remove();
       genSentBtn.disabled = false;
-      genSentBtn.textContent = origText;
     });
     return;
   }
@@ -1072,7 +1232,7 @@ document.getElementById('vocab100Btn').onclick = () => {
   };
   saveSets(existing);
   renderSets();
-  toast(`✓ 已加载 100 个词汇（含真实例句 + 翻译）`, 'ok');
+  toast(`已加载 100 个词汇（含真实例句 + 翻译）`, 'ok');
 };
 
 // --- SAT 200 set (decoded from 生词网页化.docx) ---
@@ -1101,7 +1261,7 @@ document.getElementById('satBtn').onclick = () => {
   };
   saveSets(existing);
   renderSets();
-  toast(`✓ 已加载 200 个 SAT 词汇（含真实例句）`, 'ok');
+  toast(`已加载 200 个 SAT 词汇（含真实例句）`, 'ok');
 };
 
 // --- Sample set ---
@@ -1128,7 +1288,7 @@ document.getElementById('sampleBtn').onclick = () => {
   };
   saveSets(sets);
   renderSets();
-  toast('✓ 已加载示例词集', 'ok');
+  toast('已加载示例词集', 'ok');
 };
 
 // --- Logout ---
@@ -1204,7 +1364,7 @@ localStorage.setItem('vocab_last_page', 'index.html' + location.search);
   pendingText = text;
   const itemCount = parseVocab(text).length;
   showPreview(text);
-  toast(`✓ 已收到步骤 1 提取的文本（${text.length} 字符，${itemCount} 条候选词条）`);
+  toast(`已收到步骤 1 提取的文本（${text.length} 字符，${itemCount} 条候选词条）`);
   // Don't consume it yet — let user edit in the modal before confirming.
 })();
 </script>

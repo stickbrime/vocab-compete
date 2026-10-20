@@ -72,6 +72,8 @@ async function initDb() {
   try { db.run('ALTER TABLE sets ADD COLUMN retry_mode INTEGER DEFAULT 0'); } catch(e) {}
   try { db.run('ALTER TABLE sets ADD COLUMN retry_pos INTEGER DEFAULT 0'); } catch(e) {}
   try { db.run('ALTER TABLE sets ADD COLUMN retry_order TEXT DEFAULT "[]"'); } catch(e) {}
+  try { db.run('ALTER TABLE sets ADD COLUMN mode TEXT DEFAULT \'en\''); } catch(e) {}
+  try { db.run('ALTER TABLE users ADD COLUMN avatar TEXT'); } catch(e) {}
   saveDb();
 }
 function saveDb() {
@@ -138,9 +140,24 @@ app.post('/api/logout', (req, res) => {
 });
 
 app.get('/api/user', auth, (req, res) => {
-  const user = query('SELECT id, email FROM users WHERE id = ?', [req.userId])[0];
+  const user = query('SELECT id, email, avatar FROM users WHERE id = ?', [req.userId])[0];
   if (!user) return res.status(404).json({ error: '用户不存在' });
   res.json(user);
+});
+
+// Avatar upload (base64, max 500KB)
+app.post('/api/avatar', auth, (req, res) => {
+  const { avatar } = req.body || {};
+  if (!avatar || typeof avatar !== 'string') return res.status(400).json({ error: '无效的头像' });
+  if (avatar.length > 500 * 1024) return res.status(413).json({ error: '头像太大，请压缩后重试' });
+  if (!avatar.startsWith('data:image/')) return res.status(400).json({ error: '仅支持图片格式' });
+  run('UPDATE users SET avatar = ? WHERE id = ?', [avatar, req.userId]);
+  res.json({ ok: true, avatar });
+});
+
+app.delete('/api/avatar', auth, (req, res) => {
+  run('UPDATE users SET avatar = NULL WHERE id = ?', [req.userId]);
+  res.json({ ok: true });
 });
 
 // Change password
@@ -188,6 +205,7 @@ app.get('/api/sets', auth, (req, res) => {
       retryMode: !!r.retry_mode,
       retryPos: r.retry_pos || 0,
       retryOrder: JSON.parse(r.retry_order || '[]'),
+      mode: r.mode || 'en',
       createdAt: r.created_at,
       lastPlayed: r.updated_at,
     };
@@ -239,11 +257,12 @@ app.delete('/api/sets/:id', auth, (req, res) => {
 
 // ---------- Progress sync ----------
 app.put('/api/sets/:id/progress', auth, (req, res) => {
-  const { mastered, wrong, pos, order, retryMode, retryPos, retryOrder } = req.body || {};
+  const { mastered, wrong, pos, order, retryMode, retryPos, retryOrder, mode } = req.body || {};
   const now = Date.now();
-  run('UPDATE sets SET mastered = ?, wrong = ?, pos = ?, quiz_order = ?, retry_mode = ?, retry_pos = ?, retry_order = ?, updated_at = ? WHERE id = ? AND user_id = ?',
+  run('UPDATE sets SET mastered = ?, wrong = ?, pos = ?, quiz_order = ?, retry_mode = ?, retry_pos = ?, retry_order = ?, mode = ?, updated_at = ? WHERE id = ? AND user_id = ?',
     [JSON.stringify(mastered || []), JSON.stringify(wrong || []), pos || 0, JSON.stringify(order || []),
      retryMode ? 1 : 0, retryPos || 0, JSON.stringify(retryOrder || []),
+     (mode === 'cn' || mode === 'mix') ? mode : 'en',
      now, req.params.id, req.userId]);
   res.json({ ok: true });
 });
@@ -251,8 +270,8 @@ app.put('/api/sets/:id/progress', auth, (req, res) => {
 // Physically delete/reset all progress fields for one set
 app.delete('/api/sets/:id/progress', auth, (req, res) => {
   const now = Date.now();
-  run('UPDATE sets SET mastered = ?, wrong = ?, pos = ?, quiz_order = ?, retry_mode = ?, retry_pos = ?, retry_order = ?, updated_at = ? WHERE id = ? AND user_id = ?',
-    ['[]', '[]', 0, '[]', 0, 0, '[]', now, req.params.id, req.userId]);
+  run('UPDATE sets SET mastered = ?, wrong = ?, pos = ?, quiz_order = ?, retry_mode = ?, retry_pos = ?, retry_order = ?, mode = ?, updated_at = ? WHERE id = ? AND user_id = ?',
+    ['[]', '[]', 0, '[]', 0, 0, '[]', 'en', now, req.params.id, req.userId]);
   res.json({ ok: true });
 });
 
@@ -452,6 +471,74 @@ app.post('/api/parse-pdf', upload.single('pdf'), (req, res) => {
   } finally {
     try { fs.unlinkSync(tmpPdf); } catch(e) {}
   }
+});
+
+// Fetch real-world sentences via Python, chained in two passes:
+//   1) sat_sentence_fetcher.py — Merriam-Webster "Examples on the Web"
+//      (NYT / The Economist / CNN via MW) with Vocabulary.com fallback
+//   2) fetch_sentences.py — GDELT real news articles + Wikipedia +
+//      Tatoeba + DictionaryAPI + Glosbe, for words pass 1 missed
+// Body: { words: [{ word, def }] } (max 20 per call) → { items: [...] }
+// Async spawn (NOT spawnSync) so the event loop stays free for progress saves.
+const { spawn } = require('child_process');
+
+function runPyStdin(script, payload, timeoutMs) {
+  return new Promise((resolve) => {
+    const child = spawn('python3', [path.join(__dirname, script), '--stdin']);
+    let out = '', err = '';
+    const killer = setTimeout(() => child.kill('SIGKILL'), timeoutMs);
+    child.stdout.on('data', d => { if (out.length < 20 * 1024 * 1024) out += d; });
+    child.stderr.on('data', d => { err += d; });
+    child.on('error', e => {
+      clearTimeout(killer);
+      resolve({ ok: false, error: '无法启动 Python: ' + e.message });
+    });
+    child.on('close', code => {
+      clearTimeout(killer);
+      if (code !== 0) {
+        return resolve({ ok: false, error: (err || '').slice(-300) });
+      }
+      try {
+        resolve({ ok: true, items: JSON.parse(out || '[]') });
+      } catch(e) {
+        resolve({ ok: false, error: '结果 JSON 无效' });
+      }
+    });
+    child.stdin.end(JSON.stringify(payload));
+  });
+}
+
+app.post('/api/generate-sentences', auth, async (req, res) => {
+  const words = (req.body && req.body.words) || [];
+  if (!Array.isArray(words) || !words.length) {
+    return res.status(400).json({ error: 'words 不能为空' });
+  }
+  if (words.length > 20) {
+    return res.status(400).json({ error: '单次最多 20 个词' });
+  }
+  const clean = words
+    .map(w => ({ word: String(w.word || '').trim(), def: String(w.def || '').trim() }))
+    .filter(w => /^[A-Za-z][A-Za-z\-']*$/.test(w.word));
+  if (!clean.length) return res.json({ items: [] });
+
+  // Pass 1: Merriam-Webster / Vocabulary.com (user's fetcher)
+  const p1 = await runPyStdin('sat_sentence_fetcher.py', clean, 110000);
+  let items = p1.ok ? p1.items : clean.map(w => ({ ...w, sentence: '', translation: '', src: '' }));
+
+  // Pass 2: GDELT / Wikipedia / corpora fallback for words pass 1 missed
+  const missed = items.filter(it => !it.sentence);
+  if (missed.length) {
+    const p2 = await runPyStdin('fetch_sentences.py', missed, 120000);
+    if (p2.ok) {
+      const byWord = {};
+      p2.items.forEach(it => { byWord[(it.word || '').toLowerCase()] = it; });
+      items = items.map(it => {
+        const fb = byWord[(it.word || '').toLowerCase()];
+        return (fb && fb.sentence) ? fb : it;
+      });
+    }
+  }
+  res.json({ items });
 });
 
 // Serve index.html for the root

@@ -5,81 +5,91 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vocab Trainer · 闯关训练</title>
 <style>
-:root{--bg:#0f172a;--card:#1e293b;--card2:#273549;--accent:#38bdf8;--good:#22c55e;--bad:#ef4444;--txt:#e2e8f0;--dim:#94a3b8;--gold:#fbbf24;}
+:root{--bg:#101013;--panel:#17171B;--panel2:#1D1D22;--line:#2B2B31;--ink:#F4F4F1;--dim:#8E8E96;--accent:#D8F43C;--accent-ink:#111100;--bad:#FF5449;--good:#6FDD8B;--gold:#FFD23F;}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:linear-gradient(160deg,#0f172a 0%,#1e1b4b 100%);color:var(--txt);min-height:100vh;padding:16px;}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding:16px;}
 .wrap{max-width:820px;margin:0 auto;}
 header{text-align:center;padding:18px 0 10px;position:relative;}
-.back-home{position:absolute;left:0;top:18px;text-decoration:none;color:var(--dim);font-size:.85rem;padding:6px 12px;border:1px solid #475569;border-radius:8px;background:rgba(30,41,59,.6);transition:all .2s;}
+.back-home{position:absolute;left:0;top:18px;text-decoration:none;color:var(--dim);font-size:.85rem;padding:6px 12px;border:1px solid var(--line);background:var(--panel);transition:all .15s;}
 .back-home:hover{color:var(--accent);border-color:var(--accent);}
-.topnav{display:flex;align-items:center;gap:14px;padding:10px 16px;background:rgba(30,41,59,.7);border:1px solid #334155;border-radius:12px;margin-bottom:14px;font-size:.86rem;}
-.nav-link{color:var(--dim);text-decoration:none;padding:6px 12px;border-radius:8px;transition:all .2s;}
-.nav-link:hover{color:var(--accent);background:rgba(56,189,248,.08);}
-.nav-link.active{color:var(--accent);background:rgba(56,189,248,.12);font-weight:600;}
+.topnav{display:flex;align-items:center;gap:14px;padding:10px 16px;background:var(--panel);border:1px solid var(--line);margin-bottom:14px;font-size:.86rem;}
+.nav-link{color:var(--dim);text-decoration:none;padding:6px 12px;transition:all .15s;}
+.nav-link:hover{color:var(--accent);background:#1B1E24;}
+.nav-link.active{color:var(--accent);background:#1B1E24;font-weight:600;}
 .nav-spacer{flex:1;}
 .nav-user{color:var(--dim);font-size:.82rem;}
-.nav-btn{padding:5px 12px;font-size:.78rem;border:1px solid #475569;border-radius:8px;background:transparent;color:var(--dim);cursor:pointer;transition:all .2s;}
+.nav-btn{padding:5px 12px;font-size:.72rem;border:1px solid var(--line);background:transparent;color:var(--dim);cursor:pointer;transition:all .15s;font-family:"SF Mono",ui-monospace,Menlo,monospace;letter-spacing:.06em;}
 .nav-btn:hover{border-color:var(--accent);color:var(--accent);}
-h1{font-size:1.5rem;letter-spacing:1px;}
-.sub{color:var(--dim);font-size:.82rem;margin-top:6px;}
-.bar{height:10px;background:#334155;border-radius:99px;overflow:hidden;margin:14px 0 4px;}
-.bar>i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#818cf8);transition:width .35s ease;border-radius:99px;}
-.barmeta{display:flex;justify-content:space-between;font-size:.75rem;color:var(--dim);margin-bottom:12px;}
-.card{background:var(--card);border:1px solid #334155;border-radius:16px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.35);}
-.leveltag{display:inline-block;font-size:.72rem;color:var(--accent);border:1px solid var(--accent);border-radius:99px;padding:2px 12px;margin-bottom:14px;}
+h1{text-transform:uppercase;letter-spacing:.14em;font-weight:800;font-size:1.02rem;}
+.sub{font-size:.78rem;color:var(--dim);margin-top:6px;}
+.bar{height:10px;background:var(--panel2);border:1px solid var(--line);overflow:hidden;margin:14px 0 4px;}
+.bar>i{display:block;height:100%;width:0%;background:var(--accent);transition:width .35s ease;}
+.barmeta{display:flex;justify-content:space-between;font-size:.72rem;color:var(--dim);margin-bottom:12px;font-family:"SF Mono",ui-monospace,Menlo,monospace;letter-spacing:.06em;font-feature-settings:"tnum";}
+.card{background:var(--panel);border:1px solid var(--line);padding:22px;}
+.leveltag{display:inline-block;font-size:.72rem;color:var(--accent);border:1px solid var(--accent);padding:2px 12px;margin-bottom:14px;font-family:"SF Mono",ui-monospace,Menlo,monospace;letter-spacing:.06em;}
 .sent{font-size:1.08rem;line-height:1.85;margin-bottom:6px;}
-.blank{color:var(--gold);font-weight:700;border-bottom:2px dashed var(--gold);padding:0 6px;}
-.src{font-size:.72rem;color:var(--dim);margin-bottom:10px;}
-.ctxbox{background:rgba(56,189,248,.06);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:16px;font-size:.86rem;line-height:1.7;color:#cbd5e1;}
+.blank{color:var(--gold);font-weight:700;border-bottom:2px solid var(--gold);padding:0 6px;}
+.src{font-size:.72rem;color:var(--dim);margin-bottom:10px;font-family:"SF Mono",ui-monospace,Menlo,monospace;letter-spacing:.06em;}
+.ctxbox{background:var(--panel);border-left:2px solid var(--accent);padding:10px 12px;margin-bottom:16px;font-size:.86rem;line-height:1.7;color:var(--ink);}
 .ctxbox b{color:var(--accent);font-size:.75rem;display:block;margin-bottom:4px;}
 .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px;}
-.opts button{background:var(--card2);border:1px solid #3b4a63;color:var(--txt);border-radius:10px;padding:12px;font-size:.95rem;cursor:pointer;transition:all .15s;text-align:left;}
-.opts button:hover:not(:disabled){border-color:var(--accent);transform:translateY(-1px);}
+.opts button{background:var(--panel2);border:1px solid var(--line);color:var(--ink);padding:12px;font-size:.95rem;cursor:pointer;transition:all .15s;text-align:left;}
+.opts button:hover:not(:disabled){border-color:var(--accent);}
 .opts button:disabled{cursor:default;opacity:.75;}
-.opts button.correct{background:rgba(34,197,94,.18);border-color:var(--good);color:#86efac;}
-.opts button.wrong{background:rgba(239,68,68,.18);border-color:var(--bad);color:#fca5a5;}
-.feedback{margin-top:14px;padding:12px 14px;border-radius:10px;font-size:.88rem;line-height:1.7;display:none;}
-.feedback.ok{display:block;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.4);}
-.feedback.no{display:block;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);}
-.mean{color:#c4b5fd;}
+.opts button.correct{background:#141B11;border-color:#33502B;color:var(--good);}
+.opts button.wrong{background:#1F1113;border-color:#5C2A28;color:var(--bad);}
+.feedback{margin-top:14px;padding:12px 14px;font-size:.88rem;line-height:1.7;display:none;}
+.feedback.ok{display:block;background:#141B11;border:1px solid #33502B;}
+.feedback.no{display:block;background:#1F1113;border:1px solid #5C2A28;}
+.mean{color:var(--ink);}
 .trans{color:var(--dim);}
 .tools{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
-.tools button{flex:1;min-width:120px;background:#0ea5e9;border:none;color:#082f49;font-weight:700;border-radius:10px;padding:11px;cursor:pointer;font-size:.9rem;}
-.tools button.ghost{background:transparent;border:1px solid #475569;color:var(--dim);font-weight:400;}
+.tools button{flex:1;min-width:120px;background:var(--accent);border:1px solid var(--accent);color:var(--accent-ink);font-weight:700;padding:11px;cursor:pointer;font-size:.9rem;}
+.tools button.ghost{background:transparent;border:1px solid var(--line);color:var(--dim);font-weight:400;}
+.tools button.ghost:hover{border-color:var(--accent);color:var(--accent);}
 .hidden{display:none!important;}
 .result{text-align:center;padding:40px 10px;}
-.result .big{font-size:2.4rem;margin-bottom:8px;}
+.result .big{font-size:2rem;margin-bottom:8px;color:var(--accent);}
 .wronglist{margin-top:18px;text-align:left;font-size:.85rem;color:var(--dim);max-height:260px;overflow:auto;}
-.wronglist div{padding:6px 0;border-bottom:1px dashed #334155;}
-footer{margin-top:18px;text-align:center;color:#64748b;font-size:.72rem;line-height:1.8;}
+.wronglist div{padding:6px 0;border-bottom:1px dashed var(--line);}
+footer{margin-top:18px;text-align:center;color:var(--dim);font-size:.72rem;line-height:1.8;}
 @media(max-width:560px){.opts{grid-template-columns:1fr;}}
-.rate-btn{border-radius:10px;padding:10px 16px;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:2px;}
-.rate-btn:hover{transform:translateY(-2px);filter:brightness(1.1);}
-.rate-btn small{font-size:.65rem;opacity:.7;}
-.rate-again{background:rgba(239,68,68,.2);color:#fca5a5;border:1px solid var(--bad);}
-.rate-hard{background:rgba(245,158,11,.18);color:#fcd34d;border:1px solid #f59e0b;}
-.rate-good{background:rgba(34,197,94,.18);color:#86efac;border:1px solid var(--good);}
-.rate-easy{background:rgba(59,130,246,.18);color:#93c5fd;border:1px solid #3b82f6;}
+.rate-btn{border:1px solid var(--line);background:var(--panel2);color:var(--ink);padding:10px 16px;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.rate-btn small{font-size:.65rem;opacity:.7;font-family:"SF Mono",ui-monospace,Menlo,monospace;letter-spacing:.06em;}
+.rate-again{background:#1F1113;color:#FF5449;border:1px solid #5C2A28;}
+.rate-again:hover{border-color:#FF5449;}
+.rate-hard{background:#1F1A10;color:#FFD23F;border:1px solid #5C4A22;}
+.rate-hard:hover{border-color:#FFD23F;}
+.rate-good{background:#141B11;color:#6FDD8B;border:1px solid #33502B;}
+.rate-good:hover{border-color:#6FDD8B;}
+.rate-easy{background:#14181F;color:#7FB3E8;border:1px solid #2E4460;}
+.rate-easy:hover{border-color:#7FB3E8;}
+.modebar{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;}
+.mode-btn{background:var(--panel2);border:1px solid var(--line);color:var(--dim);padding:5px 14px;font-size:.72rem;cursor:pointer;transition:all .15s;font-family:"SF Mono",ui-monospace,Menlo,monospace;letter-spacing:.06em;}
+.mode-btn:hover{border-color:var(--accent);color:var(--accent);}
+.mode-btn.active{background:#1B1E24;border-color:var(--accent);color:var(--accent);font-weight:600;}
 </style>
 </head>
 <body>
+<script src="shared.js"></script>
 <div class="wrap">
 <nav class="topnav">
-<a href="index.html" class="nav-link">🏠 首页</a>
-<a href="workshop.html" class="nav-link">🌐 创意工坊</a>
-<a href="wrong.html" class="nav-link">📕 错题集</a>
-<a href="account.html" class="nav-link">👤 账户</a>
+<a href="index.html" class="nav-link">首页</a>
+<a href="workshop.html" class="nav-link">创意工坊</a>
+<a href="wrong.html" class="nav-link">错题集</a>
+<a href="account.html" class="nav-link">账户</a>
 <span class="nav-spacer"></span>
 <button class="nav-btn" id="logoutBtn">退出</button>
 </nav>
 <header>
-<h1>📚 词汇闯关训练</h1>
+<h1>词汇闯关训练</h1>
 <div class="sub" id="setSub">例句来自真实出版物 / 新闻媒体 / 词典语料库</div>
 </header>
 <div class="bar"><i id="barfill"></i></div>
 <div class="barmeta"><span id="pos"></span><span id="score"></span></div>
+<div id="modebar" class="modebar"></div>
 <div id="quiz" class="card"><div style="text-align:center;color:var(--dim);padding:40px 0">加载中…</div></div>
-<footer>每题含目标句 + 英文释义提示 · 来源标注于题下 · 中文翻译可隐藏/显示 · 答错题自动进入通关后重练</footer>
+<footer>队列闯关：答错 → 揭示答案 →「重做本题」原地重做到对，并插入队尾 · 只有首次答对才算通过<br>题式：英文选词（挖空选单词）/ 中文选义（还原句意选释义），可随时切换<br>答对后评分：重来=3-5题后重练 · 困难=队列中部 · 良好=错过则排至队尾 · 简单=直接通过<br>含 E「不知道」选项 · 空格/回车=下一题 · 1-4=选项/评分 · 5=不知道 · 答错自动进入错题集</footer>
 </div>
 <script src="db.js"></script>
 <script>
@@ -95,14 +105,14 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random
 // Load set from backend (with auth check)
 (async function init(){
   if(!setId){
-    document.getElementById('quiz').innerHTML = '<div class="result"><div class="big">⚠️</div><p style="color:var(--dim)">缺少词集 ID</p><p style="margin-top:14px"><a href="index.html" style="color:var(--accent)">← 返回首页</a></p></div>';
+    document.getElementById('quiz').innerHTML = '<div class="result"><div class="big">!</div><p style="color:var(--dim)">缺少词集 ID</p><p style="margin-top:14px"><a href="index.html" style="color:var(--accent)">← 返回首页</a></p></div>';
     return;
   }
   try {
     const sets = await DB.getSets();
     const set = sets[setId];
     if(!set){
-      document.getElementById('quiz').innerHTML = '<div class="result"><div class="big">⚠️</div><p style="color:var(--dim)">找不到这个词集，可能已被删除。</p><p style="margin-top:14px"><a href="index.html" style="color:var(--accent)">← 返回首页</a></p></div>';
+      document.getElementById('quiz').innerHTML = '<div class="result"><div class="big">!</div><p style="color:var(--dim)">找不到这个词集，可能已被删除。</p><p style="margin-top:14px"><a href="index.html" style="color:var(--accent)">← 返回首页</a></p></div>';
       return;
     }
     startQuiz(set);
@@ -137,30 +147,45 @@ function startQuiz(set){
       t: it.translation || '',
       en: it.englishDef || ''
     }));
-  document.getElementById('setSub').textContent = set.name + ' · 共 ' + DATA.length + ' 词';
+  document.getElementById('setSub').textContent = set.name + ' · 共 ' + DATA.length + ' 词 · 队列闯关';
 
-  const LEVEL = 10;
   const IRREG = {};
-  let order = shuffle([...Array(DATA.length).keys()]);
-  let pos = 0, correct = 0, wrongPool = [], answered = false, showDef = false;
+  // Queue-based structure (reference template): single queue; a wrong answer
+  // pushes the item to the tail and you redo it in place until correct.
+  // Only first-try corrects pass without reappearing.
+  const N = DATA.length;
+  let order = shuffle([...Array(N).keys()]);
+  let pos = 0, correct = 0, firstTryOK = 0, answered = false, showDef = false;
+  let curHadWrong = false;      // current question was missed this presentation
+  let wrongEver = new Set();    // session stats: words ever missed
   let curOpts = [];
   let curHasSentence = false; // whether current question is sentence-blank type
   let masteredSet = new Set();
   let wrongSet = new Set();
   let retryMode = false;
   let origPos = 0, origOrder = [];
+  // Per-item distractor memory: round 2 shows different distractors and
+  // avoids putting the correct answer in the same slot (reference behavior)
+  let lastD = {}, lastPos = {};
+  // Question mode (reference templates): en=英文选词, cn=中文选义, mix=混合
+  const urlMode = params.get('mode');
+  let qMode = (urlMode === 'cn' || urlMode === 'mix') ? urlMode : 'en';
+  let curQIsCn = false, curAnswer = '';
 
   // Load saved progress for this set (mastered/wrong words + quiz position + retry state)
   function loadProgress() {
     masteredSet = new Set(set.mastered || []);
+    // Restore saved question mode unless URL overrides it
+    if (!urlMode && (set.mode === 'cn' || set.mode === 'mix' || set.mode === 'en')) qMode = set.mode;
     wrongSet = new Set((set.wrong || []).filter(i => typeof i === 'number' && i >= 0 && i < DATA.length));
     // Clean: remove any wrong indices that are also mastered
     masteredSet.forEach(i => wrongSet.delete(i));
-    if (typeof set.pos === 'number' && set.pos >= 0 && set.pos <= DATA.length) {
-      pos = set.pos;
+    if (Array.isArray(set.order) && set.order.length >= N &&
+        set.order.every(i => typeof i === 'number' && i >= 0 && i < N)) {
+      order = set.order; // queue length varies as missed items are re-appended
     }
-    if (Array.isArray(set.order) && set.order.length === DATA.length) {
-      order = set.order;
+    if (typeof set.pos === 'number' && set.pos >= 0 && set.pos <= order.length) {
+      pos = set.pos;
     }
     // Restore retry state if previously in retry mode
     if (set.retryMode && Array.isArray(set.retryOrder) && set.retryOrder.length > 0) {
@@ -189,7 +214,8 @@ function startQuiz(set){
       order: retryMode ? origOrder : order,
       retryMode: retryMode,
       retryPos: retryMode ? pos : 0,
-      retryOrder: retryMode ? order : []
+      retryOrder: retryMode ? order : [],
+      mode: qMode
     }).catch(()=>{}).finally(() => {
       _saveInFlight = false;
       // If state changed again while saving, save the latest state now
@@ -223,8 +249,8 @@ function startQuiz(set){
   // Show resume indicator if continuing from saved position
   if (pos > 0) {
     const sub = document.getElementById('setSub');
-    sub.innerHTML = set.name + ' · 共 ' + DATA.length + ' 词' +
-      ' · <span style="color:var(--good)">⏯ 继续上次进度（第 ' + (pos+1) + ' 题，已掌握 ' + masteredSet.size + '）</span>';
+    sub.innerHTML = set.name + ' · 共 ' + N + ' 词' +
+      ' · <span style="color:var(--good)">继续上次进度（第 ' + Math.min(pos + 1, order.length) + ' 题，已掌握 ' + masteredSet.size + '）</span>';
   }
 
   function formsOf(w){
@@ -248,15 +274,58 @@ function startQuiz(set){
     if(!m) return {html:esc(item.s), hit:false};
     return {html:esc(item.s).replace(esc(m[1]),'<span class="blank">＿＿＿</span>'), hit:true};
   }
-  function distractors(item){
-    const pool = DATA.filter((d,i)=>d.w!==item.w);
-    return shuffle(pool).slice(0,3).map(d=>d.w);
+  // Restore word in sentence with highlight (cn mode / 中文选义 stem)
+  function fillSentenceHtml(item){
+    if(!item.s) return null;
+    if(/_{3,}/.test(item.s)){
+      return esc(item.s).replace(/_{3,}/g,'<span class="blank" style="border-bottom:2px solid var(--gold)">'+esc(item.w)+'</span>');
+    }
+    const fs = formsOf(item.w).sort((a,b)=>b.length-a.length).map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
+    const re = new RegExp('\\b('+fs.join('|')+')\\b','i');
+    const m = item.s.match(re);
+    if(!m) return null;
+    return esc(item.s).replace(esc(m[1]),'<span class="blank" style="border-bottom:2px solid var(--gold)">'+esc(m[1])+'</span>');
+  }
+  function distractors(item, idx, key){
+    // Prefer same-POS distractors (first char of Chinese def = 词性); works
+    // for both key='w' (英文选词) and key='m' (中文选义)
+    let pool = DATA.filter(d => d.w !== item.w && d.m.charAt(0) === item.m.charAt(0) && d[key] !== item[key]);
+    if(pool.length < 4) pool = DATA.filter(d => d.w !== item.w && d[key] !== item[key]);
+    // Avoid repeating the same distractors for the same word across rounds
+    const prev = lastD[idx + ':' + key] || [];
+    let fresh = pool.filter(d => prev.indexOf(d[key]) < 0);
+    if(fresh.length < 3) fresh = pool;
+    const seen = new Set([item[key]]);
+    const ds = [];
+    for(const d of shuffle([...fresh])){
+      if(seen.has(d[key])) continue;
+      seen.add(d[key]); ds.push(d[key]);
+      if(ds.length === 3) break;
+    }
+    lastD[idx + ':' + key] = ds;
+    return ds;
   }
   function updateMeta(){
-    const total = order.length;
-    document.getElementById('barfill').style.width = (pos/total*100)+'%';
-    document.getElementById('pos').textContent = '第 ' + Math.min(pos+1,total) + ' / ' + total + ' 题' + (retryMode?' （错题重练）':'');
-    document.getElementById('score').textContent = '已掌握 ' + masteredSet.size + ' · 错题 ' + wrongSet.size + ' · 本轮答对 ' + correct;
+    document.getElementById('barfill').style.width = Math.min(100, pos/Math.max(1,order.length)*100)+'%';
+    document.getElementById('pos').textContent =
+      (retryMode ? '错题重练 · 第 ' : '第 ') + Math.min(pos+1, order.length) + ' / ' + order.length + ' 题';
+    document.getElementById('score').textContent = '答对 ' + correct + ' · 待重练 ' + Math.max(0, order.length - pos - 1) + ' · 已掌握 ' + masteredSet.size + ' · 错题 ' + wrongSet.size;
+  }
+  function renderModeBar(){
+    const bar = document.getElementById('modebar');
+    bar.innerHTML = '<span style="color:var(--dim);font-size:.75rem">题式</span>' +
+      [['en','英文选词'],['cn','中文选义'],['mix','混合']].map(function(kv){
+        return '<button class="mode-btn'+(qMode===kv[0]?' active':'')+'" data-mode="'+kv[0]+'">'+kv[1]+'</button>';
+      }).join('');
+    bar.querySelectorAll('.mode-btn').forEach(function(b){
+      b.onclick = function(){
+        if(qMode === b.dataset.mode) return;
+        qMode = b.dataset.mode;
+        renderModeBar();
+        saveProgress();
+        if(!answered) render(); // unanswered question re-renders in new mode immediately
+      };
+    });
   }
   function render(){
     if(pos>=order.length){return finish();}
@@ -264,117 +333,172 @@ function startQuiz(set){
     // Clear focus from any button left over from the previous question
     if(document.activeElement && document.activeElement.tagName === 'BUTTON') document.activeElement.blur();
     const item = DATA[order[pos]];
-    const b = blankSentence(item);
+    const idx = order[pos];
+    // Pick question type for this round (mix = random per question)
+    curQIsCn = qMode==='cn' || (qMode==='mix' && Math.random()<0.5);
+    let stemHtml, b;
+    if(curQIsCn){
+      // 中文选义 (cn_choice template): sentence with the word restored → pick the meaning
+      const filled = fillSentenceHtml(item);
+      b = {hit: !!filled};
+      stemHtml = filled ? filled
+        : '<span style="color:var(--gold);font-weight:700;font-size:1.25rem">'+esc(item.w)+'</span>';
+      curAnswer = item.m;
+    } else {
+      // 英文选词 (en_choice template): blanked sentence (or meaning) → pick the word
+      b = blankSentence(item);
+      stemHtml = b.hit ? b.html
+        : '选出与下列释义对应的单词：<br><span style="color:var(--gold)">'+esc(item.m)+'</span>';
+      curAnswer = item.w;
+    }
     curHasSentence = b.hit;
-    const opts = shuffle([item.w, ...distractors(item)]);
+    const ds = distractors(item, idx, curQIsCn ? 'm' : 'w');
+    let opts = shuffle([curAnswer, ...ds]);
+    // Avoid the correct answer landing in the same slot as last time
+    let guard = 0;
+    while(idx in lastPos && opts.indexOf(curAnswer) === lastPos[idx] && guard < 10){
+      opts = shuffle([curAnswer, ...ds]); guard++;
+    }
+    lastPos[idx] = opts.indexOf(curAnswer);
     curOpts = opts;
-    const lvl = Math.floor(pos/LEVEL)+1, totalInLvl = Math.min(LEVEL, order.length-(lvl-1)*LEVEL), inLvl = pos%LEVEL+1;
+    const tag = retryMode ? '错题重练 · 答错插至队尾' : '队列闯关 · 答错插至队尾重练';
     document.getElementById('quiz').innerHTML =
-      '<span class="leveltag">第 '+lvl+' 关 · '+inLvl+'/'+totalInLvl+'</span>'+
-      '<div class="sent">'+(b.hit?b.html:'选出与下列释义对应的单词：<br><span style="color:var(--gold)">'+esc(item.m)+'</span>')+'</div>'+
-      (item.t?'<div class="trans" style="margin-top:8px;font-size:.92rem;line-height:1.7;color:#94a3b8">🌐 '+esc(item.t)+'</div>':'')+
-      (item.src?'<div class="src">📰 目标句出处：'+esc(item.src)+'</div>':'')+
-      '<div class="opts">'+opts.map(o=>'<button data-w="'+esc(o)+'">'+esc(o)+'</button>').join('')+'</div>'+
+      '<span class="leveltag"' + (retryMode ? ' style="color:var(--gold);border-color:var(--gold)"' : '') + '>' + tag + '</span>'+
+      '<div class="sent">'+stemHtml+'</div>'+
+      (item.src?'<div class="src">出处：'+esc(item.src)+'</div>':'')+
+      '<div class="opts">'+opts.map(function(o,i){
+        return '<button data-i="'+i+'">'+(curQIsCn?String.fromCharCode(65+i)+'．':'')+esc(o)+'</button>';
+      }).join('')+
+        '<button data-i="4" style="color:var(--dim);grid-column:1 / -1">E．不知道</button></div>'+
       '<div class="feedback" id="fb"></div>'+
       '<div class="tools">'+
-        '<button class="ghost" id="tglDef">📖 显示答案释义</button>'+
+        '<button class="ghost" id="tglDef">显示答案释义</button>'+
       '</div>'+
-      '<div id="defBox" class="hidden" style="margin-top:14px;font-size:.9rem;line-height:1.8;color:#cbd5e1">📖 答案释义：'+esc(item.m)+'</div>';
+      '<div id="defBox" class="hidden" style="margin-top:14px;font-size:.9rem;line-height:1.8;color:var(--ink)">答案释义：'+esc(item.w)+'　'+esc(item.m)+'</div>';
     document.querySelectorAll('.opts button').forEach(btn=>btn.onclick=()=>pick(btn,item));
     document.getElementById('tglDef').onclick = toggleDef;
-    // Also save when the question is answered (before pos changes) via beforeunload + interval
     updateMeta();
   }
   function toggleDef(){
     showDef=!showDef;
     document.getElementById('defBox').classList.toggle('hidden',!showDef);
-    document.getElementById('tglDef').textContent = showDef?'🙈 隐藏答案释义':'📖 显示答案释义';
+    document.getElementById('tglDef').textContent = showDef?'隐藏答案释义':'显示答案释义';
   }
   function pick(btn, item){
     if(answered) return;
     answered=true;
-    const ok = btn.dataset.w===item.w;
+    const isIdk = btn.dataset.i === '4';
+    const chosen = isIdk ? null : curOpts[+btn.dataset.i];
+    const ok = chosen === curAnswer;
     const idx = order[pos];
-    document.querySelectorAll('.opts button').forEach(b=>{b.disabled=true; if(b.dataset.w===item.w) b.classList.add('correct');});
+    document.querySelectorAll('.opts button').forEach(b=>{b.disabled=true; if(b.dataset.i!=='4' && curOpts[+b.dataset.i]===curAnswer) b.classList.add('correct');});
     const fb=document.getElementById('fb');
     if(!ok){
-      btn.classList.add('wrong'); wrongPool.push(idx);
-      // Only mark as wrong if NOT previously mastered — once you've answered correctly,
-      // a later miss shouldn't un-master the card or add it to 错题.
+      if(!isIdk) btn.classList.add('wrong');
+      wrongEver.add(idx);
+      curHadWrong = true;
+      // Once mastered, a later miss never re-enters 错题集
       if(!masteredSet.has(idx)) wrongSet.add(idx);
     } else {
-      // Only count as a new correct answer if not already mastered (avoids double-counting
-      // when a card is re-asked via 重来/困难 rating).
-      if(!masteredSet.has(idx)) correct++;
-      masteredSet.add(idx); wrongSet.delete(idx);
+      correct++;
+      if(!curHadWrong){
+        // First-try correct: mastered, and graduates OUT of 错题集
+        firstTryOK++;
+        masteredSet.add(idx);
+        wrongSet.delete(idx);
+      } else {
+        // Redone correctly after a miss: counts as mastered, but STAYS in
+        // 错题集 for review until a clean first-try correct on a later round
+        masteredSet.add(idx);
+      }
     }
+    saveProgress();
+    const afterMissMsg = curHasSentence
+      ? '此题之前错过——评分决定复习时机（良好=队尾，简单=跳过）'
+      : '此题之前错过——下一题后自动排至队尾，稍后还要再练一次';
     fb.className='feedback '+(ok?'ok':'no');
-    fb.innerHTML = (ok?'✅ 正确！　':'❌ 你选的是 <b>'+esc(btn.dataset.w)+'</b>　')
-      + '<div style="margin-top:6px;color:#cbd5e1">📖 '+esc(item.w)+'　'+esc(item.m)+'</div>'
-      + '<div style="margin-top:12px;font-size:.83rem"><b style="color:var(--accent)">🔍 选项解析（全部选项释义）</b>'
-      + curOpts.map(o=>{const d=DATA.find(x=>x.w===o);
-          const mark = (o===item.w)?' <span style="color:var(--good)">✔ 正确</span>':(o===btn.dataset.w?' <span style="color:var(--bad)">✗ 你选的</span>':'');
-          return '<div style="padding:6px 0;border-bottom:1px dashed #334155">▸ <b>'+esc(o)+'</b>'+mark
-            +'<div style="margin-top:3px"><span style="color:var(--dim)">中文：</span><span class="mean">'+esc(d.m||'-')+'</span></div>'
-            +'<div style="margin-top:2px"><span style="color:var(--dim)">英文：</span><span class="trans">'+esc(d.en||'-')+'</span></div></div>';}).join('')
+    fb.innerHTML = (ok?(curHadWrong?'正确 · 答对了，但'+afterMissMsg+'　':'正确 · 一次做对　'):(isIdk?'错误 · 正确答案已标出　':'错误 · 你选的是 <b>'+esc(chosen)+'</b>　'))
+      + '<div style="margin-top:6px"><b style="color:var(--gold)">'+esc(item.w)+'</b>　<span class="mean">'+esc(item.m)+'</span></div>'
+      + (item.en?'<div class="trans" style="margin-top:4px;font-size:.82rem">English: '+esc(item.en)+'</div>':'')
+      + (item.t?'<div class="trans" style="margin-top:4px">句意：'+esc(item.t)+'</div>':'')
+      + '<div style="margin-top:12px;font-size:.83rem"><b style="color:var(--accent)">选项解析</b>'
+      + curOpts.map(o=>{
+          const d = DATA.find(x=> curQIsCn ? x.m===o : x.w===o);
+          const mark = (o===curAnswer)?' <span style="color:var(--good)">· 正确</span>':(o===chosen?' <span style="color:var(--bad)">· 你选的</span>':'');
+          return '<div style="padding:6px 0;border-bottom:1px dashed var(--line)">▸ <b>'+esc(curQIsCn&&d?d.w:o)+'</b>'+mark
+            +'<div style="margin-top:3px"><span style="color:var(--dim)">中文：</span><span class="mean">'+esc(d?(d.m||'-'):'-')+'</span></div>'
+            +'<div style="margin-top:2px"><span style="color:var(--dim)">英文：</span><span class="trans">'+esc(d?(d.en||'-'):'-')+'</span></div></div>';}).join('')
       + '</div>';
     if(!showDef){showDef=true;toggleDef();}
 
-    // Anki-style rating buttons only for sentence-blank questions.
-    // For definition-only questions, just show a simple "next" button.
     const toolsEl = document.querySelector('.tools');
     const oldNext = document.getElementById('next');
     if(oldNext) oldNext.remove();
-    if(curHasSentence){
+    if(!ok){
+      // Reference mechanic: wrong answer → item pushed to the tail AND must
+      // redo THIS question in place until correct (no advancing, no rating)
+      toolsEl.insertAdjacentHTML('beforeend',
+        '<div id="rateArea" style="width:100%;margin-top:14px;display:flex;justify-content:center">'+
+          '<button class="ghost" id="next" style="min-width:160px">重做本题（已排至队尾）</button>'+
+        '</div>'
+      );
+      document.getElementById('next').onclick = ()=>{ order.push(order[pos]); saveProgress(); updateMeta(); render(); };
+    } else if(curHasSentence){
+      // Correct on a sentence-blank question → Anki rating + next
       toolsEl.insertAdjacentHTML('beforeend',
         '<div id="rateArea" style="width:100%;margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center">'+
-          '<button class="rate-btn rate-again" data-rate="again"><span>🔁 重来</span><small>1</small></button>'+
-          '<button class="rate-btn rate-hard" data-rate="hard"><span>⚠️ 困难</span><small>2</small></button>'+
-          '<button class="rate-btn rate-good" data-rate="good"><span>✅ 良好</span><small>3</small></button>'+
-          '<button class="rate-btn rate-easy" data-rate="easy"><span>💎 简单</span><small>4</small></button>'+
-          '<button class="ghost" id="next" style="min-width:120px">下一题 ➜</button>'+
+          '<button class="rate-btn rate-again" data-rate="again"><span>重来</span><small>1</small></button>'+
+          '<button class="rate-btn rate-hard" data-rate="hard"><span>困难</span><small>2</small></button>'+
+          '<button class="rate-btn rate-good" data-rate="good"><span>良好</span><small>3</small></button>'+
+          '<button class="rate-btn rate-easy" data-rate="easy"><span>简单</span><small>4</small></button>'+
+          '<button class="ghost" id="next" style="min-width:120px">下一题 →</button>'+
         '</div>'
       );
       toolsEl.querySelectorAll('[data-rate]').forEach(rb => {
         rb.onclick = () => { applyRating(rb.dataset.rate, idx); };
       });
+      // Plain 下一题 = default (same as 良好): a missed item requeues at tail
+      document.getElementById('next').onclick = ()=>{ if(curHadWrong) order.push(order[pos]); advance(); };
     } else {
+      // Definition-only question: plain next; a missed item auto-requeues at tail
       toolsEl.insertAdjacentHTML('beforeend',
         '<div id="rateArea" style="width:100%;margin-top:14px;display:flex;justify-content:center">'+
-          '<button class="ghost" id="next" style="min-width:160px">下一题 ➜</button>'+
+          '<button class="ghost" id="next" style="min-width:160px">下一题 →</button>'+
         '</div>'
       );
+      document.getElementById('next').onclick = ()=>{ if(curHadWrong) order.push(order[pos]); advance(); };
     }
-    document.getElementById('next').onclick = ()=>{pos++; saveProgress(); updateMeta(); render();};
     updateMeta();
   }
+  function advance(){
+    pos++;
+    curHadWrong = false;
+    saveProgress();
+    updateMeta();
+    render();
+  }
 
-  // Anki-style queue reordering
+  // Anki-style queue reordering (queue semantics: reinsert AFTER current pos,
+  // next item slides in; items missed this session default to tail on 良好)
   function applyRating(rating, currentIdx){
     if(pos >= order.length) return;
-    // Remove current from order
     const cur = order[pos];
+    const hadWrong = curHadWrong;
     order.splice(pos, 1);
-
+    curHadWrong = false;
     if(rating === 'again'){
       // Reinsert 3-5 cards ahead
       const at = Math.min(pos + 3 + Math.floor(Math.random()*3), order.length);
       order.splice(at, 0, cur);
-      if(at <= pos) pos++;
     } else if(rating === 'hard'){
       // Reinsert halfway to end
       const at = Math.min(pos + Math.ceil((order.length - pos) / 2), order.length);
       order.splice(at, 0, cur);
-      if(at <= pos) pos++;
     } else if(rating === 'good'){
-      // Move to end
-      order.push(cur);
-      // pos stays
-    } else if(rating === 'easy'){
-      // Remove from queue entirely
-      order.splice(pos, 0); // already removed, just don't reinsert
-      // pos stays — next card slides in
+      // Missed before → back of queue (template rule); otherwise pass
+      if(hadWrong) order.push(cur);
     }
+    // easy: never reinsert — passed
     saveProgress();
     updateMeta();
     render();
@@ -383,7 +507,7 @@ function startQuiz(set){
     saveProgress();
     const mastered = masteredSet.size;
     const wrong = wrongSet.size;
-    const perfect = wrong === 0 && mastered === DATA.length;
+    const perfect = wrong === 0 && mastered === N;
     const retryDone = retryMode;
     if(retryMode) {
       // Restore main quiz state
@@ -391,18 +515,17 @@ function startQuiz(set){
       order = origOrder;
       retryMode = false;
     }
-    // Progress bar shows main quiz progress, not 100%
-    document.getElementById('barfill').style.width = (pos/DATA.length*100)+'%';
-    let html = '<div class="result"><div class="big">'+(perfect?'🏆':(retryDone?'✅':'🎉'))+'</div>'+
-      '<h2>'+(perfect?'全部掌握！':(retryDone?'错题重练完成！':'本轮完成！'))+'</h2>'+
-      '<p style="margin-top:10px;color:var(--dim)">共 '+DATA.length+' 词 · 已掌握 '+mastered+' · 错题 '+wrong+'</p>';
+    document.getElementById('barfill').style.width = '100%';
+    let html = '<div class="result"><div class="big">'+(perfect?'■':(retryDone?'■':'■'))+'</div>'+
+      '<h2>'+(perfect?'全部答对，通关！':(retryDone?'错题重练完成！':'队列通关！'))+'</h2>'+
+      '<p style="margin-top:10px;color:var(--dim)">共 '+N+' 词 · 一次答对 '+firstTryOK+' 词 · 曾答错 '+wrongEver.size+' 词（均已插至队尾循环重练）· 已掌握 '+mastered+' · 错题 '+wrong+'</p>';
     if(wrong>0){
-      html += '<div class="wronglist"><b>📌 错题回顾</b>';
+      html += '<div class="wronglist"><b>错题回顾</b>';
       Array.from(wrongSet).forEach(i=>{const d=DATA[i];
-        html+='<div>▸ <b style="color:#fca5a5">'+esc(d.w)+'</b>　<span class="mean">'+esc(d.m)+'</span>'+(d.s?'<br><span class="trans">'+esc(d.s)+'</span>':'')+'</div>';});
-      html+='</div><div class="tools" style="margin-top:20px"><button id="retry">🔁 重练错题（共 '+wrongSet.size+' 词）</button></div>';
+        html+='<div>▸ <b style="color:var(--bad)">'+esc(d.w)+'</b>　<span class="mean">'+esc(d.m)+'</span>'+(d.s?'<br><span class="trans">'+esc(d.s)+'</span>':'')+'</div>';});
+      html+='</div><div class="tools" style="margin-top:20px"><button id="retry">重练错题（共 '+wrongSet.size+' 词）</button></div>';
     }
-    html+='<div class="tools" style="margin-top:20px;justify-content:center"><a href="index.html" class="ghost" style="background:transparent;border:1px solid #475569;color:var(--dim);text-decoration:none;padding:11px 18px;border-radius:10px">← 返回首页</a></div></div>';
+    html+='<div class="tools" style="margin-top:20px;justify-content:center"><a href="index.html" class="ghost" style="background:transparent;border:1px solid var(--line);color:var(--dim);text-decoration:none;padding:11px 18px">← 返回首页</a></div></div>';
     document.getElementById('quiz').innerHTML=html;
     const r=document.getElementById('retry');
     if(r) r.onclick=()=>{
@@ -417,39 +540,37 @@ function startQuiz(set){
       origPos = pos;
       origOrder = order.slice();
       order = shuffle(wrongIndices);
-      pos = 0; wrongPool = []; correct = 0;
+      pos = 0; correct = 0;
       saveProgress();
       updateMeta();
       render();
     };
   }
-  // Keyboard shortcuts: Enter → next (after answering), 1-4 → pick option (before) or rate (after)
+  // Keyboard: Enter/Space → primary action (下一题 / 重做本题);
+  // 1-4 → pick option (before) or rate (after correct); 5 → E．不知道
   document.addEventListener('keydown', function(e){
-    // Always prevent Enter from clicking a focused button — we handle it explicitly
-    if(e.key === 'Enter'){
-      e.preventDefault();
+    if(e.key === 'Enter' || e.key === ' '){
+      e.preventDefault(); // never let the browser click a focused button / scroll
       if(answered){
         const nxt = document.getElementById('next');
         if(nxt) nxt.click();
       }
-      return; // never let the browser handle Enter
+      return;
     }
-    if(['1','2','3','4'].includes(e.key)){
+    if(['1','2','3','4','5'].includes(e.key)){
       if(!answered){
         const btns = document.querySelectorAll('.opts button');
         const idx = parseInt(e.key)-1;
         if(btns[idx]){ e.preventDefault(); btns[idx].click(); }
-      } else {
-        // After answering, 1-4 triggers rating (only for sentence-type with rating buttons)
+      } else if(e.key !== '5'){
+        // After a correct answer, 1-4 triggers rating (sentence-type only)
         const rateMap = {'1':'again','2':'hard','3':'good','4':'easy'};
-        const rating = rateMap[e.key];
-        if(rating){
-          const rb = document.querySelector('[data-rate="'+rating+'"]');
-          if(rb){ e.preventDefault(); rb.click(); }
-        }
+        const rb = document.querySelector('[data-rate="'+rateMap[e.key]+'"]');
+        if(rb){ e.preventDefault(); rb.click(); }
       }
     }
   });
+  renderModeBar();
   updateMeta(); render();
 }
 
